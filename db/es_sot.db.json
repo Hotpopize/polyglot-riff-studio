@@ -1,0 +1,628 @@
+{
+  "db_id": "polyglot.es_sot",
+  "primary_focus": "ES_SOT (Sotogrande Duende)",
+  "registers": [
+    "ES_SOT",
+    "ES_STD"
+  ],
+  "personas": {
+    "ES_SOT": {
+      "id": "ES_SOT",
+      "tier": "REGIONAL",
+      "flag": "🇪🇸",
+      "name": "Sotogrande Duende",
+      "subtitle": "Costa del Sol Sun & Playful Challenge",
+      "family": "Iberian Romance (Andaluz High Register)",
+      "address_form": "Conspiratorial Peer Tuteo (tío / mójate conmigo)",
+      "rhythm": "Rapid melodic bursts followed by dramatic, sun-soaked pauses.",
+      "trick": "Conspiratorial subjunctive mood + sensory hyperbole (duende, ni de coña, mójate).",
+      "posture": "Expressive hands, warm eyes, leaning forward on the counterattack.",
+      "paired_register_id": "ES_STD"
+    },
+    "ES_STD": {
+      "id": "ES_STD",
+      "tier": "FORMAL",
+      "flag": "🇪🇸",
+      "name": "Español Ejecutivo",
+      "subtitle": "Consejo & Dirección • High-Trust Formal Register",
+      "family": "Standard Peninsular Executive Spanish",
+      "address_form": "Formal Usted / Executive Vosotros",
+      "rhythm": "Balanced crisp syllable timing, poised Mediterranean authority.",
+      "trick": "Elegance + directness (poner las cartas sobre la mesa, rigor operativo) before warming into confidant tone.",
+      "posture": "Poised upright stance, calm open palm gesture.",
+      "paired_register_id": "ES_SOT"
+    }
+  },
+  "idioms": {
+    "cartas sobre la mesa": {
+      "term": "cartas sobre la mesa",
+      "lang": "ES_STD",
+      "origin": "Executive Peninsular transparency idiom",
+      "meaning": "Putting all cards openly on the table with executive candor.",
+      "delivery": "Open palm gesture, calm authority.",
+      "cousin": "базару нет"
+    },
+    "mirar los toros desde la barrera": {
+      "term": "mirar los toros desde la barrera",
+      "lang": "ES_SOT",
+      "origin": "Spanish taurine idiom",
+      "meaning": "Watching the bulls safely from behind the barrier instead of stepping into the arena.",
+      "delivery": "Playful challenge, raised chin.",
+      "cousin": "69 Mustang collecting dust"
+    },
+    "tener buena muñeca": {
+      "term": "tener buena muñeca",
+      "lang": "ES_SOT",
+      "origin": "Polo & equestrian dexterity idiom",
+      "meaning": "Having the subtle wrist touch and finesse to steer a high-speed situation effortlessly.",
+      "delivery": "Subtle flick of the wrist, low conspiratorial Andaluz cadence.",
+      "cousin": "fachat"
+    },
+    "tiene duende": {
+      "term": "tiene duende",
+      "lang": "ES_SOT",
+      "origin": "Andalusian flamenco & artistic magnetism",
+      "meaning": "It has unteachable soul, electricity, and spine-tingling presence.",
+      "delivery": "Soft, magnetic intensity.",
+      "cousin": "schwer in Ordnung"
+    }
+  },
+  "vocab": [
+    {
+      "uid": "ES_V_ANALISIS",
+      "term": "análisis de recursos estilísticos",
+      "lang_code": "es",
+      "register_id": "ES_STD",
+      "register_type": "FORMAL_EXAM",
+      "meaning": "Analysis of literary and stylistic resources",
+      "ib_source": "Spanish A1 Paper 1 HL",
+      "grammar_note": "",
+      "etymology": "",
+      "warning": ""
+    },
+    {
+      "uid": "ES_V_HINCAPIE",
+      "term": "hacer hincapié en",
+      "lang_code": "es",
+      "register_id": "ES_STD",
+      "register_type": "FORMAL_EXAM",
+      "meaning": "Emphasize / insist firmly on a key point",
+      "ib_source": "Spanish A1 Paper 1 HL",
+      "grammar_note": "Mandatory 'en' prepositional complement",
+      "etymology": "",
+      "warning": ""
+    },
+    {
+      "uid": "ES_V_MANIFIESTO",
+      "term": "poner de manifiesto",
+      "lang_code": "es",
+      "register_id": "ES_STD",
+      "register_type": "FORMAL_EXAM",
+      "meaning": "Highlight / demonstrate explicitly",
+      "ib_source": "Spanish ab initio Paper 1 SL",
+      "grammar_note": "",
+      "etymology": "",
+      "warning": ""
+    },
+    {
+      "uid": "ES_V_DUENDE",
+      "term": "tener duende",
+      "lang_code": "es",
+      "register_id": "ES_SOT",
+      "register_type": "REGIONAL_RIFF",
+      "meaning": "Possess unmanufacturable soul and magnetic presence",
+      "ib_source": "Sotogrande Andaluz Register",
+      "grammar_note": "",
+      "etymology": "Andaluz aesthetic concept",
+      "warning": ""
+    },
+    {
+      "uid": "ES_V_TOROS",
+      "term": "mirar los toros desde la barrera",
+      "lang_code": "es",
+      "register_id": "ES_SOT",
+      "register_type": "REGIONAL_RIFF",
+      "meaning": "Observe passively from safety without taking risk",
+      "ib_source": "Sotogrande Andaluz Register",
+      "grammar_note": "",
+      "etymology": "Taurine arena idiom",
+      "warning": ""
+    }
+  ],
+  "songs": [
+    {
+      "uid": "SONG_ES_SOT_CAMARON",
+      "title": "Volando Voy",
+      "artist": "Camarón de la Isla (Kiko Veneno)",
+      "city_region": "Sotogrande & Andalucian Coast",
+      "genre": "Flamenco-Rumba / Andaluz Moderno",
+      "bpm": 104,
+      "register_id": "ES_SOT",
+      "original_lang": "ES_SOT",
+      "original_lyric": "Volando voy, volando vengo, por el camino yo me entretengo. Enamorao de la vida, porque esto tiene duende y no hay que mirar los toros desde la barrera.",
+      "translation_es": "Volando voy, volando vengo, por el camino yo me entretengo. Enamorao de la vida, porque esto tiene duende y no hay que mirar los toros desde la barrera.",
+      "translation_en": "Flying I go, flying I come, along the way I enjoy myself. In love with life, because this has true duende and you shouldn't watch the bulls from the sidelines.",
+      "translation_cz": "Létám sem a tam, cestou se bavím. Zamilovaný do života, bo to má skutočný duende a nemá smysl koukat na býky jen z bariéry.",
+      "translation_de": "Fliegend komme ich, fliegend gehe ich, unterwegs genieße ich das Leben. Verliebt ins Leben, weil das echten Duende hat und man die Stiere nicht von der Tribüne aus beobachten sollte.",
+      "translation_ru": "Лечу туда, лечу обратно, по дороге наслаждаюсь жизнью. Влюблённый в жизнь, потому что в этом есть настоящий дуэнде, и нечего смотреть на быков с трибуны.",
+      "cultural_vibe": "Sensory hyperbole, conspiratorial rhythm, unmanufacturable passion",
+      "pivot_line": "Oye, para el carro un segundo, tío: lo que transmites tiene duende. Eso no se fabrica ni se compra... ¡y ni de coña me digas que vas a mirar los toros desde la barrera!",
+      "reinforces_card_uid": "ES_SOT_COMP",
+      "slang_vocab_uids": [
+        "ES_V_DUENDE",
+        "ES_V_TOROS"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "uid": "ES_SOT_ADVENTURE_CHAM",
+      "lang": "ES_SOT",
+      "stage": "CHAMELEON",
+      "arena": "adventure",
+      "lens": null,
+      "text": "Somos iguales en eso: lo inolvidable empieza justo cuando cierras el reloj y te dejas llevar por el momento.",
+      "phonetics": "",
+      "english": "We’re alike in that: the unforgettable starts right when you stop checking the clock.",
+      "idioms": []
+    },
+    {
+      "uid": "ES_SOT_ADVENTURE_COMP",
+      "lang": "ES_SOT",
+      "stage": "COMPLIMENT",
+      "arena": "adventure",
+      "lens": null,
+      "text": "Se te ve en la mirada esa chispa indomable que <span class=\"slang-token\" data-term=\"tiene duende\">tiene duende</span>; tú no has nacido para planes tibios.",
+      "phonetics": "",
+      "english": "You can see that untamed spark with duende in your eyes; you weren’t born for lukewarm plans.",
+      "idioms": [
+        "tiene duende"
+      ]
+    },
+    {
+      "uid": "ES_SOT_ADVENTURE_COUNT",
+      "lang": "ES_SOT",
+      "stage": "COUNTERACT",
+      "arena": "adventure",
+      "lens": null,
+      "text": "¿Dejarlo para otro día? ¡Qué va! Eso es quedarse <span class=\"slang-token\" data-term=\"mirar los toros desde la barrera\">mirando los toros desde la barrera</span> cuando suena la música.",
+      "phonetics": "",
+      "english": "Leave it for another day? No chance! That’s watching the bulls from behind the barrier right as the music plays.",
+      "idioms": [
+        "mirar los toros desde la barrera"
+      ]
+    },
+    {
+      "uid": "ES_SOT_ADVENTURE_CUR",
+      "lang": "ES_SOT",
+      "stage": "CURIOSITY",
+      "arena": "adventure",
+      "lens": null,
+      "text": "Venga, mójate conmigo veinte minutos: si nos escapamos del guion ahora mismo, ¿adónde tiramos?",
+      "phonetics": "",
+      "english": "Come on, jump in with me for twenty minutes: if we escape the script right now, where do we head?",
+      "idioms": []
+    },
+    {
+      "uid": "ES_SOT_B2B_CHAM",
+      "lang": "ES_SOT",
+      "stage": "CHAMELEON",
+      "arena": "b2b",
+      "lens": null,
+      "text": "Fuera corbatas un minuto: en trinchera técnica lo que vale es <span class=\"slang-token\" data-term=\"tener buena muñeca\">tener buena muñeca</span> para que producción fluya limpia.",
+      "phonetics": "",
+      "english": "Ties off for a minute: in the technical trench what counts is real finesse so production flows cleanly.",
+      "idioms": [
+        "tener buena muñeca"
+      ]
+    },
+    {
+      "uid": "ES_SOT_B2B_COMP",
+      "lang": "ES_SOT",
+      "stage": "COMPLIMENT",
+      "arena": "b2b",
+      "lens": null,
+      "text": "En la sala de juntas se ven mil presentaciones, pero vuestra ingeniería de base <span class=\"slang-token\" data-term=\"tiene duende\">tiene duende</span> y solidez real.",
+      "phonetics": "",
+      "english": "In the boardroom you see a thousand slide decks, yet your core engineering has real duende and solidity.",
+      "idioms": [
+        "tiene duende"
+      ]
+    },
+    {
+      "uid": "ES_SOT_B2B_COUNT",
+      "lang": "ES_SOT",
+      "stage": "COUNTERACT",
+      "arena": "b2b",
+      "lens": null,
+      "text": "Tener al equipo senior apagando fuegos manuales es <span class=\"slang-token\" data-term=\"mirar los toros desde la barrera\">mirar los toros desde la barrera</span> mientras la automatización espera.",
+      "phonetics": "",
+      "english": "Having the senior team putting out manual fires is watching from behind the barrier while automation sits ready.",
+      "idioms": [
+        "mirar los toros desde la barrera"
+      ]
+    },
+    {
+      "uid": "ES_SOT_B2B_CUR",
+      "lang": "ES_SOT",
+      "stage": "CURIOSITY",
+      "arena": "b2b",
+      "lens": null,
+      "text": "De ingeniero a ingeniero: ¿qué cuello de botella crítico despejamos primero en el piloto de esta semana?",
+      "phonetics": "",
+      "english": "Engineer to engineer: what critical bottleneck do we clear first in this week’s pilot?",
+      "idioms": []
+    },
+    {
+      "uid": "ES_STD_CHAM_01",
+      "lang": "ES_STD",
+      "stage": "CHAMELEON",
+      "arena": "b2b",
+      "lens": null,
+      "text": "Sé que preferís poner las <span class=\"slang-token\" data-term=\"cartas sobre la mesa\">cartas sobre la mesa</span> y proteger el foco del equipo frente a cualquier complejidad innecesaria.",
+      "phonetics": "",
+      "english": "I know you prefer putting all cards on the table and protecting team focus from unnecessary complexity.",
+      "idioms": [
+        "cartas sobre la mesa"
+      ]
+    },
+    {
+      "uid": "ES_STD_COMP_01",
+      "lang": "ES_STD",
+      "stage": "COMPLIMENT",
+      "arena": "b2b",
+      "lens": null,
+      "text": "He seguido de cerca cómo estáis escalando la operación y se nota un rigor técnico poco habitual en el sector.",
+      "phonetics": "",
+      "english": "I’ve closely followed how you are scaling operations, and there is a technical rigor rarely seen in the sector.",
+      "idioms": []
+    },
+    {
+      "uid": "ES_SOT_HOCHKULTUR_CHAM",
+      "lang": "ES_SOT",
+      "stage": "CHAMELEON",
+      "arena": "hochkultur",
+      "lens": null,
+      "text": "Nos entendemos con media mirada en el foyer: elegancia toda, pero <span class=\"slang-token\" data-term=\"tener buena muñeca\">buena muñeca</span> y verdad por delante.",
+      "phonetics": "",
+      "english": "Half a glance in the foyer and we get each other: full elegance, with real finesse and truth up front.",
+      "idioms": [
+        "tener buena muñeca"
+      ]
+    },
+    {
+      "uid": "ES_SOT_HOCHKULTUR_COMP",
+      "lang": "ES_SOT",
+      "stage": "COMPLIMENT",
+      "arena": "hochkultur",
+      "lens": null,
+      "text": "Entre tanta etiqueta de gala, encontrar una mente con criterio propio y obra que <span class=\"slang-token\" data-term=\"tiene duende\">tiene duende</span> es oro puro.",
+      "phonetics": "",
+      "english": "Amid so much gala etiquette, meeting an independent mind whose work truly has duende is pure gold.",
+      "idioms": [
+        "tiene duende"
+      ]
+    },
+    {
+      "uid": "ES_SOT_HOCHKULTUR_COUNT",
+      "lang": "ES_SOT",
+      "stage": "COUNTERACT",
+      "arena": "hochkultur",
+      "lens": null,
+      "text": "Quedarse solo en el brindis de salón sería <span class=\"slang-token\" data-term=\"mirar los toros desde la barrera\">mirar los toros desde la barrera</span> teniendo el escenario listo.",
+      "phonetics": "",
+      "english": "Staying just at the salon toast would be watching the bulls from behind the barrier when the stage is ready.",
+      "idioms": [
+        "mirar los toros desde la barrera"
+      ]
+    },
+    {
+      "uid": "ES_SOT_HOCHKULTUR_CUR",
+      "lang": "ES_SOT",
+      "stage": "CURIOSITY",
+      "arena": "hochkultur",
+      "lens": null,
+      "text": "Dime aquí en el palco: ¿qué gran obra estrenamos juntos cuando se abra el telón de verdad?",
+      "phonetics": "",
+      "english": "Tell me right here in the box: what grand work do we premiere together when the real curtain rises?",
+      "idioms": []
+    },
+    {
+      "uid": "HOCH_ES_SOT_BASE",
+      "lang": "ES_SOT",
+      "stage": "COMPLIMENT",
+      "arena": "hochkultur",
+      "lens": null,
+      "text": "Entre tanta etiqueta de salón, se agradece encontrar a alguien que habla claro y cuyo trabajo <span class=\"slang-token\" data-term=\"tiene duende\">tiene duende</span> de verdad.",
+      "phonetics": "",
+      "english": "Amid so much salon etiquette, it’s refreshing to meet someone who speaks clearly and whose work truly has duende.",
+      "idioms": [
+        "tiene duende"
+      ]
+    },
+    {
+      "uid": "ES_SOT_POLO_CHAM",
+      "lang": "ES_SOT",
+      "stage": "CHAMELEON",
+      "arena": "polo",
+      "lens": null,
+      "text": "Brisa de levante, caballos finos y cero postureo en las tablas; hablamos exactamente el mismo idioma.",
+      "phonetics": "",
+      "english": "Levante breeze, fine horses, and zero posturing by the boards; we speak the exact same language.",
+      "idioms": []
+    },
+    {
+      "uid": "ES_SOT_POLO_COMP",
+      "lang": "ES_SOT",
+      "stage": "COMPLIMENT",
+      "arena": "polo",
+      "lens": null,
+      "text": "En Santa María se ve al vuelo quién <span class=\"slang-token\" data-term=\"tener buena muñeca\">tiene buena muñeca</span> y temple—vuestro juego <span class=\"slang-token\" data-term=\"tiene duende\">tiene duende</span> en la cancha.",
+      "phonetics": "",
+      "english": "At Santa María you spot right away who has effortless wrist touch and poise—your game has real duende on the field.",
+      "idioms": [
+        "tener buena muñeca",
+        "tiene duende"
+      ]
+    },
+    {
+      "uid": "ES_SOT_POLO_COUNT",
+      "lang": "ES_SOT",
+      "stage": "COUNTERACT",
+      "arena": "polo",
+      "lens": null,
+      "text": "Con esa cuadra, reservarse ahora es <span class=\"slang-token\" data-term=\"mirar los toros desde la barrera\">mirar los toros desde la barrera</span> en el último chukker.",
+      "phonetics": "",
+      "english": "With a string of horses like that, holding back now is watching the bulls from behind the barrier in the final chukker.",
+      "idioms": [
+        "mirar los toros desde la barrera"
+      ]
+    },
+    {
+      "uid": "ES_SOT_POLO_CUR",
+      "lang": "ES_SOT",
+      "stage": "CURIOSITY",
+      "arena": "polo",
+      "lens": null,
+      "text": "Dime antes de subir al caballo: ¿qué jugada maestra lanzamos nada más sonar la campana?",
+      "phonetics": "",
+      "english": "Tell me before mounting up: what master play do we launch the second the bell rings?",
+      "idioms": []
+    },
+    {
+      "uid": "HAUTE_POLO_ES_RAC",
+      "lang": "ES_SOT",
+      "stage": "COUNTERACT",
+      "arena": "polo",
+      "lens": "RACONTEUR",
+      "text": "¡Con ese purasangre no te puedes quedar <span class=\"slang-token\" data-term=\"mirar los toros desde la barrera\">mirando los toros desde la barrera</span>, tío—mójate y salimos a ganar el partido ahora mismo!",
+      "phonetics": "",
+      "english": "",
+      "idioms": [
+        "mirar los toros desde la barrera"
+      ]
+    },
+    {
+      "uid": "POLO_ES_SOT_BASE",
+      "lang": "ES_SOT",
+      "stage": "COUNTERACT",
+      "arena": "polo",
+      "lens": null,
+      "text": "En Sotogrande con buena brisa y mejores caballos, quedarse quieto es <span class=\"slang-token\" data-term=\"mirar los toros desde la barrera\">mirar los toros desde la barrera</span>—salgamos a jugar el mejor chukker.",
+      "phonetics": "",
+      "english": "In Sotogrande with a good breeze and better horses, standing still is watching the bulls from behind the barrier—let’s ride out and play the best chukker.",
+      "idioms": [
+        "mirar los toros desde la barrera"
+      ]
+    },
+    {
+      "uid": "ES_SOT_RUNWAY_CHAM",
+      "lang": "ES_SOT",
+      "stage": "CHAMELEON",
+      "arena": "runway",
+      "lens": null,
+      "text": "Aquí en el backstage se respira oficio de verdad, con esa <span class=\"slang-token\" data-term=\"tener buena muñeca\">buena muñeca</span> que no necesita aplauso fácil.",
+      "phonetics": "",
+      "english": "Backstage you breathe real craft, with that effortless wrist finesse that needs zero easy applause.",
+      "idioms": [
+        "tener buena muñeca"
+      ]
+    },
+    {
+      "uid": "ES_SOT_RUNWAY_COMP",
+      "lang": "ES_SOT",
+      "stage": "COMPLIMENT",
+      "arena": "runway",
+      "lens": null,
+      "text": "Cuando se apagan los focos de la pasarela, lo único que manda es el corte—y el vuestro <span class=\"slang-token\" data-term=\"tiene duende\">tiene duende</span> en cada costura.",
+      "phonetics": "",
+      "english": "When the runway lights go dark, only the cut rules—and yours has duende in every seam.",
+      "idioms": [
+        "tiene duende"
+      ]
+    },
+    {
+      "uid": "ES_SOT_RUNWAY_COUNT",
+      "lang": "ES_SOT",
+      "stage": "COUNTERACT",
+      "arena": "runway",
+      "lens": null,
+      "text": "Guardar el diseño estrella en el camerino es <span class=\"slang-token\" data-term=\"mirar los toros desde la barrera\">mirar los toros desde la barrera</span> en plena noche de estreno.",
+      "phonetics": "",
+      "english": "Keeping the star design in the dressing room is watching the bulls from behind the barrier on opening night.",
+      "idioms": [
+        "mirar los toros desde la barrera"
+      ]
+    },
+    {
+      "uid": "ES_SOT_RUNWAY_CUR",
+      "lang": "ES_SOT",
+      "stage": "CURIOSITY",
+      "arena": "runway",
+      "lens": null,
+      "text": "Entre bastidores, dime: ¿qué prenda rompe-esquemas sacamos ahora mismo para cerrar el desfile?",
+      "phonetics": "",
+      "english": "Behind the scenes, tell me: what rule-breaking piece do we send out right now to close the show?",
+      "idioms": []
+    },
+    {
+      "uid": "RUNWAY_ES_SOT_BASE",
+      "lang": "ES_SOT",
+      "stage": "CURIOSITY",
+      "arena": "runway",
+      "lens": null,
+      "text": "Cuando se apagan los focos de la pasarela, lo que queda es el corte real—y lo vuestro <span class=\"slang-token\" data-term=\"tiene duende\">tiene duende</span>. ¿Qué vamos a estrenar ahora?",
+      "phonetics": "",
+      "english": "When the runway spotlights turn off, what remains is the real cut—and yours has soul (duende). What are we premiering next?",
+      "idioms": [
+        "tiene duende"
+      ]
+    },
+    {
+      "uid": "ES_SOT_SPARK_CHAM",
+      "lang": "ES_SOT",
+      "stage": "CHAMELEON",
+      "arena": "spark",
+      "lens": null,
+      "text": "Qué gusto cruzar mirada con alguien cero impostado; conectamos al vuelo sin necesidad de presentaciones eternas.",
+      "phonetics": "",
+      "english": "What a pleasure meeting someone with zero pretense; instant wavelength without endless introductions.",
+      "idioms": []
+    },
+    {
+      "uid": "ES_SOT_SPARK_COMP",
+      "lang": "ES_SOT",
+      "stage": "COMPLIMENT",
+      "arena": "spark",
+      "lens": null,
+      "text": "Espera un segundo: nada más entrar se nota quién ilumina la sala y quién solo hace bulto—lo tuyo <span class=\"slang-token\" data-term=\"tiene duende\">tiene duende</span>.",
+      "phonetics": "",
+      "english": "Hold on a second: the moment you walk in you can tell who lights up the room—your vibe has real duende.",
+      "idioms": [
+        "tiene duende"
+      ]
+    },
+    {
+      "uid": "ES_SOT_SPARK_COUNT",
+      "lang": "ES_SOT",
+      "stage": "COUNTERACT",
+      "arena": "spark",
+      "lens": null,
+      "text": "¡Ni de coña nos quedamos hablando del tiempo! Eso sería <span class=\"slang-token\" data-term=\"mirar los toros desde la barrera\">mirar los toros desde la barrera</span> en la mejor noche.",
+      "phonetics": "",
+      "english": "No way we stay talking about the weather! That would be watching the bulls from behind the barrier on the best night.",
+      "idioms": [
+        "mirar los toros desde la barrera"
+      ]
+    },
+    {
+      "uid": "ES_SOT_SPARK_CUR",
+      "lang": "ES_SOT",
+      "stage": "CURIOSITY",
+      "arena": "spark",
+      "lens": null,
+      "text": "Dime la verdad: ¿qué plan inesperado haría que esta noche valga por diez?",
+      "phonetics": "",
+      "english": "Tell me the truth: what unexpected plan would make tonight worth ten?",
+      "idioms": []
+    },
+    {
+      "uid": "ES_SOT_CHAM",
+      "lang": "ES_SOT",
+      "stage": "CHAMELEON",
+      "arena": "terrace",
+      "lens": null,
+      "text": "Se nota que vamos en la misma onda—como charlar en el puerto de Sotogrande al amanecer, sin postureo y con las cartas sobre la mesa.",
+      "phonetics": "",
+      "english": "You can tell we’re on the same wavelength—like chatting at Sotogrande port at sunrise, zero posturing, cards on the table.",
+      "idioms": []
+    },
+    {
+      "uid": "ES_SOT_COMP",
+      "lang": "ES_SOT",
+      "stage": "COMPLIMENT",
+      "arena": "terrace",
+      "lens": null,
+      "text": "Oye, para el carro un segundo, tío: lo que transmites <span class=\"slang-token\" data-term=\"tiene duende\">tiene duende</span>. Eso no se fabrica ni se compra.",
+      "phonetics": "",
+      "english": "Hold your horses a second, man: what you project has unteachable soul (duende). You can’t manufacture or buy that.",
+      "idioms": [
+        "tiene duende"
+      ]
+    },
+    {
+      "uid": "ES_SOT_COUNT",
+      "lang": "ES_SOT",
+      "stage": "COUNTERACT",
+      "arena": "terrace",
+      "lens": null,
+      "text": "¡Anda ya, ni de coña me digas que vas a ir despacio! Quedarse ahí es <span class=\"slang-token\" data-term=\"mirar los toros desde la barrera\">mirar los toros desde la barrera</span>.",
+      "phonetics": "",
+      "english": "Come on, no way you tell me you’re going slow! Staying back there is watching the bulls safely from behind the barrier.",
+      "idioms": [
+        "mirar los toros desde la barrera"
+      ]
+    },
+    {
+      "uid": "ES_SOT_CUR",
+      "lang": "ES_SOT",
+      "stage": "CURIOSITY",
+      "arena": "terrace",
+      "lens": null,
+      "text": "Mójate un poco conmigo: si nos olvidamos de lo prudente ahora mismo, ¿cuál es la jugada que de verdad te pide el cuerpo?",
+      "phonetics": "",
+      "english": "Jump in with me a little: if we forget about playing it cautious right now, what’s the move your gut is really asking for?",
+      "idioms": []
+    },
+    {
+      "uid": "ES_SOT_WIEN_CHAM",
+      "lang": "ES_SOT",
+      "stage": "CHAMELEON",
+      "arena": "wien",
+      "lens": null,
+      "text": "Media voz, <span class=\"slang-token\" data-term=\"tener buena muñeca\">buena muñeca</span> y confianza limpia en la mesa de mármol—así es como salen las jugadas serias.",
+      "phonetics": "",
+      "english": "Low voice, subtle wrist finesse, and clean trust at the marble table—that’s how serious plays get done.",
+      "idioms": [
+        "tener buena muñeca"
+      ]
+    },
+    {
+      "uid": "ES_SOT_WIEN_COMP",
+      "lang": "ES_SOT",
+      "stage": "COMPLIMENT",
+      "arena": "wien",
+      "lens": null,
+      "text": "En este rincón tranquilo de café vienés se nota quién juega el ajedrez fino: tu planteamiento <span class=\"slang-token\" data-term=\"tiene duende\">tiene duende</span> y precisión.",
+      "phonetics": "",
+      "english": "In this quiet Viennese café corner you can tell who plays fine chess: your approach has both duende and precision.",
+      "idioms": [
+        "tiene duende"
+      ]
+    },
+    {
+      "uid": "ES_SOT_WIEN_COUNT",
+      "lang": "ES_SOT",
+      "stage": "COUNTERACT",
+      "arena": "wien",
+      "lens": null,
+      "text": "Esperar al comité eterno sería <span class=\"slang-token\" data-term=\"mirar los toros desde la barrera\">mirar los toros desde la barrera</span> teniendo la llave en la mano.",
+      "phonetics": "",
+      "english": "Waiting on an endless committee would be watching the bulls from behind the barrier while holding the key in your hand.",
+      "idioms": [
+        "mirar los toros desde la barrera"
+      ]
+    },
+    {
+      "uid": "ES_SOT_WIEN_CUR",
+      "lang": "ES_SOT",
+      "stage": "CURIOSITY",
+      "arena": "wien",
+      "lens": null,
+      "text": "Aquí en confianza frente al café: ¿qué movimiento silencioso activamos esta misma semana?",
+      "phonetics": "",
+      "english": "Here in confidence over coffee: what quiet move do we activate this very week?",
+      "idioms": []
+    }
+  ]
+}

@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>5-Language Register Switcher & IB Past Paper :Vocab Explorer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="polyglot_api_client.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+    body { font-family: 'Inter', sans-serif; background-color: #090d16; color: #f1f5f9; }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+
+    /* Ultra-Compact In-Header 3D Rotating Carousel Dial (Mouse-Drag + Wheel + Click) */
+    #switcherLangBar {
+      transform-origin: center top;
+      transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.24s ease, filter 0.24s ease;
+      will-change: transform, opacity;
+    }
+    #switcherLangBar.is-morphed-away {
+      transform: translateY(-8px) scale(0.95);
+      opacity: 0.16;
+      filter: blur(1.5px);
+    }
+    .switcher-dial-dock {
+      pointer-events: none;
+      opacity: 0;
+      transform: translateY(4px) scale(0.9);
+      transform-origin: center;
+      transition: opacity 0.26s cubic-bezier(0.22, 1, 0.36, 1),
+                  transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .switcher-dial-dock.is-open {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+    .switcher-dial-shell {
+      background: radial-gradient(ellipse at 50% 50%, rgba(15, 35, 42, 0.95) 0%, rgba(2, 6, 23, 0.98) 85%);
+      box-shadow:
+        0 6px 18px -6px rgba(0, 0, 0, 0.76),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        inset 0 -1px 0 rgba(52, 211, 153, 0.28);
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .switcher-dial-drum-stage {
+      width: 102px;
+      height: 24px;
+      perspective: 280px;
+      cursor: grab;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .switcher-dial-drum-stage::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 35;
+      background: linear-gradient(
+        90deg,
+        rgba(2, 6, 23, 0.88) 0%,
+        rgba(2, 6, 23, 0.16) 24%,
+        rgba(255, 255, 255, 0) 50%,
+        rgba(2, 6, 23, 0.16) 76%,
+        rgba(2, 6, 23, 0.88) 100%
+      );
+    }
+    .switcher-dial-rotor {
+      position: absolute;
+      inset: 0;
+      transform-style: preserve-3d;
+    }
+    .switcher-carousel-item {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      transform-origin: center center;
+      will-change: transform, opacity;
+    }
+    .switcher-center-lens {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 46px;
+      height: 20px;
+      border-radius: 9999px;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.3) 0%, rgba(99, 102, 241, 0.2) 100%);
+      border: 1px solid rgba(52, 211, 153, 0.76);
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+      pointer-events: none;
+      z-index: 25;
+    }
+    .switcher-center-lens::after {
+      content: '';
+      position: absolute;
+      bottom: -2.5px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 5px;
+      height: 2.5px;
+      border-radius: 9999px;
+      background: #34d399;
+      box-shadow: 0 0 5px #34d399;
+    }
+    .switcher-dial-shell.is-dragging,
+    .switcher-dial-shell.is-dragging .switcher-dial-drum-stage,
+    .switcher-dial-shell.is-dragging button {
+      cursor: grabbing !important;
+    }
+    .switcher-dial-ticks {
+      background-image: repeating-linear-gradient(
+        90deg,
+        rgba(52, 211, 153, 0.35) 0px,
+        rgba(52, 211, 153, 0.35) 1px,
+        transparent 1px,
+        transparent 5px
+      );
+      mask-image: linear-gradient(90deg, transparent 0%, black 20%, black 80%, transparent 100%);
+      -webkit-mask-image: linear-gradient(90deg, transparent 0%, black 20%, black 80%, transparent 100%);
+    }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body x-data="registerSwitcherApp()" x-init="init()" class="min-h-screen flex flex-col items-center selection:bg-indigo-500 selection:text-white">
+
+  <!-- Sticky Top Heading Bar with Shrunk 3D Rotating Carousel Dial -->
+  <header id="switcherHeader" class="sticky top-0 z-40 w-full bg-slate-950/90 backdrop-blur-xl border-b border-slate-800/90">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 py-2 flex flex-wrap sm:flex-nowrap items-center justify-between gap-2">
+      <div class="flex items-center gap-2 min-w-0">
+        <span class="w-7 h-7 rounded-lg bg-gradient-to-br from-emerald-500 to-indigo-600 flex items-center justify-center text-xs font-bold text-slate-950 shrink-0">2T</span>
+        <div class="truncate">
+          <div class="text-xs sm:text-sm font-bold text-white truncate">5-Language Register Switcher</div>
+          <div class="text-[10px] mono text-indigo-300 hidden sm:block" x-text="currentIbPairLabel"></div>
+        </div>
+      </div>
+
+      <!-- Shrunk 3D Cylindrical Language Carousel (Morphs in on scroll; Drag, Wheel, or Click) -->
+      <div id="switcherDialDock" :class="dialDocked ? 'is-open' : ''" class="switcher-dial-dock flex items-center shrink-0 ml-auto sm:ml-0" aria-label="3D Rotating Language Carousel">
+        <div id="switcherDialShell" class="switcher-dial-shell rounded-full border border-emerald-500/40 px-1 py-0.5 relative overflow-hidden flex items-center gap-0.5">
+          <div id="switcherDialTicks" class="switcher-dial-ticks absolute inset-x-4 bottom-0 h-[2.5px] opacity-75 pointer-events-none z-30"></div>
+          <button type="button" @click="stepLanguageDial(-1)" title="Spin Left (or drag / wheel)"
+            class="w-[18px] h-[20px] rounded-full bg-slate-900/90 hover:bg-emerald-500/20 text-slate-300 hover:text-white flex items-center justify-center transition flex-shrink-0 text-[11px] font-bold leading-none focus:outline-none z-40">
+            ‹
+          </button>
+          <div id="switcherDialTrackWrap" class="switcher-dial-drum-stage relative overflow-hidden" title="Drag 3D carousel left/right, scroll wheel, or click flank">
+            <div id="switcherDialGlider" class="switcher-center-lens"></div>
+            <div id="switcherDialStations" class="switcher-dial-rotor">
+              <template x-for="l in languages" :key="'dial-' + l.code">
+                <button type="button"
+                  :data-dial-code="l.code"
+                  @click="handleDialClick($event, l.code)"
+                  :title="l.shortCode + ' • ' + l.label"
+                  :class="activeLang === l.code ? 'text-emerald-200 font-bold' : 'text-slate-300 hover:text-white font-medium'"
+                  class="switcher-carousel-item px-1.5 py-0.5 rounded-full text-[10px] transition-colors flex items-center justify-center gap-1 select-none whitespace-nowrap focus:outline-none">
+                  <span class="inline-flex" x-html="l.svg"></span>
+                  <span class="mono text-[9.5px] tracking-tight" x-text="l.shortCode"></span>
+                </button>
+              </template>
+            </div>
+          </div>
+          <button type="button" @click="stepLanguageDial(1)" title="Spin Right (or drag / wheel)"
+            class="w-[18px] h-[20px] rounded-full bg-slate-900/90 hover:bg-emerald-500/20 text-slate-300 hover:text-white flex items-center justify-center transition flex-shrink-0 text-[11px] font-bold leading-none focus:outline-none z-40">
+            ›
+          </button>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 ml-auto sm:ml-0">
+        <a href="polyglot-srs-cypher-migration.cypher" download
+          class="text-[11px] mono px-2.5 py-1 rounded-lg border bg-indigo-950/50 border-indigo-500/40 text-indigo-300 hover:bg-indigo-900/60 transition whitespace-nowrap">
+          ⬇ Cypher
+        </a>
+        <span class="text-[11px] mono px-2.5 py-1 rounded-lg border whitespace-nowrap"
+          :class="backendLive ? 'bg-emerald-950/60 border-emerald-500/40 text-emerald-300' : 'bg-slate-950 border-slate-800 text-slate-400'"
+          x-text="backendLive ? '● Live DB' : '○ Seed'"></span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Switcher & IB Past Paper :Vocab Workbench -->
+  <div class="w-full max-w-5xl bg-slate-900 text-slate-100 p-6 sm:p-8 rounded-2xl border border-slate-700/80 shadow-2xl space-y-6 my-5 mx-4">
+    <!-- Top Language Selector -->
+    <div id="switcherLangBar" :class="dialDocked ? 'is-morphed-away' : ''" class="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-800">
+      <div class="flex flex-wrap items-center gap-1.5 bg-slate-950 p-1.5 rounded-xl border border-slate-800">
+        <template x-for="l in languages" :key="l.code">
+          <button @click="selectLang(l.code)"
+            :class="activeLang === l.code ? 'bg-emerald-600 text-white shadow' : 'text-slate-400 hover:text-white'"
+            class="px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5">
+            <span class="inline-flex" x-html="l.svg"></span>
+            <span x-text="l.label"></span>
+          </button>
+        </template>
+      </div>
+      <span class="text-[11px] mono text-slate-400 hidden md:inline">Scroll down to morph languages into header dial</span>
+    </div>
+
+    <!-- Header & Register Tier Toggle -->
+    <div class="flex flex-wrap justify-between items-center gap-4 border-b border-slate-800 pb-5">
+      <div>
+        <div class="flex items-center gap-2 mb-1">
+          <span class="text-xs mono uppercase tracking-widest text-indigo-400">2-Tier Polyglot Register-Drop Engine</span>
+          <span class="text-[10px] mono px-2 py-0.5 rounded bg-slate-950 border border-slate-800 text-emerald-300"
+            x-text="currentIbPairLabel"></span>
+        </div>
+        <h1 class="text-xl font-bold tracking-wide" x-text="currentMeta.flag + ' ' + currentMeta.title"></h1>
+      </div>
+      <div class="flex flex-wrap items-center gap-2 bg-slate-950 p-1.5 rounded-xl border border-slate-800">
+        <button @click="setTier('FORMAL')" :class="activeTier === 'FORMAL' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-white'" class="px-3.5 py-2 rounded-lg text-xs font-semibold transition">
+          1. <span x-text="currentMeta.formalLabel"></span>
+        </button>
+        <button @click="setTier('BRIDGE')" :class="activeTier === 'BRIDGE' ? 'bg-fuchsia-600 text-white shadow' : 'text-slate-400 hover:text-white'" class="px-3.5 py-2 rounded-lg text-xs font-semibold transition">
+          ↳ Pivot Bridge
+        </button>
+        <button @click="setTier('REGIONAL')" :class="activeTier === 'REGIONAL' ? 'bg-amber-600 text-white shadow' : 'text-slate-400 hover:text-white'" class="px-3.5 py-2 rounded-lg text-xs font-semibold transition">
+          2. <span x-text="currentMeta.regionalLabel"></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Optional Czech Executive Deck Toggle (C-Suite Scale vs IB Architect V3DV Outreach) -->
+    <div x-show="activeLang === 'cs'" class="flex flex-wrap items-center justify-between gap-2 bg-slate-950/80 border border-indigo-500/30 rounded-xl px-3.5 py-2 text-xs">
+      <div class="flex items-center gap-2">
+        <span class="mono text-[10px] uppercase tracking-wider text-indigo-300 font-semibold">Czech Formal Track:</span>
+        <button @click="setCzechTrack('std')"
+          :class="czechTrack === 'std' ? 'bg-indigo-600 text-white' : 'bg-slate-900 text-slate-400 hover:text-white'"
+          class="px-2.5 py-1 rounded-lg font-medium transition">
+          C-Suite Scale (`CZ_STD_*` → `BR_CZ_STD_TO_OVA`)
+        </button>
+        <button @click="setCzechTrack('exec')"
+          :class="czechTrack === 'exec' ? 'bg-emerald-600 text-white' : 'bg-slate-900 text-slate-400 hover:text-white'"
+          class="px-2.5 py-1 rounded-lg font-medium transition">
+          IB Past Paper Architect (`CZ_EXEC_*` → `BRIDGE_CZ_FORMAL_TO_OVA`)
+        </button>
+      </div>
+      <span class="mono text-[11px] text-amber-300">5th-Case Vocative + Accusative Governance</span>
+    </div>
+
+    <!-- Stage Selector Pills -->
+    <div class="flex flex-wrap items-center justify-between gap-2 text-xs">
+      <div class="flex flex-wrap gap-1.5">
+        <template x-for="(item, index) in sequence" :key="item.uid">
+          <button @click="selectStep(index)"
+            :class="stepIndex === index ? 'bg-slate-800 border-indigo-500 text-white' : 'bg-slate-950/70 border-slate-800 text-slate-400 hover:text-slate-200'"
+            class="px-3 py-1.5 rounded-lg border mono text-[11px] transition flex items-center gap-1.5">
+            <span x-text="(index + 1) + '. ' + item.stage"></span>
+          </button>
+        </template>
+      </div>
+      <span class="mono text-[11px] text-slate-400" x-text="'UID: ' + currentCard.uid"></span>
+    </div>
+
+    <!-- Teleprompter Card Display -->
+    <div class="bg-slate-950 p-6 rounded-xl border border-slate-800 min-h-[210px] flex flex-col justify-between space-y-4">
+      <div class="space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <span class="text-xs font-bold uppercase tracking-widest text-indigo-400" x-text="currentCard.stage + ' • ' + currentCard.lang"></span>
+          <span class="text-[11px] mono px-2.5 py-0.5 rounded bg-slate-900 border border-slate-800 text-amber-300" x-text="currentCard.vibe"></span>
+        </div>
+        <p class="text-lg sm:text-xl font-medium leading-relaxed text-white" x-text="currentCard.text"></p>
+        <div x-show="currentCard.phonetics" class="text-xs mono text-amber-300 bg-slate-900/80 px-3 py-2 rounded-lg border border-slate-800">
+          🔊 <span x-text="currentCard.phonetics"></span>
+        </div>
+        <div x-show="currentCard.english" class="text-xs italic text-slate-400" x-text="'🇬🇧 ' + currentCard.english"></div>
+      </div>
+
+      <!-- Idiom & Mechanics Spotlight Footer -->
+      <div class="pt-4 border-t border-slate-800/80 flex flex-wrap justify-between items-center gap-4 text-xs text-slate-400">
+        <div class="space-y-1 max-w-xl">
+          <div>Key Mechanics: <strong class="text-slate-200" x-text="currentCard.mechanics"></strong></div>
+          <div x-show="currentCard.delivery" class="text-emerald-400">Vocal Cue: <span x-text="currentCard.delivery"></span></div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button @click="prevCard()" class="bg-slate-900 hover:bg-slate-800 border border-slate-700 px-3 py-1.5 rounded-lg text-slate-300 transition">&larr; Prev</button>
+          <button @click="nextCard()" class="bg-indigo-600 hover:bg-indigo-500 px-4 py-1.5 rounded-lg text-white font-semibold transition">Next Riff &rarr;</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- =================================================================== -->
+    <!-- IB PAST PAPER :Vocab (:FORMAL_EXAM ↔ :REGIONAL_RIFF) & :FALSE_FRIEND_ALERT EXPLORER -->
+    <!-- =================================================================== -->
+    <div class="pt-4 border-t border-slate-800 space-y-4">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <div class="text-[11px] mono uppercase tracking-widest text-emerald-400">Neo4j :Vocab &amp; :FALSE_FRIEND_ALERT Topology</div>
+          <h2 class="text-base sm:text-lg font-bold text-white">
+            IB Past Paper Academic Governance <span class="text-slate-500">↔</span> Regional Working Riff
+          </h2>
+        </div>
+
+        <!-- Register Type Filter Pills -->
+        <div class="flex flex-wrap items-center gap-1.5 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
+          <button @click="vocabFilter = 'ALL'"
+            :class="vocabFilter === 'ALL' ? 'bg-slate-800 text-white shadow' : 'text-slate-400 hover:text-white'"
+            class="px-2.5 py-1 rounded-lg font-medium transition">
+            All (<span x-text="langVocabItems.length"></span>)
+          </button>
+          <button @click="vocabFilter = 'FORMAL_EXAM'"
+            :class="vocabFilter === 'FORMAL_EXAM' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-white'"
+            class="px-2.5 py-1 rounded-lg font-medium transition">
+            :FORMAL_EXAM
+          </button>
+          <button @click="vocabFilter = 'REGIONAL_RIFF'"
+            :class="vocabFilter === 'REGIONAL_RIFF' ? 'bg-amber-600 text-white shadow' : 'text-slate-400 hover:text-white'"
+            class="px-2.5 py-1 rounded-lg font-medium transition">
+            :REGIONAL_RIFF
+          </button>
+          <button @click="vocabFilter = 'ALERTS'"
+            :class="vocabFilter === 'ALERTS' ? 'bg-rose-600 text-white shadow' : 'text-rose-300/80 hover:text-rose-200'"
+            class="px-2.5 py-1 rounded-lg font-medium transition">
+            🛡️ :FALSE_FRIEND_ALERT (<span x-text="alertNodes.length"></span>)
+          </button>
+        </div>
+      </div>
+
+      <!-- Active False-Friend Alert Banner (Highlighted when triggered or in Slavic languages) -->
+      <div x-show="activeAlertNode"
+        class="p-4 rounded-xl bg-rose-950/40 border border-rose-500/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div class="space-y-1">
+          <div class="flex items-center gap-2">
+            <span class="px-2 py-0.5 rounded bg-rose-500/20 border border-rose-500/40 text-rose-300 mono text-[10px] font-bold uppercase">
+              :FALSE_FRIEND_ALERT → <span x-text="activeAlertNode ? activeAlertNode.uid : ''"></span>
+            </span>
+            <span class="text-sm font-bold text-white" x-text="activeAlertNode ? activeAlertNode.term : ''"></span>
+          </div>
+          <p class="text-xs text-rose-200 leading-relaxed" x-text="activeAlertNode ? activeAlertNode.warning : ''"></p>
+        </div>
+        <button @click="activeAlertUid = null" class="self-start sm:self-center text-xs mono text-rose-300 hover:text-white px-2.5 py-1 rounded border border-rose-500/30">
+          Dismiss
+        </button>
+      </div>
+
+      <!-- :Vocab Cards Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <template x-for="v in filteredVocabItems" :key="v.uid">
+          <div @click="inspectVocab(v)"
+            :class="v.register_type === 'FALSE_FRIEND_ALERT'
+              ? 'bg-rose-950/25 border-rose-500/40 hover:border-rose-400'
+              : v.register_type === 'FORMAL_EXAM'
+                ? 'bg-slate-950 border-indigo-500/30 hover:border-indigo-400/70'
+                : 'bg-slate-950 border-amber-500/30 hover:border-amber-400/70'"
+            class="p-4 rounded-xl border transition cursor-pointer flex flex-col justify-between space-y-2.5">
+            <div class="space-y-1.5">
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-[10px] mono font-bold uppercase px-2 py-0.5 rounded border"
+                  :class="v.register_type === 'FALSE_FRIEND_ALERT'
+                    ? 'bg-rose-500/20 border-rose-500/40 text-rose-300'
+                    : v.register_type === 'FORMAL_EXAM'
+                      ? 'bg-indigo-500/15 border-indigo-500/40 text-indigo-300'
+                      : 'bg-amber-500/15 border-amber-500/40 text-amber-300'"
+                  x-text="v.register_type === 'FORMAL_EXAM' ? ':FORMAL_EXAM • ' + (v.register_id || '') : v.register_type === 'REGIONAL_RIFF' ? ':REGIONAL_RIFF • ' + (v.register_id || '') : '🛡️ :FALSE_FRIEND_ALERT'"></span>
+                <span class="text-[10px] mono text-slate-500" x-text="v.uid"></span>
+              </div>
+
+              <div class="flex items-center justify-between gap-2">
+                <div class="text-sm sm:text-base font-bold text-white" x-text="v.term"></div>
+                <template x-if="getLinkedAlertForVocab(v.uid)">
+                  <span class="text-[10px] mono px-2 py-0.5 rounded bg-rose-500/20 border border-rose-500/40 text-rose-300 whitespace-nowrap">
+                    ⚠️ Trap Alert
+                  </span>
+                </template>
+              </div>
+
+              <p class="text-xs text-slate-300 leading-relaxed" x-text="v.meaning"></p>
+            </div>
+
+            <div class="pt-2 border-t border-slate-800/80 space-y-1 text-[11px]">
+              <div x-show="v.ib_source" class="text-slate-400">
+                📚 Source: <span class="text-slate-200 font-medium" x-text="v.ib_source"></span>
+              </div>
+              <div x-show="v.grammar_note" class="text-indigo-300">
+                ⚙️ Governance: <span x-text="v.grammar_note"></span>
+              </div>
+              <div x-show="v.etymology" class="text-amber-300">
+                🔗 Etymology: <span x-text="v.etymology"></span>
+              </div>
+              <div x-show="v.warning" class="text-rose-300 font-medium" x-text="v.warning"></div>
+            </div>
+          </div>
+        </template>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const IB_PAIR_LABELS = {
+      cs: 'CZ_FORMAL_IB ↔ CZ_REGIONAL_OVA',
+      de: 'DE_FORMAL_IB ↔ DE_REGIONAL_VIE',
+      ru: 'RU_FORMAL_IB ↔ RU_REGIONAL_ALA',
+      en: 'EN_FORMAL_IB ↔ EN_REGIONAL_YYC',
+      es: 'ES_FORMAL_IB ↔ ES_REGIONAL_SOT'
+    };
+
+    const CZECH_IB_EXEC_SEQUENCE = [
+      { uid: 'CZ_EXEC_COMP', reg: 'CZ_STD', tier: 'FORMAL', stage: 'COMPLIMENT', lang: 'Spisovná čeština (IB Formal • Architect Outreach)', vibe: 'Mastered (w: 0.91 • #34d399)', text: 'Vážený pane architekte, sleduji přesnost vašich projektů a oceňuji, jak čistě držíte strukturální rozbor bez zbytečného šumu.', phonetics: '[VAA-zhe-nee PA-ne AR-khi-tek-te, SLE-du-yi PRES-nost VA-shikh PRO-yek-too...]', english: 'Dear Architect, I follow the precision of your projects and appreciate how cleanly you maintain structural clarity without noise.', mechanics: '5th-case Vocative (pane architekte) + IB Czech A1 analytical nominal framing (strukturální rozbor)', delivery: 'Calm executive authority, crisp vowel length' },
+      { uid: 'CZ_EXEC_CHAM', reg: 'CZ_STD', tier: 'FORMAL', stage: 'CHAMELEON', lang: 'Spisovná čeština (IB Formal • V3DV Alignment)', vibe: 'Mastered (w: 0.85 • #34d399)', text: 'Ve V3DV se zaměřujeme přesně na tyto oblasti – stavíme modulární AI nadstavbu tak, abychom do firmy nevnášeli další zbytečný software.', phonetics: '', english: 'At V3DV we focus squarely on these areas—building a modular AI layer without introducing bloatware into the firm.', mechanics: 'German-calqued prepositional governance: zaměřovat se na (+ Acc)', delivery: 'Measured C-Suite alignment' },
+      { uid: 'BRIDGE_CZ_FORMAL_TO_OVA', reg: 'BRIDGE', tier: 'BRIDGE', stage: 'PIVOTS_VIA_BRIDGE', lang: 'IB Formal → Ostravština Riff (CZ_FORMAL_IB → CZ_OVA)', vibe: 'Active Indigo (w: 0.82 • #818cf8)', text: 'Ale když se na to podíváme pod kapotou...', phonetics: '[A-le kdish se na to PO-dee-vaa-me pod KA-po-tow...]', english: 'But when we look right under the hood...', mechanics: 'Mid-sentence matrix shift from IB Spisovná Čeština into Ostrava engineering peer riff', delivery: 'Drop half an octave, lean in as an engineering peer' },
+      { uid: 'CZ_OVA_COUNT', reg: 'CZ_OVA', tier: 'REGIONAL', stage: 'COUNTERACT', lang: 'Ostravský pracovní registr (Tykání • Tech Peer)', vibe: 'Pragmatic Engineering Disruption', text: 'Ale upřímně: držet to teď při zemi je zbytečná šichta navíc. Jak pustíš tuhle brzdu, máš čistý fajront, bo ten motor pojede sám.', phonetics: '', english: 'Holding this back right now is an extra grind shift. Release that brake and you have a clean Feierabend, because the engine runs itself.', mechanics: 'Industrial Germanisms (šichta, fajront) + Silesian causal connector "bo"', delivery: 'Clipped short vowels, crisp first-syllable stress' },
+      { uid: 'CZ_EXEC_CUR', reg: 'CZ_STD', tier: 'FORMAL', stage: 'CURIOSITY', lang: 'Spisovná čeština (Executive Calendar Close)', vibe: 'Active Indigo (w: 0.78 • #818cf8)', text: 'Máte příští týden v úterý nebo ve čtvrtek 15 minut na krátký hovor, kde bychom prošli, jak tuto architekturu nasadit přímo u vás?', phonetics: '', english: 'Do you have 15 minutes next Tuesday or Thursday for a brief call to walk through deploying this architecture directly with your team?', mechanics: 'Low-friction executive calendar hook', delivery: 'Clean upward curiosity close' }
+    ];
+
+    const OFFLINE_VOCAB = [
+      { uid: 'CZ_V_ZAMERIT', term: 'zaměřit se na (+ Acc)', lang_code: 'cs', register_id: 'CZ_STD', register_type: 'FORMAL_EXAM', meaning: 'Focus on / target specifically', ib_source: 'Czech A1 Paper 1 HL/SL', grammar_note: 'German-calqued prepositional governance (fokussieren auf)', etymology: '', warning: '' },
+      { uid: 'CZ_V_SPOLEHAT', term: 'spoléhat se na (+ Acc)', lang_code: 'cs', register_id: 'CZ_STD', register_type: 'FORMAL_EXAM', meaning: 'Rely upon / depend on cleanly', ib_source: 'Czech A1 Paper 1 HL/SL', grammar_note: 'Mandatory Accusative governance (sich verlassen auf + Acc)', etymology: '', warning: '' },
+      { uid: 'CZ_V_DATOVAL', term: 'dávat si pozor na (+ Acc)', lang_code: 'cs', register_id: 'CZ_STD', register_type: 'FORMAL_EXAM', meaning: 'Exercise caution / pay strict attention to', ib_source: 'Czech B2B & Academic Outreach', grammar_note: 'Mandatory Accusative governance', etymology: '', warning: '' },
+      { uid: 'CZ_V_ROZBOR', term: 'literární a strukturální rozbor', lang_code: 'cs', register_id: 'CZ_STD', register_type: 'FORMAL_EXAM', meaning: 'Literary and structural breakdown', ib_source: 'Czech A1 Paper 2 HL', grammar_note: 'Analytical nominal framing + 5th-case vocative register', etymology: '', warning: '' },
+      { uid: 'CZ_V_FACHAT', term: 'fachat', lang_code: 'cs', register_id: 'CZ_OVA', register_type: 'REGIONAL_RIFF', meaning: 'Work / function reliably without friction', ib_source: 'Ostravština Dialect Study', grammar_note: '', etymology: 'Industrial Austrian loanword (fachen / arbeiten)', warning: '' },
+      { uid: 'CZ_V_SICHTA', term: 'šichta', lang_code: 'cs', register_id: 'CZ_OVA', register_type: 'REGIONAL_RIFF', meaning: 'Heavy work shift / manual grind', ib_source: 'Ostravština Dialect Study', grammar_note: '', etymology: 'German Schicht', warning: '' },
+      { uid: 'CZ_V_FAJRONT', term: 'fajront', lang_code: 'cs', register_id: 'CZ_OVA', register_type: 'REGIONAL_RIFF', meaning: 'Quitting time / clean finish of work day', ib_source: 'Ostravština Dialect Study', grammar_note: '', etymology: 'German Feierabend', warning: '' },
+      { uid: 'CZ_V_BO', term: 'bo', lang_code: 'cs', register_id: 'CZ_OVA', register_type: 'REGIONAL_RIFF', meaning: 'Causal connector "because" (never "or")', ib_source: 'Silesian & Northeast Czech Grammar', grammar_note: '', etymology: 'Silesian contact particle', warning: '' },
+
+      { uid: 'DE_V_ERORTERUNG', term: 'die Erörterung', lang_code: 'de', register_id: 'DE_STD', register_type: 'FORMAL_EXAM', meaning: 'Structured argumentative essay / text discussion', ib_source: 'German A Language & Literature Paper 1 HL', grammar_note: '', etymology: '', warning: '' },
+      { uid: 'DE_V_STILMITTEL', term: 'rhetorische Stilmittel', lang_code: 'de', register_id: 'DE_STD', register_type: 'FORMAL_EXAM', meaning: 'Rhetorical devices and stylistic techniques', ib_source: 'German A2 Paper 1 HL', grammar_note: '', etymology: '', warning: '' },
+      { uid: 'DE_V_AUSWIRKEN', term: 'sich auswirken auf (+ Acc)', lang_code: 'de', register_id: 'DE_STD', register_type: 'FORMAL_EXAM', meaning: 'Exert an impact / influence upon', ib_source: 'German Academic B2B', grammar_note: 'Mandatory Accusative governance', etymology: '', warning: '' },
+      { uid: 'DE_V_HINBLICK', term: 'im Hinblick auf (+ Acc / Gen)', lang_code: 'de', register_id: 'DE_STD', register_type: 'FORMAL_EXAM', meaning: 'With regard to / in strategic view of', ib_source: 'German A Language & Literature Paper 1 HL', grammar_note: 'High-register prepositional framing', etymology: '', warning: '' },
+      { uid: 'DE_V_SCHMAEH', term: 'Wiener Schmäh', lang_code: 'de', register_id: 'AT_VIE', register_type: 'REGIONAL_RIFF', meaning: 'Charming Viennese irony & status-equalizing wit', ib_source: 'Wiener Schmäh Study', grammar_note: '', etymology: 'Austro-Bavarian Kaffeehaus tradition', warning: '' },
+      { uid: 'DE_V_PARTICLES', term: 'eh / halt / ja / mal', lang_code: 'de', register_id: 'AT_VIE', register_type: 'REGIONAL_RIFF', meaning: 'Modal particles modulating speaker stance & rapport', ib_source: 'Subtle Art of German Modal Particles', grammar_note: 'Unstressed mid-clause pragmatic softeners', etymology: '', warning: '' },
+      { uid: 'DE_V_GSCHICHTL', term: 'G’schichtldrucken', lang_code: 'de', register_id: 'AT_VIE', register_type: 'REGIONAL_RIFF', meaning: 'Tall-tale spinning / corporate puffery', ib_source: 'Austrian Conversational Register', grammar_note: '', etymology: 'Viennese colloquial compound', warning: '' },
+
+      { uid: 'RU_V_ANALIZ', term: 'сопоставительный анализ', lang_code: 'ru', register_id: 'RU_STD', register_type: 'FORMAL_EXAM', meaning: 'Comparative literary breakdown', ib_source: 'Russian A1 Paper 1 HL/SL', grammar_note: '', etymology: '', warning: '' },
+      { uid: 'RU_V_SREDSTVA', term: 'изобразительно-выразительные средства', lang_code: 'ru', register_id: 'RU_STD', register_type: 'FORMAL_EXAM', meaning: 'Expressive and poetic devices', ib_source: 'Russian A1 Paper 2 HL', grammar_note: '', etymology: '', warning: '' },
+      { uid: 'RU_V_OPIRATSA', term: 'опираться на (+ Acc)', lang_code: 'ru', register_id: 'RU_STD', register_type: 'FORMAL_EXAM', meaning: 'Rely upon / base arguments on', ib_source: 'Russian B Paper 2 SL', grammar_note: 'Mandatory Accusative governance', etymology: '', warning: '' },
+      { uid: 'RU_V_KRASOTA', term: 'сделали по красоте', lang_code: 'ru', register_id: 'RU_ALA', register_type: 'REGIONAL_RIFF', meaning: 'Executed flawlessly with aesthetic mastery', ib_source: 'Almaty Working Register', grammar_note: '', etymology: '', warning: '' },
+      { uid: 'RU_V_BAZARU', term: 'базару нет', lang_code: 'ru', register_id: 'RU_ALA', register_type: 'REGIONAL_RIFF', meaning: 'Unquestionably / zero doubt', ib_source: 'Almaty Working Register', grammar_note: '', etymology: 'Turkic-Russian Southern Capital contact', warning: '' },
+      { uid: 'RU_V_DASTARKHAN', term: 'за широким дастарханом', lang_code: 'ru', register_id: 'RU_ALA', register_type: 'REGIONAL_RIFF', meaning: 'Around a generous table of high-trust hospitality', ib_source: 'Almaty Working Register', grammar_note: '', etymology: 'Kazakh hospitality metaphor', warning: '' },
+
+      { uid: 'EN_V_RHETORIC', term: 'rhetorical appeal & authorial choice', lang_code: 'en', register_id: 'EN_EXEC', register_type: 'FORMAL_EXAM', meaning: 'Persuasive strategy and stylistic decisions', ib_source: 'English A Language & Literature Paper 1 SL', grammar_note: '', etymology: '', warning: '' },
+      { uid: 'EN_V_HINGE', term: 'hinge upon (+ Noun)', lang_code: 'en', register_id: 'EN_EXEC', register_type: 'FORMAL_EXAM', meaning: 'Depend fundamentally on a pivotal condition', ib_source: 'English B Paper 2 HL', grammar_note: 'Formal prepositional verb', etymology: '', warning: '' },
+      { uid: 'EN_V_RECONCILE', term: 'reconcile tension', lang_code: 'en', register_id: 'EN_EXEC', register_type: 'FORMAL_EXAM', meaning: 'Synthesize competing strategic propositions cleanly', ib_source: 'English A Language & Literature Paper 1 SL', grammar_note: '', etymology: '', warning: '' },
+      { uid: 'EN_V_CATTLE', term: 'all hat and no cattle', lang_code: 'en', register_id: 'EN_YYC', register_type: 'REGIONAL_RIFF', meaning: 'All talk and posture without underlying substance', ib_source: 'Calgary Foothills Register', grammar_note: '', etymology: 'Western ranching idiom', warning: '' },
+      { uid: 'EN_V_GIVE_ER', term: 'give ’er', lang_code: 'en', register_id: 'EN_YYC', register_type: 'REGIONAL_RIFF', meaning: 'Go all out / execute at full throttle', ib_source: 'Calgary Foothills Register', grammar_note: '', etymology: 'Western Canadian vernacular', warning: '' },
+
+      { uid: 'ES_V_ANALISIS', term: 'análisis de recursos estilísticos', lang_code: 'es', register_id: 'ES_STD', register_type: 'FORMAL_EXAM', meaning: 'Analysis of literary and stylistic resources', ib_source: 'Spanish A1 Paper 1 HL', grammar_note: '', etymology: '', warning: '' },
+      { uid: 'ES_V_MANIFIESTO', term: 'poner de manifiesto', lang_code: 'es', register_id: 'ES_STD', register_type: 'FORMAL_EXAM', meaning: 'Highlight / demonstrate explicitly', ib_source: 'Spanish ab initio Paper 1 SL', grammar_note: '', etymology: '', warning: '' },
+      { uid: 'ES_V_HINCAPIE', term: 'hacer hincapié en', lang_code: 'es', register_id: 'ES_STD', register_type: 'FORMAL_EXAM', meaning: 'Emphasize / insist firmly on a key point', ib_source: 'Spanish A1 Paper 1 HL', grammar_note: "Mandatory 'en' prepositional complement", etymology: '', warning: '' },
+      { uid: 'ES_V_DUENDE', term: 'tener duende', lang_code: 'es', register_id: 'ES_SOT', register_type: 'REGIONAL_RIFF', meaning: 'Possess unmanufacturable soul and magnetic presence', ib_source: 'Sotogrande Andaluz Register', grammar_note: '', etymology: 'Andaluz aesthetic concept', warning: '' },
+      { uid: 'ES_V_TOROS', term: 'mirar los toros desde la barrera', lang_code: 'es', register_id: 'ES_SOT', register_type: 'REGIONAL_RIFF', meaning: 'Observe passively from safety without taking risk', ib_source: 'Sotogrande Andaluz Register', grammar_note: '', etymology: 'Taurine arena idiom', warning: '' },
+
+      { uid: 'FF_CZ_UZASNY', term: 'Úžasný (CZ) vs Ужасный (RU)', lang_code: 'cs', register_id: null, register_type: 'FALSE_FRIEND_ALERT', meaning: 'Czech úžasný = amazing/wonderful ≠ Russian ужасный = terrible/horrible', ib_source: 'Slavic Interference Shield', grammar_note: '', etymology: '', warning: 'CRITICAL FALSE FRIEND: Czech "úžasný" means amazing/wonderful, whereas Russian "ужасный" means terrible/horrible.' },
+      { uid: 'FF_CZ_CERSTVY', term: 'Čerstvý (CZ) vs Черствый (RU)', lang_code: 'cs', register_id: null, register_type: 'FALSE_FRIEND_ALERT', meaning: 'Czech čerstvý = fresh (čerstvá data) ≠ Russian черствый = stale/hard', ib_source: 'Slavic Interference Shield', grammar_note: '', etymology: '', warning: 'CRITICAL FALSE FRIEND: Czech "čerstvý" means fresh (e.g. čerstvá data), whereas Russian "черствый" means stale/hard bread.' },
+      { uid: 'FF_CZ_POZOR', term: 'Pozor! (CZ) vs Позор (RU)', lang_code: 'cs', register_id: null, register_type: 'FALSE_FRIEND_ALERT', meaning: 'Czech dávat si pozor = exercise attention ≠ Russian позор = shame/disgrace', ib_source: 'Slavic Interference Shield', grammar_note: '', etymology: '', warning: 'CRITICAL FALSE FRIEND: Czech "Dávat si pozor" means to exercise care/attention, whereas Russian "позор" means shame/disgrace.' }
+    ];
+
+    const OFFLINE_VOCAB_ALERTS = [
+      { source_uid: 'CZ_V_ZAMERIT', target_uid: 'FF_CZ_POZOR' },
+      { source_uid: 'CZ_V_DATOVAL', target_uid: 'FF_CZ_POZOR' },
+      { source_uid: 'CZ_V_ROZBOR', target_uid: 'FF_CZ_UZASNY' },
+      { source_uid: 'RU_V_ANALIZ', target_uid: 'FF_CZ_CERSTVY' }
+    ];
+
+    const OFFLINE_DECKS = {
+      cs: {
+        flag: '🇨🇿',
+        title: 'Czech Switcher: Spisovná Boardroom → Ostravština Trench',
+        formalLabel: 'CZ_STD (Spisovná C-Suite)',
+        regionalLabel: 'CZ_OVA (Ostravština Dev)',
+        sequence: [
+          { uid: 'CZ_STD_COMP_01', reg: 'CZ_STD', tier: 'FORMAL', stage: 'COMPLIMENT', lang: 'Spisovná čeština (Vykání • C-Suite)', vibe: 'High-Warmth / Executive Respect', text: 'Sleduji, Petře, v jakém měřítku teď v týmu škálujete produkci – málokdo na trhu má takhle čistě zvládnutou exekuci.', phonetics: '[SLE-du-yi, PET-rzhe, v YA-kehm MYE-rzheet-ku ted v TEE-mu SHKAA-lu-ye-te PRO-duk-tsi]', english: 'I’ve been watching the scale at which your team is scaling production, Petr—very few execute this cleanly.', mechanics: '5th-case Vocative + German-aligned prepositional governance (zaměřit se na)', delivery: 'Precise vowel length, calm C-Suite cadence' },
+          { uid: 'CZ_STD_CHAM_01', reg: 'CZ_STD', tier: 'FORMAL', stage: 'CHAMELEON', lang: 'Spisovná čeština (Vykání • C-Suite)', vibe: 'Metric Alignment', text: 'Vím, že se teď chcete zaměřit na čistou návratnost a nechcete do firmy tahat zbytečný bloatware, který by lidi jen zpomaloval.', phonetics: '', english: 'I know you want to focus squarely on clean ROI without pulling bloatware into the org.', mechanics: 'High-register analytical framing before dropping the tie', delivery: 'Measured pace, slight nod of agreement' },
+          { uid: 'BR_CZ_STD_TO_OVA', reg: 'BRIDGE', tier: 'BRIDGE', stage: 'REGISTER_DROP_BRIDGE', lang: 'Code-Switch Pivot (CZ_STD → CZ_OVA)', vibe: 'PIVOTS_VIA (Weight: 0.98)', text: 'A když teď odložíme kravaty a podíváme se přímo pod kapotu s klukama z vývoje—', phonetics: '', english: 'And if we set the ties aside now and look straight under the hood with the guys in engineering—', mechanics: 'Mid-sentence matrix shift from formal Vykání to peer Ostravština Tykání', delivery: 'Drop half an octave, lean forearms onto the table' },
+          { uid: 'CZ_OVA_COUNT_01', reg: 'CZ_OVA', tier: 'REGIONAL', stage: 'COUNTERACT', lang: 'Ostravský pracovní registr (Tykání • Tech Peer)', vibe: 'Pragmatic Engineering Disruption', text: 'Máte to postavené fajně, ale to ruční překlápění dat je zbytečná šichta navíc. Jak nasadíme náš modul, bude to fachat samo a kluci můžou mít v klidu fajront, bo skript to pohlídá za ně.', phonetics: '', english: 'You built it nicely, but manual data handoffs are an extra grind shift. Deploy our module and it runs itself so the crew gets a clean Feierabend.', mechanics: 'Austrian industrial loans (fachat, šichta, fajront) + Silesian causal "bo"', delivery: 'Clipped short vowels, crisp first-syllable punch, exhale on "fajront"' },
+          { uid: 'CZ_OVA_CUR_01', reg: 'CZ_OVA', tier: 'REGIONAL', stage: 'CURIOSITY', lang: 'Ostravský pracovní registr (Tykání • Tech Peer)', vibe: 'Action-Oriented Open Loop', text: 'Hoď na to oko v příloze, a jestli to dává smysl, brnkni mi zítra dopoledne a sfoukneme to.', phonetics: '', english: 'Throw an eye on the attachment, and if it makes sense, ping me tomorrow morning and we’ll knock it out.', mechanics: 'Colloquial action verbs (hodit oko, brnknout, sfouknout)', delivery: 'Upbeat, zero-friction peer close' }
+        ]
+      },
+      de: {
+        flag: '🇦🇹',
+        title: 'German Switcher: DACH Hochdeutsch → Wiener Schmäh',
+        formalLabel: 'DE_STD (Hochdeutsch Siezen)',
+        regionalLabel: 'AT_VIE (Wiener Schmäh)',
+        sequence: [
+          { uid: 'DE_STD_COMP_01', reg: 'DE_STD', tier: 'FORMAL', stage: 'COMPLIMENT', lang: 'Hochdeutsch Executive (Siezen)', vibe: 'DACH Boardroom Precision', text: 'Ich verfolge genau, mit welcher Disziplin Sie Ihre Plattform skalieren – man sieht sofort Substanz vor Show.', phonetics: '', english: 'I closely follow the discipline with which you scale your platform—substance over show.', mechanics: 'Precision compound framing (Substanz vor Show)', delivery: 'Composed DACH boardroom authority' },
+          { uid: 'DE_STD_CHAM_01', reg: 'DE_STD', tier: 'FORMAL', stage: 'CHAMELEON', lang: 'Hochdeutsch Executive (Siezen)', vibe: 'Throughput Alignment', text: 'Mir ist klar, dass für Sie belastbare Durchlaufzeiten zählen und kein zusätzlicher Abstimmungsaufwand im Tagesgeschäft entstehen darf.', phonetics: '', english: 'Reliable throughput counts for you with zero extra coordination overhead.', mechanics: 'Structured main-to-subordinate clause cadence', delivery: 'Calm analytical nod' },
+          { uid: 'BR_DE_STD_TO_VIE', reg: 'BRIDGE', tier: 'BRIDGE', stage: 'REGISTER_DROP_BRIDGE', lang: 'Code-Switch Pivot (DE_STD → AT_VIE)', vibe: 'PIVOTS_VIA (Weight: 0.95)', text: 'Und wenn wir das steife Protokoll kurz beiseitelassen und ehrlich wie im Wiener Beisl reden—', phonetics: '', english: 'And if we set stiff protocol aside for a moment and talk honestly like in a Viennese Beisl—', mechanics: 'Clause-boundary shift from DACH Siezen into Austro-Bavarian Kaffeehaus Duzen', delivery: 'Lean back 10 degrees, crooked grin, stretch vowels' },
+          { uid: 'AT_VIE_COUNT', reg: 'AT_VIE', tier: 'REGIONAL', stage: 'COUNTERACT', lang: 'Wiener Schmäh (Kaffeehaus Insider)', vibe: 'Velvet Irony Equalizer', text: 'Aber geh bitte: Jetzt auf Nummer sicher gehen? Da musst du die übertriebene Vorsicht mal an der Garderobe abgeben.', phonetics: '', english: 'Come on now: playing it safe right now? Check that excessive caution at the coat check.', mechanics: 'Modal particles + Staatsoper coat-check trope', delivery: 'Wry smile, casual wave of the hand' },
+          { uid: 'AT_VIE_CUR', reg: 'AT_VIE', tier: 'REGIONAL', stage: 'CURIOSITY', lang: 'Wiener Schmäh (Kaffeehaus Insider)', vibe: 'Accomplice Open Loop', text: 'Hand aufs Herz: Wenn wir heute Abend alle Ausreden streichen – was ist der schönste Bledsinn, den wir als Nächstes anreißen?', phonetics: '', english: 'Hand on heart: if we cross out all excuses tonight—what bold move do we kick off next?', mechanics: 'Warm Viennese understatement ("schönster Bledsinn")', delivery: 'Unhurried pause, warm eye contact' }
+        ]
+      },
+      ru: {
+        flag: '🇰🇿',
+        title: 'Russian Switcher: Деловой Вы → Almaty Terrace Insider',
+        formalLabel: 'RU_STD (Деловой Вы)',
+        regionalLabel: 'RU_ALA (Almaty Insider)',
+        sequence: [
+          { uid: 'RU_STD_COMP_01', reg: 'RU_STD', tier: 'FORMAL', stage: 'COMPLIMENT', lang: 'Деловой русский (Formal Вы)', vibe: 'Executive Scale', text: 'Мы внимательно посмотрели вашу архитектуру — редкий случай на рынке, когда заложен такой серьёзный запас прочности.', phonetics: '', english: 'We examined your architecture closely—a rare case with such serious structural headroom.', mechanics: 'High-respect strategic framing (запас прочности)', delivery: 'Calm executive baritone' },
+          { uid: 'RU_STD_CHAM_01', reg: 'RU_STD', tier: 'FORMAL', stage: 'CHAMELEON', lang: 'Деловой русский (Formal Вы)', vibe: 'Unit Economics Alignment', text: 'Прекрасно понимаю ваш приоритет: предсказуемая экономика процесса без лишней бюрократии и ручного контроля.', phonetics: '', english: 'Predictable unit economics without extra bureaucracy or manual oversight.', mechanics: 'Measured verbal-noun framing', delivery: 'Composed nod' },
+          { uid: 'BR_RU_STD_TO_ALA', reg: 'BRIDGE', tier: 'BRIDGE', stage: 'REGISTER_DROP_BRIDGE', lang: 'Code-Switch Pivot (RU_STD → RU_ALA)', vibe: 'PIVOTS_VIA (Weight: 0.95)', text: 'А если убрать официоз и сказать по-человечески, от души, как у нас в Алматы за дастарханом—', phonetics: '', english: 'And if we drop the formality and speak human-to-human, from the heart, like around an Almaty dastarkhan—', mechanics: 'Discourse pivot from Formal Вы into Southern Capital kinship warmth', delivery: 'Open chest resonance, slow tempo by 15%' },
+          { uid: 'RU_ALA_COUNT', reg: 'RU_ALA', tier: 'REGIONAL', stage: 'COUNTERACT', lang: 'Almaty Insider (Peer Ты)', vibe: 'Steppe Scale Challenge', text: 'Но тормозить сейчас — это держать горный беркут в золотой клетке. Твой размах просит высоты, а не паузы.', phonetics: '', english: 'Hitting the brakes now is keeping a mountain golden eagle in a gilded cage.', mechanics: 'Kazakh steppe imagery + high-trust directness', delivery: 'Deep chest voice, quiet intensity' },
+          { uid: 'RU_ALA_CUR', reg: 'RU_ALA', tier: 'REGIONAL', stage: 'CURIOSITY', lang: 'Almaty Insider (Peer Ты)', vibe: 'Medeu Open Loop', text: 'Признайся честно: если прямо сейчас рвануть наверх на Медеу без тормозов — какую самую дерзкую идею мы запустим первой?', phonetics: '', english: 'If we floor it up to Medeu right now with zero brakes—what boldest idea do we launch first?', mechanics: 'Local Almaty Medeu altitude anchor', delivery: 'Warm smile, inviting close' }
+        ]
+      },
+      en: {
+        flag: '🇨🇦',
+        title: 'English Switcher: Executive C-Suite → Calgary Foothills',
+        formalLabel: 'EN_EXEC (Boardroom)',
+        regionalLabel: 'EN_YYC (Calgary Flair)',
+        sequence: [
+          { uid: 'EN_EXEC_COMP_01', reg: 'EN_EXEC', tier: 'FORMAL', stage: 'COMPLIMENT', lang: 'Executive Boardroom English', vibe: 'Operational Discipline', text: 'Looking at your deployment velocity this quarter, the signal-to-noise ratio in your engineering org is genuinely rare.', phonetics: '', english: 'Boardroom recognition of disciplined throughput.', mechanics: 'High signal-to-noise executive framing', delivery: 'Clean downward declarative cadence' },
+          { uid: 'EN_EXEC_CHAM_01', reg: 'EN_EXEC', tier: 'FORMAL', stage: 'CHAMELEON', lang: 'Executive Boardroom English', vibe: 'Margin & Uptime Alignment', text: 'You’re optimizing for clean margin and resilient uptime—not adding another vendor layer your leads have to babysit.', phonetics: '', english: 'Aligning on resilient uptime before dropping into garage candor.', mechanics: 'Zero-filler executive alignment', delivery: 'Measured boardroom pause' },
+          { uid: 'BR_EN_EXEC_TO_YYC', reg: 'BRIDGE', tier: 'BRIDGE', stage: 'REGISTER_DROP_BRIDGE', lang: 'Code-Switch Pivot (EN_EXEC → EN_YYC)', vibe: 'PIVOTS_VIA (Weight: 0.94)', text: 'Now if we take the boardroom slide deck off the table for a second and talk brass tacks—', phonetics: '', english: 'Dropping C-Suite abstraction into Foothills straight-shooter candor.', mechanics: 'Conditional boundary shifting into Western Canadian peer register', delivery: 'Relax shoulders, accomplice half-smirk' },
+          { uid: 'EN_YYC_COUNT', reg: 'EN_YYC', tier: 'REGIONAL', stage: 'COUNTERACT', lang: 'Calgary Flair (Foothills Peer)', vibe: 'Garage Horsepower Interrupt', text: 'Playing it safe right now is like keeping a 69 Mustang collecting dust in the garage all summer.', phonetics: '', english: 'Playful mechanical metaphor challenging incrementalism.', mechanics: 'High-horsepower Calgary garage metaphor', delivery: 'Drop half an octave, grin like an accomplice' },
+          { uid: 'EN_YYC_CUR', reg: 'EN_YYC', tier: 'REGIONAL', stage: 'CURIOSITY', lang: 'Calgary Flair (Foothills Peer)', vibe: 'Open Highway Hook', text: 'Between you and me, bud—if we kick the garage doors open tonight and just give ’er, where are we taking this thing first?', phonetics: '', english: 'Accomplice Foothills open-loop invitation.', mechanics: 'Solidarity "bud" + Western Canadian "give ’er"', delivery: 'Upbeat percussive close' }
+        ]
+      },
+      es: {
+        flag: '🇪🇸',
+        title: 'Spanish Switcher: Consejo Ejecutivo → Sotogrande Duende',
+        formalLabel: 'ES_STD (Ejecutivo)',
+        regionalLabel: 'ES_SOT (Sotogrande)',
+        sequence: [
+          { uid: 'ES_STD_COMP_01', reg: 'ES_STD', tier: 'FORMAL', stage: 'COMPLIMENT', lang: 'Español Ejecutivo (Consejo)', vibe: 'Rigor Operativo', text: 'He seguido de cerca cómo estáis escalando la operación y se nota un rigor técnico poco habitual en el sector.', phonetics: '', english: 'I closely followed how you are scaling operations—rare technical rigor.', mechanics: 'Poised executive authority', delivery: 'Balanced Peninsular cadence' },
+          { uid: 'ES_STD_CHAM_01', reg: 'ES_STD', tier: 'FORMAL', stage: 'CHAMELEON', lang: 'Español Ejecutivo (Consejo)', vibe: 'Transparencia Ejecutiva', text: 'Sé que preferís poner las cartas sobre la mesa y proteger el foco del equipo frente a cualquier complejidad innecesaria.', phonetics: '', english: 'Putting cards on the table and protecting team focus.', mechanics: 'Executive transparency idiom', delivery: 'Open palm gesture' },
+          { uid: 'BR_ES_STD_TO_SOT', reg: 'BRIDGE', tier: 'BRIDGE', stage: 'REGISTER_DROP_BRIDGE', lang: 'Code-Switch Pivot (ES_STD → ES_SOT)', vibe: 'PIVOTS_VIA (Weight: 0.93)', text: 'Y si dejamos ahora el protocolo de sala de juntas y hablamos en confianza como a pie de cancha—', phonetics: '', english: 'Setting boardroom protocol aside to speak in confidence field-side—', mechanics: 'Clause-boundary shift into high-trust Sotogrande tuteo', delivery: 'Lean forward warmly, sun-soaked pause' },
+          { uid: 'ES_SOT_COUNT', reg: 'ES_SOT', tier: 'REGIONAL', stage: 'COUNTERACT', lang: 'Sotogrande Duende (Andaluz Peer)', vibe: 'Playful Arena Challenge', text: '¡Anda ya, ni de coña me digas que vas a ir despacio! Quedarse ahí es mirar los toros desde la barrera.', phonetics: '', english: 'No way you tell me you’re going slow—that’s watching the bulls from behind the barrier.', mechanics: 'Taurine metaphor + high-warmth challenge', delivery: 'Expressive hands, raised chin' },
+          { uid: 'ES_SOT_CUR', reg: 'ES_SOT', tier: 'REGIONAL', stage: 'CURIOSITY', lang: 'Sotogrande Duende (Andaluz Peer)', vibe: 'Subjunctive Open Loop', text: 'Mójate un poco conmigo: si nos olvidamos de lo prudente ahora mismo, ¿cuál es la jugada que de verdad te pide el cuerpo?', phonetics: '', english: 'Jump in with me: what move is your gut really asking for?', mechanics: 'Conspiratorial imperative + subjunctive', delivery: 'Warm magnetic close' }
+        ]
+      }
+    };
+
+    function registerSwitcherApp() {
+      return {
+        activeLang: 'cs',
+        czechTrack: 'std',
+        stepIndex: 0,
+        backendLive: false,
+        dialDocked: false,
+        dialDragging: false,
+        dialPos: 0,
+        dialTargetPos: 0,
+        dialRafId: null,
+        suppressNextDialClick: false,
+        vocabFilter: 'ALL',
+        activeAlertUid: 'FF_CZ_POZOR',
+        languages: [
+          {
+            code: 'cs',
+            shortCode: 'CZ',
+            flag: '🇨🇿',
+            shortName: 'Czech',
+            pairBadge: 'CZ_STD→OVA',
+            label: 'Czech (CZ_STD → CZ_OVA)',
+            svg: `<svg class="w-[13px] h-[13px] rounded-full shrink-0 ring-1 ring-white/25" viewBox="0 0 16 16"><rect width="16" height="8" fill="#ffffff"/><rect y="8" width="16" height="8" fill="#dc2626"/><polygon points="0,0 8.5,8 0,16" fill="#2563eb"/></svg>`
+          },
+          {
+            code: 'de',
+            shortCode: 'AT',
+            flag: '🇦🇹',
+            shortName: 'German',
+            pairBadge: 'DE_STD→VIE',
+            label: 'German (DE_STD → AT_VIE)',
+            svg: `<svg class="w-[13px] h-[13px] rounded-full shrink-0 ring-1 ring-white/25" viewBox="0 0 16 16"><rect width="16" height="5.3" fill="#ef4444"/><rect y="5.3" width="16" height="5.4" fill="#ffffff"/><rect y="10.7" width="16" height="5.3" fill="#ef4444"/></svg>`
+          },
+          {
+            code: 'ru',
+            shortCode: 'KZ',
+            flag: '🇰🇿',
+            shortName: 'Russian',
+            pairBadge: 'RU_STD→ALA',
+            label: 'Russian (RU_STD → RU_ALA)',
+            svg: `<svg class="w-[13px] h-[13px] rounded-full shrink-0 ring-1 ring-white/25" viewBox="0 0 16 16"><rect width="16" height="16" fill="#0ea5e9"/><circle cx="8" cy="7.6" r="2.8" fill="#fbbf24"/><path d="M4.2 11.4Q8 9.6 11.8 11.4" stroke="#fbbf24" stroke-width="1.2" fill="none" stroke-linecap="round"/></svg>`
+          },
+          {
+            code: 'en',
+            shortCode: 'CA',
+            flag: '🇨🇦',
+            shortName: 'English',
+            pairBadge: 'EN_EXEC→YYC',
+            label: 'English (EN_EXEC → EN_YYC)',
+            svg: `<svg class="w-[13px] h-[13px] rounded-full shrink-0 ring-1 ring-white/25" viewBox="0 0 16 16"><rect width="16" height="16" fill="#ffffff"/><rect width="4.2" height="16" fill="#ef4444"/><rect x="11.8" width="4.2" height="16" fill="#ef4444"/><path d="M8 3.6L9.4 6.7L11.2 6.4L9.7 8.8L10.3 10.6L8.4 10.1V12.5H7.6V10.1L5.7 10.6L6.3 8.8L4.8 6.4L6.6 6.7Z" fill="#ef4444"/></svg>`
+          },
+          {
+            code: 'es',
+            shortCode: 'ES',
+            flag: '🇪🇸',
+            shortName: 'Spanish',
+            pairBadge: 'ES_STD→SOT',
+            label: 'Spanish (ES_STD → ES_SOT)',
+            svg: `<svg class="w-[13px] h-[13px] rounded-full shrink-0 ring-1 ring-white/25" viewBox="0 0 16 16"><rect width="16" height="4" fill="#dc2626"/><rect y="4" width="16" height="8" fill="#facc15"/><rect y="12" width="16" height="4" fill="#dc2626"/></svg>`
+          }
+        ],
+        decks: JSON.parse(JSON.stringify(OFFLINE_DECKS)),
+        vocabItems: JSON.parse(JSON.stringify(OFFLINE_VOCAB)),
+        vocabAlerts: JSON.parse(JSON.stringify(OFFLINE_VOCAB_ALERTS)),
+
+        async init() {
+          this.setupDialScrollMorph();
+          await Promise.all([
+            this.loadFromBackend('cs'),
+            this.loadVocabFromBackend()
+          ]);
+          this.$nextTick(() => this.renderDial3DFrame(this.dialPos));
+        },
+
+        handleDialClick(ev, code) {
+          if (this.suppressNextDialClick) {
+            this.suppressNextDialClick = false;
+            if (ev) ev.preventDefault();
+            return;
+          }
+          this.selectLang(code);
+        },
+
+        renderDial3DFrame(pos) {
+          const stationsEl = document.getElementById('switcherDialStations');
+          const ticksEl = document.getElementById('switcherDialTicks');
+          if (!stationsEl || !stationsEl.querySelectorAll) return;
+
+          const btns = stationsEl.querySelectorAll('[data-dial-code]');
+          const N = this.languages.length;
+          btns.forEach((btn, i) => {
+            let d = ((i - pos) % N + N) % N;
+            if (d > N / 2) d -= N;
+
+            const theta = d * ((2 * Math.PI) / N);
+            const sinT = Math.sin(theta);
+            const cosT = Math.cos(theta);
+
+            const x = sinT * 31.5;
+            const z = (cosT - 1) * 24;
+            const rotY = -d * 52;
+            const frontness = Math.max(0, (cosT + 0.35) / 1.35);
+            const scale = 0.64 + 0.38 * frontness;
+            const opacity = cosT <= -0.35 ? 0 : Math.min(1, 0.16 + 0.84 * Math.pow(frontness, 1.35));
+            const zIndex = Math.round(frontness * 100);
+
+            btn.style.transform = `translate(-50%, -50%) translate3d(${x.toFixed(2)}px, 0px, ${z.toFixed(2)}px) rotateY(${rotY.toFixed(1)}deg) scale(${scale.toFixed(3)})`;
+            btn.style.opacity = opacity.toFixed(3);
+            btn.style.zIndex = String(zIndex);
+            btn.style.pointerEvents = opacity > 0.2 ? 'auto' : 'none';
+          });
+
+          if (ticksEl) {
+            ticksEl.style.backgroundPositionX = `${(-pos * 22).toFixed(1)}px`;
+          }
+        },
+
+        animateDialTo(newTargetPos) {
+          this.dialTargetPos = newTargetPos;
+          if (this.dialRafId && typeof cancelAnimationFrame === 'function') {
+            cancelAnimationFrame(this.dialRafId);
+            this.dialRafId = null;
+          }
+          if (typeof requestAnimationFrame !== 'function') {
+            this.dialPos = newTargetPos;
+            this.renderDial3DFrame(this.dialPos);
+            return;
+          }
+          const tick = () => {
+            const diff = this.dialTargetPos - this.dialPos;
+            if (Math.abs(diff) < 0.003) {
+              this.dialPos = this.dialTargetPos;
+              this.dialRafId = null;
+              this.renderDial3DFrame(this.dialPos);
+              return;
+            }
+            this.dialPos += diff * 0.24;
+            this.renderDial3DFrame(this.dialPos);
+            this.dialRafId = requestAnimationFrame(tick);
+          };
+          this.dialPos += (this.dialTargetPos - this.dialPos) * 0.24;
+          this.renderDial3DFrame(this.dialPos);
+          this.dialRafId = requestAnimationFrame(tick);
+        },
+
+        setupDialScrollMorph() {
+          const updateDock = () => {
+            const bar = document.getElementById('switcherLangBar');
+            const header = document.getElementById('switcherHeader');
+            if (!bar || !header) return;
+            const headerBottom = header.getBoundingClientRect().bottom;
+            const rect = bar.getBoundingClientRect();
+            const shouldDock = rect.bottom <= headerBottom + 10;
+            if (shouldDock !== this.dialDocked) {
+              this.dialDocked = shouldDock;
+              if (shouldDock) {
+                requestAnimationFrame(() => this.renderDial3DFrame(this.dialPos));
+              }
+            }
+          };
+
+          let ticking = false;
+          window.addEventListener('scroll', () => {
+            if (!ticking) {
+              requestAnimationFrame(() => {
+                updateDock();
+                ticking = false;
+              });
+              ticking = true;
+            }
+          }, { passive: true });
+
+          window.addEventListener('resize', () => {
+            requestAnimationFrame(() => {
+              updateDock();
+              if (!this.dialDragging) this.renderDial3DFrame(this.dialPos);
+            });
+          });
+
+          const shell = document.getElementById('switcherDialShell');
+          const trackWrap = document.getElementById('switcherDialTrackWrap');
+
+          if (trackWrap && shell) {
+            let pointerDown = false;
+            let pointerId = null;
+            let startX = 0;
+            let startPos = 0;
+
+            trackWrap.addEventListener('pointerdown', (e) => {
+              if (!this.dialDocked) return;
+              if (e.button !== undefined && e.button !== 0) return;
+              if (this.dialRafId && typeof cancelAnimationFrame === 'function') {
+                cancelAnimationFrame(this.dialRafId);
+                this.dialRafId = null;
+              }
+              pointerDown = true;
+              this.dialDragging = false;
+              pointerId = e.pointerId;
+              startX = e.clientX;
+              startPos = this.dialPos;
+            });
+
+            trackWrap.addEventListener('pointermove', (e) => {
+              if (!pointerDown || e.pointerId !== pointerId) return;
+              const dx = e.clientX - startX;
+
+              if (!this.dialDragging && Math.abs(dx) > 3) {
+                this.dialDragging = true;
+                this.suppressNextDialClick = true;
+                shell.classList.add('is-dragging');
+                try { trackWrap.setPointerCapture(e.pointerId); } catch (_) {}
+              }
+              if (this.dialDragging) {
+                e.preventDefault();
+                const N = this.languages.length;
+                const nextPos = startPos - (dx / 30);
+                this.dialPos = nextPos;
+                this.dialTargetPos = nextPos;
+                this.renderDial3DFrame(nextPos);
+
+                const nearestIdx = ((Math.round(nextPos) % N) + N) % N;
+                const nearestCode = this.languages[nearestIdx].code;
+                if (nearestCode && nearestCode !== this.activeLang) {
+                  this.selectLang(nearestCode, true);
+                }
+              }
+            });
+
+            const finishDrag = (e) => {
+              if (!pointerDown || (e && e.pointerId !== pointerId)) return;
+              const wasDragging = this.dialDragging;
+              pointerDown = false;
+              this.dialDragging = false;
+              pointerId = null;
+              shell.classList.remove('is-dragging');
+              if (wasDragging) {
+                try { if (e) trackWrap.releasePointerCapture(e.pointerId); } catch (_) {}
+                const N = this.languages.length;
+                const snappedPos = Math.round(this.dialPos);
+                const snappedCode = this.languages[((snappedPos % N) + N) % N].code;
+                this.animateDialTo(snappedPos);
+                if (snappedCode !== this.activeLang) {
+                  this.selectLang(snappedCode, true);
+                }
+                setTimeout(() => { this.suppressNextDialClick = false; }, 60);
+              }
+            };
+
+            trackWrap.addEventListener('pointerup', finishDrag);
+            trackWrap.addEventListener('pointercancel', finishDrag);
+          }
+
+          if (shell) {
+            let lastWheelAt = 0;
+            shell.addEventListener('wheel', (e) => {
+              if (!this.dialDocked) return;
+              const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+              if (Math.abs(delta) < 6) return;
+              e.preventDefault();
+              const now = Date.now();
+              if (now - lastWheelAt < 140) return;
+              lastWheelAt = now;
+              this.stepLanguageDial(delta > 0 ? 1 : -1);
+            }, { passive: false });
+          }
+
+          updateDock();
+        },
+
+        stepLanguageDial(delta) {
+          const N = this.languages.length;
+          const nextTarget = Math.round(this.dialTargetPos) + delta;
+          const nextIdx = ((nextTarget % N) + N) % N;
+          this.animateDialTo(nextTarget);
+          this.selectLang(this.languages[nextIdx].code, true);
+        },
+
+        async loadFromBackend(code) {
+          if (!window.PolyglotAPI) return;
+          try {
+            const res = await window.PolyglotAPI.fetchRegisterSwitcher(code);
+            if (res && Array.isArray(res.sequence) && res.sequence.length > 0) {
+              this.backendLive = true;
+              this.decks[code] = {
+                flag: res.language.flag || OFFLINE_DECKS[code].flag,
+                title: `${res.language.name} Switcher: ${res.formal_register.name} → ${res.regional_register.name}`,
+                formalLabel: `${res.formal_register.id} (${res.formal_register.name})`,
+                regionalLabel: `${res.regional_register.id} (${res.regional_register.name})`,
+                sequence: res.sequence
+              };
+            }
+          } catch (_) {
+            this.backendLive = false;
+          }
+        },
+
+        async loadVocabFromBackend() {
+          if (!window.PolyglotAPI || typeof window.PolyglotAPI.fetchVocab !== 'function') return;
+          try {
+            const res = await window.PolyglotAPI.fetchVocab();
+            if (res && Array.isArray(res.vocab) && res.vocab.length > 0) {
+              this.backendLive = true;
+              this.vocabItems = res.vocab;
+              if (Array.isArray(res.false_friend_alerts) && res.false_friend_alerts.length > 0) {
+                this.vocabAlerts = res.false_friend_alerts;
+              }
+            }
+          } catch (_) {}
+        },
+
+        async selectLang(code, fromCarousel = false) {
+          this.activeLang = code;
+          this.stepIndex = 0;
+          if (this.vocabFilter === 'ALERTS') this.vocabFilter = 'ALL';
+          this.activeAlertUid = code === 'cs' ? 'FF_CZ_POZOR' : code === 'ru' ? 'FF_CZ_CERSTVY' : null;
+          if (!fromCarousel && !this.dialDragging) {
+            const N = this.languages.length;
+            const targetIdx = this.languages.findIndex(l => l.code === code);
+            if (targetIdx >= 0) {
+              let diff = ((targetIdx - this.dialTargetPos) % N + N) % N;
+              if (diff > N / 2) diff -= N;
+              this.$nextTick(() => this.animateDialTo(this.dialTargetPos + diff));
+            }
+          }
+          await this.loadFromBackend(code);
+        },
+
+        setCzechTrack(track) {
+          this.czechTrack = track;
+          this.stepIndex = 0;
+        },
+
+        get currentIbPairLabel() {
+          return IB_PAIR_LABELS[this.activeLang] || IB_PAIR_LABELS.cs;
+        },
+
+        get currentMeta() {
+          return this.decks[this.activeLang] || OFFLINE_DECKS.cs;
+        },
+
+        get sequence() {
+          if (this.activeLang === 'cs' && this.czechTrack === 'exec') {
+            return CZECH_IB_EXEC_SEQUENCE;
+          }
+          return this.currentMeta.sequence;
+        },
+
+        get currentCard() {
+          return this.sequence[this.stepIndex] || this.sequence[0];
+        },
+
+        get activeTier() {
+          return this.currentCard.tier || (this.currentCard.reg === 'BRIDGE' ? 'BRIDGE' : 'FORMAL');
+        },
+
+        get langVocabItems() {
+          return this.vocabItems.filter(v => v.lang_code === this.activeLang && v.register_type !== 'FALSE_FRIEND_ALERT');
+        },
+
+        get alertNodes() {
+          return this.vocabItems.filter(v => v.register_type === 'FALSE_FRIEND_ALERT');
+        },
+
+        get filteredVocabItems() {
+          if (this.vocabFilter === 'ALERTS') {
+            return this.alertNodes;
+          }
+          if (this.vocabFilter === 'FORMAL_EXAM' || this.vocabFilter === 'REGIONAL_RIFF') {
+            return this.langVocabItems.filter(v => v.register_type === this.vocabFilter);
+          }
+          return this.langVocabItems;
+        },
+
+        get activeAlertNode() {
+          if (!this.activeAlertUid) return null;
+          return this.alertNodes.find(a => a.uid === this.activeAlertUid) || null;
+        },
+
+        getLinkedAlertForVocab(vocabUid) {
+          const edge = this.vocabAlerts.find(e => e.source_uid === vocabUid);
+          if (!edge) return null;
+          return this.alertNodes.find(a => a.uid === edge.target_uid) || null;
+        },
+
+        inspectVocab(v) {
+          if (v.register_type === 'FALSE_FRIEND_ALERT') {
+            this.activeAlertUid = v.uid;
+            return;
+          }
+          const linked = this.getLinkedAlertForVocab(v.uid);
+          if (linked) {
+            this.activeAlertUid = linked.uid;
+          }
+        },
+
+        setTier(tier) {
+          const idx = this.sequence.findIndex(s => s.tier === tier);
+          if (idx !== -1) this.stepIndex = idx;
+        },
+
+        selectStep(idx) {
+          this.stepIndex = idx;
+        },
+
+        nextCard() {
+          this.stepIndex = (this.stepIndex + 1) % this.sequence.length;
+        },
+
+        prevCard() {
+          this.stepIndex = (this.stepIndex - 1 + this.sequence.length) % this.sequence.length;
+        }
+      };
+    }
+  </script>
+</body>
+</html>

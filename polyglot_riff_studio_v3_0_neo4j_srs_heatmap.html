@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Polyglot Interpersonal Riff Studio — Neo4j SRS Heatmap & Deck Builder</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="polyglot_api_client.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+    body { font-family: 'Inter', sans-serif; background-color: #090d16; color: #f1f5f9; }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+    .slang-token {
+      border-bottom: 2px dashed #f59e0b;
+      color: #fde68a;
+      cursor: pointer;
+      padding: 0 2px;
+      border-radius: 3px;
+      transition: all 0.15s ease;
+    }
+    .slang-token:hover { background-color: rgba(245, 158, 11, 0.25); color: #fff; }
+    @keyframes pulse-amber {
+      0%, 100% { stroke-opacity: 1; }
+      50% { stroke-opacity: 0.35; }
+    }
+    .edge-rusty {
+      stroke-dasharray: 6, 4;
+      animation: pulse-amber 1.8s infinite ease-in-out;
+    }
+    .edge-etymology {
+      stroke-dasharray: 3, 3;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white">
+
+  <!-- TOP NAVIGATION BAR -->
+  <header class="border-b border-slate-800 bg-slate-950/90 backdrop-blur sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-indigo-500 via-amber-500 to-emerald-500 flex items-center justify-center font-bold text-slate-950 shadow-lg">
+          4C
+        </div>
+        <div>
+          <h1 class="font-bold text-base tracking-tight text-white flex items-center gap-2">
+            POLYGLOT RIFF STUDIO
+            <span class="text-[11px] mono uppercase px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Neo4j SRS Engine v3.0</span>
+          </h1>
+          <p class="text-xs text-slate-400">5 Regional Personas • Etymological Root Graph • Live SRS Edge Telemetry</p>
+        </div>
+      </div>
+
+      <!-- Mode Switcher -->
+      <div class="flex items-center gap-1.5 bg-slate-900 p-1 rounded-xl border border-slate-800">
+        <button onclick="switchMode('studio')" id="btn-mode-studio" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition bg-indigo-600 text-white">
+          1. 4-C Studio & SRS Drill
+        </button>
+        <button onclick="switchMode('graph')" id="btn-mode-graph" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition text-slate-300 hover:text-white">
+          2. Neo4j Force-Graph Heatmap
+        </button>
+        <button onclick="switchMode('builder')" id="btn-mode-builder" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition text-slate-300 hover:text-white">
+          3. Cypher / JSON Deck Builder
+        </button>
+      </div>
+
+      <!-- Quick Stats & Reset -->
+      <div class="flex items-center gap-3 text-xs mono">
+        <span id="stat-nodes" class="px-2.5 py-1 rounded bg-slate-900 border border-slate-800 text-slate-300">Nodes: 0</span>
+        <span id="stat-mastery" class="px-2.5 py-1 rounded bg-emerald-950/60 border border-emerald-700/50 text-emerald-300">Avg Mastery: 0%</span>
+        <button onclick="simulateRust()" title="Simulate 10 days of decay on random edges" class="px-2.5 py-1 rounded bg-amber-500/10 border border-amber-500/40 text-amber-300 hover:bg-amber-500/20 transition">
+          ⚡ Sim Rust
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN WORKSPACE -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-6">
+
+    <!-- PERSONA BAR (Shared across Studio & Graph filter) -->
+    <section class="mb-6">
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+        <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Active Regional Persona Frequency</span>
+        <div class="flex items-center gap-2 text-xs text-slate-400">
+          <span>Social Arena:</span>
+          <select id="arena-select" onchange="changeArena(this.value)" class="bg-slate-900 border border-slate-700 text-slate-200 rounded-lg px-2.5 py-1 text-xs font-medium focus:outline-none focus:border-indigo-500">
+            <option value="terrace">Late-Night Terrace / Lounge</option>
+            <option value="spark">First-Impression Spark</option>
+            <option value="adventure">Melting Hesitation into Action</option>
+          </select>
+        </div>
+      </div>
+      <div id="persona-tabs" class="grid grid-cols-2 sm:grid-cols-5 gap-2.5"></div>
+    </section>
+
+    <!-- VIEW 1: 4-C STUDIO & SRS TELEPROMPTER -->
+    <section id="view-studio" class="space-y-6">
+      <!-- Linguistic Mechanics Banner -->
+      <div id="mechanics-banner" class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 grid grid-cols-1 md:grid-cols-3 gap-4"></div>
+
+      <!-- 4-C Cards Grid + Idiom Spotlight Sidebar -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div id="cards-container" class="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+
+        <!-- Right Column: Idiom Spotlight + Live SRS Transition Grader -->
+        <div class="space-y-4">
+          <!-- SRS Transition Drill Widget -->
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold uppercase tracking-wider text-emerald-400">SRS Edge Mastery Grader</span>
+              <span id="active-edge-badge" class="text-[11px] mono px-2 py-0.5 rounded bg-slate-800 text-slate-300">Edge: COMP → CHAM</span>
+            </div>
+            <p class="text-xs text-slate-400 mb-4">
+              Read the active card sequence out loud. Rate how naturally your vocal cadence and regional inflection landed to update the Neo4j edge weight:
+            </p>
+            <div class="grid grid-cols-3 gap-2 mb-3">
+              <button onclick="gradeActiveTransition(1)" class="py-2 px-3 rounded-xl bg-rose-950/60 hover:bg-rose-900/80 border border-rose-700/50 text-rose-200 text-xs font-semibold transition">
+                1 • Rusty (-15%)
+              </button>
+              <button onclick="gradeActiveTransition(3)" class="py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 text-xs font-semibold transition">
+                3 • Solid (+2%)
+              </button>
+              <button onclick="gradeActiveTransition(5)" class="py-2 px-3 rounded-xl bg-emerald-950/70 hover:bg-emerald-900/90 border border-emerald-600/50 text-emerald-200 text-xs font-semibold transition">
+                5 • Nailed It (+14%)
+              </button>
+            </div>
+            <div id="srs-feedback" class="text-[11px] mono text-slate-400 bg-slate-950 p-2.5 rounded-lg border border-slate-800/80">
+              Select any card or transition and grade your delivery to update the Force-Graph heatmap.
+            </div>
+          </div>
+
+          <!-- Idiom & Etymology Spotlight -->
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold uppercase tracking-wider text-amber-400">Idiom & Etymology Spotlight</span>
+              <span class="text-[11px] text-slate-500">Click dashed terms</span>
+            </div>
+            <div id="idiom-spotlight-content" class="space-y-3 text-sm">
+              <p class="text-slate-400 text-xs italic">Click any <span class="slang-token">highlighted regional idiom</span> inside the 4-C cards to inspect its acoustic delivery, literal meaning, and cross-language etymological cousins.</p>
+            </div>
+          </div>
+
+          <!-- Cross-Language Roulette Trigger -->
+          <div class="bg-gradient-to-br from-indigo-950/60 to-slate-900 border border-indigo-500/30 rounded-2xl p-5">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="text-sm font-bold text-white">Polyglot Chameleon Roulette</h3>
+              <button onclick="spinRoulette()" class="px-3 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold text-white shadow transition">
+                🎲 Spin 4-C Mashup
+              </button>
+            </div>
+            <p class="text-xs text-slate-300 mb-3">Traverses `:PIVOTS_VIA` bridge nodes across all 5 languages so you can drill mid-sentence code-switching.</p>
+            <div id="roulette-output" class="space-y-2 text-xs"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 2: NEO4J FORCE-GRAPH HEATMAP EXPLORER -->
+    <section id="view-graph" class="hidden space-y-4">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4">
+        <div class="flex flex-wrap items-center gap-4 text-xs">
+          <span class="font-semibold text-slate-200">SRS Edge Heatmap Legend:</span>
+          <span class="flex items-center gap-1.5"><span class="w-4 h-1 bg-emerald-400 inline-block rounded"></span> Mastered (≥85%)</span>
+          <span class="flex items-center gap-1.5"><span class="w-4 h-1 bg-indigo-400 inline-block rounded"></span> Active (60–84%)</span>
+          <span class="flex items-center gap-1.5"><span class="w-4 h-1 bg-amber-400 inline-block rounded border-b border-dashed"></span> Rusty / Needs Drill (&lt;60% or &gt;7d old)</span>
+          <span class="flex items-center gap-1.5"><span class="w-4 h-0.5 bg-fuchsia-400 inline-block"></span> `:SHARES_VIBE_WITH` Etymology</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="filterGraphByLang('ALL')" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-xs text-slate-200">Show All</button>
+          <button onclick="filterGraphRustyOnly()" class="px-2.5 py-1 rounded bg-amber-500/20 border border-amber-500/40 text-amber-300 text-xs hover:bg-amber-500/30">Highlight Rusty Paths</button>
+          <button onclick="renderForceGraph()" class="px-2.5 py-1 rounded bg-indigo-600 text-white text-xs">Re-Center Graph</button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+        <!-- D3 Canvas Container -->
+        <div class="lg:col-span-3 bg-slate-950 border border-slate-800 rounded-2xl relative overflow-hidden h-[620px]" id="graph-canvas-wrapper">
+          <svg id="neo4j-svg" class="w-full h-full cursor-grab active:cursor-grabbing"></svg>
+          <div class="absolute bottom-3 left-3 bg-slate-900/90 backdrop-blur border border-slate-800 rounded-xl px-3 py-2 text-[11px] text-slate-400 pointer-events-none">
+            Drag nodes to rearrange • Click any Node or Edge to inspect & drill SRS mastery
+          </div>
+        </div>
+
+        <!-- Node / Edge Inspector Panel -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between h-[620px] overflow-y-auto">
+          <div id="graph-inspector" class="space-y-4">
+            <div class="text-xs font-bold uppercase tracking-wider text-indigo-400">Graph Inspector</div>
+            <p class="text-xs text-slate-400">Click any `:Persona`, `:Card`, `:Bridge`, `:Idiom`, or relationship edge in the force-directed graph to inspect its properties and trigger an immediate SRS fluency update.</p>
+          </div>
+
+          <div class="pt-4 border-t border-slate-800 mt-4">
+            <div class="text-xs font-semibold text-slate-300 mb-2">Rusty Transitions Queue</div>
+            <div id="rusty-queue-list" class="space-y-2 text-xs max-h-48 overflow-y-auto"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 3: CYPHER / JSON DECK BUILDER -->
+    <section id="view-builder" class="hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Left: Add New Card / Idiom / Bridge Form -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
+          <h2 class="text-base font-bold text-white flex items-center justify-between">
+            <span>Inject New Riff Node into Graph</span>
+            <span class="text-xs font-normal text-emerald-400 mono">Auto-saves to localStorage</span>
+          </h2>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs text-slate-400 mb-1">Persona / Register</label>
+              <select id="new-card-lang" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white">
+                <option value="CZ_OVA">🇨🇿 Ostravština (Industrial Peer)</option>
+                <option value="AT_VIE">🇦🇹 Viennese Schmäh (Kaffeehaus)</option>
+                <option value="RU_ALA">🇰🇿 Almaty Russian (Terrace Insider)</option>
+                <option value="EN_YYC">🇨🇦 Calgary English (Backstage Rock)</option>
+                <option value="ES_SOT">🇪🇸 Sotogrande Spanish (Duende)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs text-slate-400 mb-1">4-C Stage</label>
+              <select id="new-card-stage" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white">
+                <option value="COMPLIMENT">1. COMPLIMENT</option>
+                <option value="CHAMELEON">2. CHAMELEON</option>
+                <option value="COUNTERACT">3. COUNTERACT</option>
+                <option value="CURIOSITY">4. CURIOSITY</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs text-slate-400 mb-1">Riff Monologue Text</label>
+            <textarea id="new-card-text" rows="3" placeholder="e.g., Máte to postavené fajně, ale to ruční překlápění je šichta navíc..." class="w-full bg-slate-950 border border-slate-700 rounded-lg p-3 text-xs text-white focus:border-indigo-500 focus:outline-none"></textarea>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs text-slate-400 mb-1">Featured Slang / Idiom Term</label>
+              <input id="new-card-idiom" type="text" placeholder="e.g., fajront / šichta / Oida" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white" />
+            </div>
+            <div>
+              <label class="block text-xs text-slate-400 mb-1">Vocal Delivery Cue</label>
+              <input id="new-card-delivery" type="text" placeholder="e.g., Clipped vowels, drop half octave" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs text-slate-400 mb-1">Connect From Node UID (Optional)</label>
+              <input id="new-card-from" type="text" placeholder="e.g., CZ_OVA_CHAM" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white mono" />
+            </div>
+            <div>
+              <label class="block text-xs text-slate-400 mb-1">Etymological Cousin Term (Optional)</label>
+              <input id="new-card-etym" type="text" placeholder="e.g., an der Garderobe abgeben" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white" />
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3 pt-2">
+            <button onclick="addCustomNodeToGraph()" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2.5 rounded-xl text-xs shadow transition">
+              + Commit Node & Wire Edges to Graph
+            </button>
+            <button onclick="resetGraphToDefaults()" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-rose-950 text-slate-300 hover:text-rose-200 text-xs transition">
+              Reset Default Seed
+            </button>
+          </div>
+        </div>
+
+        <!-- Right: Live Cypher & JSON Generator -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col justify-between space-y-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-base font-bold text-white">Live Neo4j Cypher & JSON Export</h2>
+              <p class="text-xs text-slate-400">Reflects all live SRS edge weights (`r.weight`), timestamps, and custom nodes.</p>
+            </div>
+            <div class="flex gap-2">
+              <button onclick="refreshExportView('cypher')" id="btn-exp-cypher" class="px-3 py-1 rounded-lg bg-indigo-600 text-white text-xs font-semibold">Cypher (.cypher)</button>
+              <button onclick="refreshExportView('json')" id="btn-exp-json" class="px-3 py-1 rounded-lg bg-slate-800 text-slate-300 text-xs font-semibold">JSON State</button>
+            </div>
+          </div>
+
+          <textarea id="export-code-box" readonly class="w-full h-72 bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-[11px] mono text-emerald-300 focus:outline-none"></textarea>
+
+          <div class="flex items-center justify-between gap-3">
+            <button onclick="copyExportCode()" class="flex-1 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition">
+              📋 Copy to Clipboard
+            </button>
+            <button onclick="importJsonPrompt()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs transition">
+              ⬆️ Import JSON State
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // =========================================================================
+    // 1. DEFAULT GRAPH STATE (5 PERSONAS, OSTRAVIAN MERGED, ETYMOLOGY & SRS)
+    // =========================================================================
+    const STORAGE_KEY = 'POLYGLOT_NEO4J_RIFF_STATE_V3';
+
+    const DEFAULT_STATE = {
+      activeLang: 'CZ_OVA',
+      activeArena: 'terrace',
+      selectedEdgeId: 'E_CZ_1',
+      personas: {
+        CZ_OVA: {
+          id: 'CZ_OVA',
+          flag: '🇨🇿',
+          name: 'Ostravština',
+          subtitle: 'Moravian-Silesian Trench & Tech Peer',
+          family: 'West Slavic + Austrian Industrial Contact',
+          rhythm: 'Clipped short vowels, uncompromising first-syllable punch, zero corporate padding.',
+          trick: 'Austrian industrial loans (fachat, šichta, fajront) + Silesian causal particle "bo" & spatial "kaj".',
+          posture: 'Forearms on the table, steady eye contact, pragmatic nod.'
+        },
+        AT_VIE: {
+          id: 'AT_VIE',
+          flag: '🇦🇹',
+          name: 'Wiener Schmäh',
+          subtitle: 'Kaffeehaus Sovereignty & Velvet Irony',
+          family: 'Austro-Bavarian',
+          rhythm: 'Syncopated waltz cadence; stretch vowels on ironic understatements.',
+          trick: 'Modal particles (eh, halt, ja, wohl) + theatrical disbelief ("Geh bitte, Oida").',
+          posture: 'Lean back in the chair, slight crooked grin, unhurried pause.'
+        },
+        RU_ALA: {
+          id: 'RU_ALA',
+          flag: '🇰🇿',
+          name: 'Almaty Insider',
+          subtitle: 'Южная Столица Terrace Warmth',
+          family: 'Slavic-Turkic Contact',
+          rhythm: 'Deep chest resonance, slow warm openings, sharp decisive pivots.',
+          trick: 'Kinship vocatives (родной, брат) + high-trust markers (базару нет, от души, по красоте).',
+          posture: 'Open chest, warm hospitable gesture as if pouring tea at a dastarkhan.'
+        },
+        EN_YYC: {
+          id: 'EN_YYC',
+          flag: '🇨🇦',
+          name: 'Calgary Flair',
+          subtitle: 'Foothills Backstage & Straight-Shooter',
+          family: 'Anglo-Germanic (Western Canadian)',
+          rhythm: 'Percussive monosyllabic punch, warm gravel, zero pretension.',
+          trick: 'Disarming "bud" address + high-horsepower mechanical metaphors.',
+          posture: 'Relaxed shoulders, half-smirk, leaning in like you are sharing backstage passes.'
+        },
+        ES_SOT: {
+          id: 'ES_SOT',
+          flag: '🇪🇸',
+          name: 'Sotogrande Duende',
+          subtitle: 'Costa del Sol Sun & Playful Challenge',
+          family: 'Iberian Romance (Andaluz High Register)',
+          rhythm: 'Rapid melodic bursts followed by dramatic, sun-soaked pauses.',
+          trick: 'Conspiratorial subjunctive mood + sensory hyperbole (duende, ni de coña, mójate).',
+          posture: 'Expressive hands, warm eyes, leaning forward on the counterattack.'
+        }
+      },
+      idioms: {
+        'fachat': { term: 'fachat', lang: 'CZ_OVA', origin: 'Austrian German: Fach / fachen', meaning: 'To run smoothly, fire on all cylinders without babysitting.', delivery: 'Short clipped "a" vowels, punch the first syllable.', cousin: 'сделали по красоте' },
+        'šichta': { term: 'šichta', lang: 'CZ_OVA', origin: 'German: Schicht (mining/industrial shift)', meaning: 'Heavy, grueling manual shift or pointless grind.', delivery: 'Heavy consonant weight, shake head slightly.', cousin: 'G’schichtldrucken' },
+        'fajront': { term: 'fajront', lang: 'CZ_OVA', origin: 'German: Feierabend', meaning: 'Clean quitting time when the job is properly finished.', delivery: 'Exhale warmly on the second syllable.', cousin: 'an der Garderobe abgeben' },
+        'bo': { term: 'bo', lang: 'CZ_OVA', origin: 'Silesian / Ostravian causal particle', meaning: 'Because (protože) — never "or". Instant local credibility marker.', delivery: 'Quick unstressed connector.', cousin: 'базару нет' },
+        'kaj': { term: 'kaj', lang: 'CZ_OVA', origin: 'Silesian spatial marker', meaning: 'Where (kde).', delivery: 'Crisp and fast.', cousin: null },
+        'an der Garderobe abgeben': { term: 'an der Garderobe abgeben', lang: 'AT_VIE', origin: 'Viennese Theater/Opera coat-check trope', meaning: 'Check your stiff caution at the coat check before we talk.', delivery: 'Wry smile, casual wave of the hand.', cousin: 'fajront' },
+        'G’schichtldrucken': { term: 'G’schichtldrucken', lang: 'AT_VIE', origin: 'Viennese dialect', meaning: 'Spinning tall tales or polite excuses.', delivery: 'Drop half an octave, raise one eyebrow.', cousin: 'all hat and no cattle' },
+        'schwer in Ordnung': { term: 'schwer in Ordnung', lang: 'AT_VIE', origin: 'Viennese understatement', meaning: 'Genuinely impressive / solid character.', delivery: 'Slow, appreciative nod.', cousin: 'сделали по красоте' },
+        'базару нет': { term: 'базару нет', lang: 'RU_ALA', origin: 'Almaty / Post-Soviet street-to-executive candor', meaning: 'Undeniably true, no argument there.', delivery: 'Palm briefly open, grounded low voice.', cousin: 'bo' },
+        'сделали по красоте': { term: 'сделали по красоте', lang: 'RU_ALA', origin: 'Southern Capital hospitality & craft idiom', meaning: 'Built with real soul, style, and precision.', delivery: 'Warm smile, slow emphasis.', cousin: 'fachat' },
+        'горный беркут в золотой клетке': { term: 'горный беркут в золотой клетке', lang: 'RU_ALA', origin: 'Kazakh steppe imagery', meaning: 'Keeping a golden eagle locked in a gilded cage (playing too small).', delivery: 'Lean forward, quiet intensity.', cousin: '69 Mustang collecting dust' },
+        'all hat and no cattle': { term: 'all hat and no cattle', lang: 'EN_YYC', origin: 'Alberta ranch & foothills idiom', meaning: 'All flash and big talk with zero horsepower underneath.', delivery: 'Dry chuckle, shake head.', cousin: 'G’schichtldrucken' },
+        '69 Mustang collecting dust': { term: '69 Mustang collecting dust', lang: 'EN_YYC', origin: 'Calgary garage culture', meaning: 'Sitting on world-class talent/energy and refusing to take it out on the highway.', delivery: 'Drop voice, grin like an accomplice.', cousin: 'горный беркут в золотой клетке' },
+        'tiene duende': { term: 'tiene duende', lang: 'ES_SOT', origin: 'Andalusian flamenco & artistic magnetism', meaning: 'It has unteachable soul, electricity, and spine-tingling presence.', delivery: 'Soft, magnetic intensity.', cousin: 'schwer in Ordnung' },
+        'mirar los toros desde la barrera': { term: 'mirar los toros desde la barrera', lang: 'ES_SOT', origin: 'Spanish taurine idiom', meaning: 'Watching the bulls safely from behind the barrier instead of stepping into the arena.', delivery: 'Playful challenge, raised chin.', cousin: '69 Mustang collecting dust' }
+      },
+      cards: [
+        // CZECH OSTRAVŠTINA (Merged pragmatic + high-trust peer)
+        { uid: 'CZ_OVA_COMP', lang: 'CZ_OVA', stage: 'COMPLIMENT', text: 'Čau, díval jsem se, jak to máte postavené, a klobouk dolů – žádná navoněná bída, ale poctivý základ, co má hlavu a patu.', idioms: [] },
+        { uid: 'CZ_OVA_CHAM', lang: 'CZ_OVA', stage: 'CHAMELEON', text: 'Mně je hned jasné, <span class="slang-token" data-term="kaj">kaj</span> míříš. My taky nehrajeme na prázdné kecy – věci mají čistě <span class="slang-token" data-term="fachat">fachat</span> a nebrzdit lidi.', idioms: ['kaj', 'fachat'] },
+        { uid: 'CZ_OVA_COUNT', lang: 'CZ_OVA', stage: 'COUNTERACT', text: 'Ale upřímně: držet to teď při zemi je zbytečná <span class="slang-token" data-term="šichta">šichta</span> navíc. Když ten strach pustíš, máš čistý <span class="slang-token" data-term="fajront">fajront</span>, <span class="slang-token" data-term="bo">bo</span> ten motor pojede sám.', idioms: ['šichta', 'fajront', 'bo'] },
+        { uid: 'CZ_OVA_CUR', lang: 'CZ_OVA', stage: 'CURIOSITY', text: 'Řekni mi na rovinu – kdybychom tenhle brzdič zítra ráno vyhodili z okna, do čeho by ses pustil s plnou parou?', idioms: [] },
+
+        // VIENNESE GERMAN
+        { uid: 'AT_VIE_COMP', lang: 'AT_VIE', stage: 'COMPLIMENT', text: 'Oida, eines muss man dir lassen: Wie du das aufgestellt hast, das ist <span class="slang-token" data-term="schwer in Ordnung">schwer in Ordnung</span>. Da steckt echtes Herzblut drin.', idioms: ['schwer in Ordnung'] },
+        { uid: 'AT_VIE_CHAM', lang: 'AT_VIE', stage: 'CHAMELEON', text: 'Ich merk eh sofort, wir ticken da gleich. Kein Theater, kein <span class="slang-token" data-term="G’schichtldrucken">G’schichtldrucken</span>, sondern Substanz mit Schmäh.', idioms: ['G’schichtldrucken'] },
+        { uid: 'AT_VIE_COUNT', lang: 'AT_VIE', stage: 'COUNTERACT', text: 'Aber geh bitte: Jetzt auf Nummer sicher gehen? Da musst du die übertriebene Vorsicht mal <span class="slang-token" data-term="an der Garderobe abgeben">an der Garderobe abgeben</span>.', idioms: ['an der Garderobe abgeben'] },
+        { uid: 'AT_VIE_CUR', lang: 'AT_VIE', stage: 'CURIOSITY', text: 'Hand aufs Herz: Wenn wir heute Abend alle Ausreden streichen – was ist der schönste Bledsinn, den wir als Nächstes anreißen?', idioms: [] },
+
+        // ALMATY RUSSIAN
+        { uid: 'RU_ALA_COMP', lang: 'RU_ALA', stage: 'COMPLIMENT', text: 'Слушай, родной, скажу как есть: то, что ты собрал — <span class="slang-token" data-term="сделали по красоте">сделали по красоте</span>. Чувствуется масштаб и живое тепло.', idioms: ['сделали по красоте'] },
+        { uid: 'RU_ALA_CHAM', lang: 'RU_ALA', stage: 'CHAMELEON', text: '<span class="slang-token" data-term="базару нет">Базару нет</span>, мы с тобой одной крови. Нам не нужны маски, важно чтобы разговор шёл по душам, как за широким дастарханом.', idioms: ['базару нет'] },
+        { uid: 'RU_ALA_COUNT', lang: 'RU_ALA', stage: 'COUNTERACT', text: 'Но тормозить сейчас — это держать <span class="slang-token" data-term="горный беркут в золотой клетке">горный беркут в золотой клетке</span>. Твой размах просит высоты, а не паузы.', idioms: ['горный беркут в золотой клетке'] },
+        { uid: 'RU_ALA_CUR', lang: 'RU_ALA', stage: 'CURIOSITY', text: 'Признайся честно: если прямо сейчас рвануть наверх на Медеу без тормозов — какую самую дерзкую идею мы запустим первой?', idioms: [] },
+
+        // CALGARY ENGLISH
+        { uid: 'EN_YYC_COMP', lang: 'EN_YYC', stage: 'COMPLIMENT', text: 'Hold on a second, bud—what you’ve got going here is the real deal. In a room full of people who are <span class="slang-token" data-term="all hat and no cattle">all hat and no cattle</span>, you actually built an engine.', idioms: ['all hat and no cattle'] },
+        { uid: 'EN_YYC_CHAM', lang: 'EN_YYC', stage: 'CHAMELEON', text: 'And look, I love how your mind works—zero corporate polish, straight to the point, ready to crank the amp to eleven.', idioms: [] },
+        { uid: 'EN_YYC_COUNT', lang: 'EN_YYC', stage: 'COUNTERACT', text: 'Which is why playing it safe right now is like keeping a <span class="slang-token" data-term="69 Mustang collecting dust">69 Mustang collecting dust</span> in the garage all summer.', idioms: ['69 Mustang collecting dust'] },
+        { uid: 'EN_YYC_CUR', lang: 'EN_YYC', stage: 'CURIOSITY', text: 'Between you and me—if we kick the garage doors open tonight and just give ’er, where are we taking this thing first?', idioms: [] },
+
+        // SOTOGRANDE SPANISH
+        { uid: 'ES_SOT_COMP', lang: 'ES_SOT', stage: 'COMPLIMENT', text: 'Oye, para el carro un segundo, tío: lo que transmites <span class="slang-token" data-term="tiene duende">tiene duende</span>. Eso no se fabrica ni se compra.', idioms: ['tiene duende'] },
+        { uid: 'ES_SOT_CHAM', lang: 'ES_SOT', stage: 'CHAMELEON', text: 'Se nota que vamos en la misma onda—como charlar en el puerto de Sotogrande al amanecer, sin postureo y con las cartas sobre la mesa.', idioms: [] },
+        { uid: 'ES_SOT_COUNT', lang: 'ES_SOT', stage: 'COUNTERACT', text: '¡Anda ya, ni de coña me digas que vas a ir despacio! Quedarse ahí es <span class="slang-token" data-term="mirar los toros desde la barrera">mirar los toros desde la barrera</span>.', idioms: ['mirar los toros desde la barrera'] },
+        { uid: 'ES_SOT_CUR', lang: 'ES_SOT', stage: 'CURIOSITY', text: 'Mójate un poco conmigo: si nos olvidamos de lo prudente ahora mismo, ¿cuál es la jugada que de verdad te pide el cuerpo?', idioms: [] }
+      ],
+      bridges: [
+        { uid: 'BR_OVA_VIE', from: 'CZ_OVA_CHAM', to: 'AT_VIE_COUNT', text: 'A jak říkají kluci dole ve Vídni u kávy—' },
+        { uid: 'BR_VIE_ALA', from: 'AT_VIE_CHAM', to: 'RU_ALA_COUNT', text: 'Aber weißt eh, как у нас в Алматы говорят от души—' },
+        { uid: 'BR_ALA_OVA', from: 'RU_ALA_CHAM', to: 'CZ_OVA_COUNT', text: 'Короче говоря, jak by ti řekli chlapi v Ostravě—' },
+        { uid: 'BR_YYC_SOT', from: 'EN_YYC_CHAM', to: 'ES_SOT_COUNT', text: 'Listen, bud—como decimos en el sur sin filtro—' }
+      ],
+      edges: [
+        // Ostravian chain
+        { id: 'E_CZ_1', source: 'CZ_OVA_COMP', target: 'CZ_OVA_CHAM', type: 'FLOWS_TO', weight: 0.92, daysAgo: 1, drills: 9 },
+        { id: 'E_CZ_2', source: 'CZ_OVA_CHAM', target: 'CZ_OVA_COUNT', type: 'FLOWS_TO', weight: 0.88, daysAgo: 2, drills: 8 },
+        { id: 'E_CZ_3', source: 'CZ_OVA_COUNT', target: 'CZ_OVA_CUR', type: 'FLOWS_TO', weight: 0.54, daysAgo: 9, drills: 3 },
+        // Viennese chain
+        { id: 'E_AT_1', source: 'AT_VIE_COMP', target: 'AT_VIE_CHAM', type: 'FLOWS_TO', weight: 0.94, daysAgo: 1, drills: 12 },
+        { id: 'E_AT_2', source: 'AT_VIE_CHAM', target: 'AT_VIE_COUNT', type: 'FLOWS_TO', weight: 0.81, daysAgo: 3, drills: 6 },
+        { id: 'E_AT_3', source: 'AT_VIE_COUNT', target: 'AT_VIE_CUR', type: 'FLOWS_TO', weight: 0.86, daysAgo: 2, drills: 7 },
+        // Almaty chain
+        { id: 'E_RU_1', source: 'RU_ALA_COMP', target: 'RU_ALA_CHAM', type: 'FLOWS_TO', weight: 0.90, daysAgo: 1, drills: 10 },
+        { id: 'E_RU_2', source: 'RU_ALA_CHAM', target: 'RU_ALA_COUNT', type: 'FLOWS_TO', weight: 0.52, daysAgo: 11, drills: 2 },
+        { id: 'E_RU_3', source: 'RU_ALA_COUNT', target: 'RU_ALA_CUR', type: 'FLOWS_TO', weight: 0.79, daysAgo: 4, drills: 5 },
+        // Calgary chain
+        { id: 'E_EN_1', source: 'EN_YYC_COMP', target: 'EN_YYC_CHAM', type: 'FLOWS_TO', weight: 0.95, daysAgo: 1, drills: 11 },
+        { id: 'E_EN_2', source: 'EN_YYC_CHAM', target: 'EN_YYC_COUNT', type: 'FLOWS_TO', weight: 0.87, daysAgo: 2, drills: 7 },
+        { id: 'E_EN_3', source: 'EN_YYC_COUNT', target: 'EN_YYC_CUR', type: 'FLOWS_TO', weight: 0.74, daysAgo: 5, drills: 4 },
+        // Sotogrande chain
+        { id: 'E_ES_1', source: 'ES_SOT_COMP', target: 'ES_SOT_CHAM', type: 'FLOWS_TO', weight: 0.78, daysAgo: 3, drills: 5 },
+        { id: 'E_ES_2', source: 'ES_SOT_CHAM', target: 'ES_SOT_COUNT', type: 'FLOWS_TO', weight: 0.48, daysAgo: 12, drills: 2 },
+        { id: 'E_ES_3', source: 'ES_SOT_COUNT', target: 'ES_SOT_CUR', type: 'FLOWS_TO', weight: 0.68, daysAgo: 6, drills: 4 },
+        // Cross-language Bridge pivots
+        { id: 'E_BR_1', source: 'CZ_OVA_CHAM', target: 'AT_VIE_COUNT', type: 'PIVOTS_VIA', weight: 0.55, daysAgo: 8, drills: 3, bridgeUid: 'BR_OVA_VIE' },
+        { id: 'E_BR_2', source: 'AT_VIE_CHAM', target: 'RU_ALA_COUNT', type: 'PIVOTS_VIA', weight: 0.89, daysAgo: 2, drills: 8, bridgeUid: 'BR_VIE_ALA' },
+        { id: 'E_BR_3', source: 'RU_ALA_CHAM', target: 'CZ_OVA_COUNT', type: 'PIVOTS_VIA', weight: 0.49, daysAgo: 10, drills: 2, bridgeUid: 'BR_ALA_OVA' },
+        { id: 'E_BR_4', source: 'EN_YYC_CHAM', target: 'ES_SOT_COUNT', type: 'PIVOTS_VIA', weight: 0.64, daysAgo: 5, drills: 4, bridgeUid: 'BR_YYC_SOT' }
+      ]
+    };
+
+    let state = loadState();
+    let currentExportFormat = 'cypher';
+    let graphFilterLang = 'ALL';
+    let graphRustyOnly = false;
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) return JSON.parse(raw);
+      } catch (e) {}
+      return JSON.parse(JSON.stringify(DEFAULT_STATE));
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      updateHeaderStats();
+    }
+
+    function isEdgeRusty(edge) {
+      return edge.weight < 0.60 || edge.daysAgo >= 7;
+    }
+
+    // =========================================================================
+    // 2. UI RENDERING: STUDIO VIEW
+    // =========================================================================
+    function updateHeaderStats() {
+      const totalNodes = Object.keys(state.personas).length + state.cards.length + Object.keys(state.idioms).length;
+      const avgWeight = state.edges.reduce((acc, e) => acc + e.weight, 0) / state.edges.length;
+      document.getElementById('stat-nodes').textContent = `Nodes: ${totalNodes} • Edges: ${state.edges.length}`;
+      document.getElementById('stat-mastery').textContent = `Avg Mastery: ${Math.round(avgWeight * 100)}%`;
+    }
+
+    function renderPersonaTabs() {
+      const container = document.getElementById('persona-tabs');
+      container.innerHTML = Object.values(state.personas).map(p => {
+        const active = p.id === state.activeLang;
+        return `
+          <button onclick="selectPersona('${p.id}')" class="text-left p-3 rounded-xl border transition flex items-start gap-2.5 ${
+            active
+              ? 'bg-indigo-950/80 border-indigo-500 text-white shadow-lg shadow-indigo-950/50'
+              : 'bg-slate-900/70 border-slate-800 text-slate-300 hover:border-slate-700'
+          }">
+            <span class="text-xl">${p.flag}</span>
+            <div class="overflow-hidden">
+              <div class="font-bold text-xs truncate">${p.name}</div>
+              <div class="text-[11px] text-slate-400 truncate">${p.subtitle}</div>
+            </div>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function renderMechanicsBanner() {
+      const p = state.personas[state.activeLang];
+      document.getElementById('mechanics-banner').innerHTML = `
+        <div>
+          <div class="text-[11px] font-bold uppercase tracking-wider text-indigo-400">Linguistic Family</div>
+          <div class="text-xs font-semibold text-white mt-0.5">${p.family}</div>
+          <div class="text-xs text-slate-400 mt-1">${p.rhythm}</div>
+        </div>
+        <div>
+          <div class="text-[11px] font-bold uppercase tracking-wider text-amber-400">Grammatical & Lexical Intimacy Trick</div>
+          <div class="text-xs text-slate-200 mt-1">${p.trick}</div>
+        </div>
+        <div>
+          <div class="text-[11px] font-bold uppercase tracking-wider text-emerald-400">Posture & Acoustic Resonance</div>
+          <div class="text-xs text-slate-200 mt-1">${p.posture}</div>
+        </div>
+      `;
+    }
+
+    function renderCards() {
+      const langCards = state.cards.filter(c => c.lang === state.activeLang);
+      const stageColors = {
+        COMPLIMENT: 'border-emerald-500/40 bg-emerald-950/15 text-emerald-300',
+        CHAMELEON: 'border-sky-500/40 bg-sky-950/15 text-sky-300',
+        COUNTERACT: 'border-amber-500/40 bg-amber-950/15 text-amber-300',
+        CURIOSITY: 'border-fuchsia-500/40 bg-fuchsia-950/15 text-fuchsia-300'
+      };
+
+      const container = document.getElementById('cards-container');
+      container.innerHTML = langCards.map((c, idx) => {
+        const nextCard = langCards[idx + 1];
+        const edge = nextCard ? state.edges.find(e => e.source === c.uid && e.target === nextCard.uid) : null;
+        const rusty = edge && isEdgeRusty(edge);
+        return `
+          <div onclick="selectEdgeForCard('${c.uid}')" class="bg-slate-900 border ${
+            edge && state.selectedEdgeId === edge.id ? 'border-indigo-500 ring-1 ring-indigo-500/50' : 'border-slate-800'
+          } rounded-2xl p-5 flex flex-col justify-between hover:border-slate-700 transition cursor-pointer">
+            <div>
+              <div class="flex items-center justify-between gap-2 mb-3">
+                <span class="text-[11px] font-bold uppercase px-2.5 py-0.5 rounded-full border ${stageColors[c.stage] || ''}">
+                  ${idx + 1}. ${c.stage}
+                </span>
+                <span class="text-[11px] mono text-slate-500">${c.uid}</span>
+              </div>
+              <p class="text-sm leading-relaxed text-slate-100 font-medium">${c.text}</p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px]">
+              ${
+                edge
+                  ? `<span class="mono ${rusty ? 'text-amber-400 font-semibold' : 'text-emerald-400'}">
+                      ${rusty ? '⚠️ Rusty Edge' : '✓ Edge Mastery'}: ${Math.round(edge.weight * 100)}% (${edge.daysAgo}d ago)
+                     </span>`
+                  : `<span class="mono text-indigo-400">⚡ Open Loop Hook</span>`
+              }
+              <span class="text-slate-400 hover:text-white">Drill Transition →</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Attach click listeners to slang tokens
+      container.querySelectorAll('.slang-token').forEach(el => {
+        el.addEventListener('click', (ev) => {
+          ev.stopPropagation();
+          const term = el.getAttribute('data-term');
+          showIdiomSpotlight(term);
+        });
+      });
+    }
+
+    function showIdiomSpotlight(term) {
+      const info = state.idioms[term];
+      if (!info) return;
+      const cousinInfo = info.cousin ? state.idioms[info.cousin] : null;
+      document.getElementById('idiom-spotlight-content').innerHTML = `
+        <div class="p-3.5 rounded-xl bg-slate-950 border border-amber-500/30 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-base font-bold text-amber-300">${info.term}</span>
+            <span class="text-[11px] mono px-2 py-0.5 rounded bg-slate-800 text-slate-300">${info.lang}</span>
+          </div>
+          <div class="text-xs text-slate-400"><strong class="text-slate-200">Root / Origin:</strong> ${info.origin}</div>
+          <div class="text-xs text-slate-300"><strong class="text-slate-200">Interpersonal Subtext:</strong> ${info.meaning}</div>
+          <div class="text-xs text-emerald-300"><strong class="text-white">Vocal Delivery:</strong> ${info.delivery}</div>
+          ${
+            cousinInfo
+              ? `<div class="pt-2 mt-2 border-t border-slate-800 text-xs text-fuchsia-300">
+                   🔗 <strong>Etymological / Vibe Cousin:</strong>
+                   <button onclick="showIdiomSpotlight('${cousinInfo.term}')" class="underline hover:text-white ml-1">${cousinInfo.term} (${cousinInfo.lang})</button>
+                 </div>`
+              : ''
+          }
+        </div>
+      `;
+    }
+
+    function selectPersona(langId) {
+      state.activeLang = langId;
+      const firstEdge = state.edges.find(e => e.source.startsWith(langId));
+      if (firstEdge) state.selectedEdgeId = firstEdge.id;
+      saveState();
+      renderPersonaTabs();
+      renderMechanicsBanner();
+      renderCards();
+      updateActiveEdgeBadge();
+    }
+
+    function selectEdgeForCard(cardUid) {
+      const edge = state.edges.find(e => e.source === cardUid) || state.edges.find(e => e.target === cardUid);
+      if (edge) {
+        state.selectedEdgeId = edge.id;
+        updateActiveEdgeBadge();
+        renderCards();
+      }
+    }
+
+    function updateActiveEdgeBadge() {
+      const edge = state.edges.find(e => e.id === state.selectedEdgeId);
+      if (!edge) return;
+      document.getElementById('active-edge-badge').textContent = `${edge.source} → ${edge.target} (${Math.round(edge.weight * 100)}%)`;
+    }
+
+    function gradeActiveTransition(score) {
+      const edge = state.edges.find(e => e.id === state.selectedEdgeId);
+      if (!edge) return;
+      const oldW = edge.weight;
+      const delta = (score - 3) * 0.07;
+      edge.weight = Math.max(0.15, Math.min(0.99, +(edge.weight + delta).toFixed(2)));
+      edge.daysAgo = score >= 3 ? 0 : edge.daysAgo;
+      edge.drills = (edge.drills || 1) + 1;
+
+      saveState();
+      renderCards();
+      updateActiveEdgeBadge();
+
+      document.getElementById('srs-feedback').innerHTML = `
+        Updated <span class="text-white font-semibold">${edge.source} → ${edge.target}</span>:
+        Mastery shifted from <span class="text-slate-300">${Math.round(oldW * 100)}%</span> to
+        <span class="${edge.weight >= 0.85 ? 'text-emerald-400' : edge.weight < 0.6 ? 'text-amber-400' : 'text-indigo-400'} font-bold">${Math.round(edge.weight * 100)}%</span>
+        (Drills: ${edge.drills}).
+      `;
+      if (!document.getElementById('view-graph').classList.contains('hidden')) {
+        renderForceGraph();
+      }
+    }
+
+    function simulateRust() {
+      state.edges.forEach((e, i) => {
+        if (i % 3 === 0) {
+          e.daysAgo = 9 + (i % 5);
+          e.weight = Math.max(0.38, +(e.weight - 0.22).toFixed(2));
+        }
+      });
+      saveState();
+      renderCards();
+      if (!document.getElementById('view-graph').classList.contains('hidden')) {
+        renderForceGraph();
+      }
+    }
+
+    function spinRoulette() {
+      const stages = ['COMPLIMENT', 'CHAMELEON', 'COUNTERACT', 'CURIOSITY'];
+      const langs = Object.keys(state.personas);
+      const picks = stages.map(st => {
+        const pool = state.cards.filter(c => c.stage === st);
+        return pool[Math.floor(Math.random() * pool.length)];
+      });
+      const bridge = state.bridges[Math.floor(Math.random() * state.bridges.length)];
+
+      document.getElementById('roulette-output').innerHTML = picks.map((p, i) => `
+        <div class="p-2.5 rounded-lg bg-slate-950/90 border border-slate-800">
+          <div class="flex justify-between text-[10px] mono text-indigo-300 mb-1">
+            <span>${i + 1}. ${p.stage}</span>
+            <span>${state.personas[p.lang].flag} ${p.lang}</span>
+          </div>
+          ${i === 2 ? `<div class="text-[11px] italic text-amber-300 mb-1">↳ Bridge: "${bridge.text}"</div>` : ''}
+          <div class="text-slate-200">${p.text}</div>
+        </div>
+      `).join('');
+    }
+
+    function changeArena(val) {
+      state.activeArena = val;
+      saveState();
+    }
+
+    // =========================================================================
+    // 3. D3.JS NEO4J FORCE-GRAPH HEATMAP EXPLORER
+    // =========================================================================
+    function renderForceGraph() {
+      const svg = d3.select('#neo4j-svg');
+      svg.selectAll('*').remove();
+
+      const wrapper = document.getElementById('graph-canvas-wrapper');
+      const width = wrapper.clientWidth || 800;
+      const height = wrapper.clientHeight || 620;
+
+      const g = svg.append('g');
+
+      svg.call(
+        d3.zoom().scaleExtent([0.35, 3]).on('zoom', (event) => {
+          g.attr('transform', event.transform);
+        })
+      );
+
+      // Build nodes & links
+      const nodes = [];
+      const links = [];
+
+      Object.values(state.personas).forEach(p => {
+        if (graphFilterLang === 'ALL' || graphFilterLang === p.id) {
+          nodes.push({ id: p.id, label: `${p.flag} ${p.name}`, group: 'PERSONA', lang: p.id, data: p });
+        }
+      });
+
+      state.cards.forEach(c => {
+        if (graphFilterLang === 'ALL' || graphFilterLang === c.lang) {
+          nodes.push({ id: c.uid, label: c.uid, group: 'CARD', stage: c.stage, lang: c.lang, data: c });
+          links.push({ id: `P_${c.uid}`, source: c.lang, target: c.uid, type: 'HAS_CARD', weight: 0.9, daysAgo: 0 });
+        }
+      });
+
+      const nodeIds = new Set(nodes.map(n => n.id));
+
+      // Add Idiom nodes and Etymology connections
+      Object.values(state.idioms).forEach(idm => {
+        if (graphFilterLang === 'ALL' || graphFilterLang === idm.lang) {
+          const idmNodeId = `IDM_${idm.term}`;
+          nodes.push({ id: idmNodeId, label: `"${idm.term}"`, group: 'IDIOM', lang: idm.lang, data: idm });
+          nodeIds.add(idmNodeId);
+
+          state.cards.forEach(c => {
+            if (c.idioms && c.idioms.includes(idm.term) && nodeIds.has(c.uid)) {
+              links.push({ id: `SL_${c.uid}_${idm.term}`, source: c.uid, target: idmNodeId, type: 'INJECTS_SLANG', weight: 0.85, daysAgo: 1 });
+            }
+          });
+        }
+      });
+
+      // Etymological cousin links
+      Object.values(state.idioms).forEach(idm => {
+        if (idm.cousin && nodeIds.has(`IDM_${idm.term}`) && nodeIds.has(`IDM_${idm.cousin}`)) {
+          links.push({
+            id: `ETYM_${idm.term}_${idm.cousin}`,
+            source: `IDM_${idm.term}`,
+            target: `IDM_${idm.cousin}`,
+            type: 'SHARES_VIBE_WITH',
+            weight: 0.9,
+            daysAgo: 0
+          });
+        }
+      });
+
+      // Add SRS Edges (:FLOWS_TO and :PIVOTS_VIA)
+      state.edges.forEach(e => {
+        if (nodeIds.has(e.source) && nodeIds.has(e.target)) {
+          if (!graphRustyOnly || isEdgeRusty(e)) {
+            links.push(Object.assign({}, e));
+          }
+        }
+      });
+
+      // Arrow markers
+      svg.append('defs').selectAll('marker')
+        .data(['mastered', 'active', 'rusty'])
+        .enter().append('marker')
+        .attr('id', d => `arrow-${d}`)
+        .attr('viewBox', '0 -5 10 10')
+        .attr('refX', 22)
+        .attr('refY', 0)
+        .attr('markerWidth', 6)
+        .attr('markerHeight', 6)
+        .attr('orient', 'auto')
+        .append('path')
+        .attr('fill', d => d === 'mastered' ? '#34d399' : d === 'rusty' ? '#fbbf24' : '#818cf8')
+        .attr('d', 'M0,-5L10,0L0,5');
+
+      const simulation = d3.forceSimulation(nodes)
+        .force('link', d3.forceLink(links).id(d => d.id).distance(d => d.type === 'PIVOTS_VIA' ? 140 : 85))
+        .force('charge', d3.forceManyBody().strength(-320))
+        .force('center', d3.forceCenter(width / 2, height / 2))
+        .force('collide', d3.forceCollide().radius(34));
+
+      const link = g.append('g')
+        .selectAll('line')
+        .data(links)
+        .enter().append('line')
+        .attr('class', d => {
+          if (d.type === 'SHARES_VIBE_WITH') return 'edge-etymology cursor-pointer';
+          if ((d.type === 'FLOWS_TO' || d.type === 'PIVOTS_VIA') && isEdgeRusty(d)) return 'edge-rusty cursor-pointer';
+          return 'cursor-pointer';
+        })
+        .attr('stroke', d => {
+          if (d.type === 'HAS_CARD') return '#334155';
+          if (d.type === 'INJECTS_SLANG') return '#f59e0b';
+          if (d.type === 'SHARES_VIBE_WITH') return '#e879f9';
+          if (isEdgeRusty(d)) return '#fbbf24';
+          return d.weight >= 0.85 ? '#34d399' : '#818cf8';
+        })
+        .attr('stroke-width', d => {
+          if (d.type === 'FLOWS_TO' || d.type === 'PIVOTS_VIA') return 1.5 + d.weight * 4.5;
+          return 1.5;
+        })
+        .attr('marker-end', d => {
+          if (d.type !== 'FLOWS_TO' && d.type !== 'PIVOTS_VIA') return null;
+          if (isEdgeRusty(d)) return 'url(#arrow-rusty)';
+          return d.weight >= 0.85 ? 'url(#arrow-mastered)' : 'url(#arrow-active)';
+        })
+        .on('click', (event, d) => {
+          inspectGraphEdge(d);
+        });
+
+      const node = g.append('g')
+        .selectAll('g')
+        .data(nodes)
+        .enter().append('g')
+        .call(d3.drag()
+          .on('start', (event, d) => {
+            if (!event.active) simulation.alphaTarget(0.3).restart();
+            d.fx = d.x;
+            d.fy = d.y;
+          })
+          .on('drag', (event, d) => {
+            d.fx = event.x;
+            d.fy = event.y;
+          })
+          .on('end', (event, d) => {
+            if (!event.active) simulation.alphaTarget(0);
+            d.fx = null;
+            d.fy = null;
+          })
+        )
+        .on('click', (event, d) => {
+          inspectGraphNode(d);
+        });
+
+      node.append('circle')
+        .attr('r', d => d.group === 'PERSONA' ? 20 : d.group === 'CARD' ? 14 : 10)
+        .attr('fill', d => {
+          if (d.group === 'PERSONA') return '#4f46e5';
+          if (d.group === 'IDIOM') return '#d97706';
+          const st = d.stage;
+          if (st === 'COMPLIMENT') return '#059669';
+          if (st === 'CHAMELEON') return '#0284c7';
+          if (st === 'COUNTERACT') return '#e11d48';
+          return '#9333ea';
+        })
+        .attr('stroke', '#0f172a')
+        .attr('stroke-width', 2.5);
+
+      node.append('text')
+        .text(d => d.label)
+        .attr('x', 0)
+        .attr('y', d => d.group === 'PERSONA' ? 31 : 24)
+        .attr('text-anchor', 'middle')
+        .attr('fill', '#e2e8f0')
+        .attr('font-size', d => d.group === 'PERSONA' ? '11px' : '10px')
+        .attr('font-weight', d => d.group === 'PERSONA' ? '700' : '500');
+
+      simulation.on('tick', () => {
+        link
+          .attr('x1', d => d.source.x)
+          .attr('y1', d => d.source.y)
+          .attr('x2', d => d.target.x)
+          .attr('y2', d => d.target.y);
+        node.attr('transform', d => `translate(${d.x},${d.y})`);
+      });
+
+      renderRustyQueue();
+    }
+
+    function inspectGraphNode(n) {
+      const box = document.getElementById('graph-inspector');
+      if (n.group === 'CARD') {
+        box.innerHTML = `
+          <div class="text-xs font-bold uppercase tracking-wider text-emerald-400">:Card Node (${n.data.stage})</div>
+          <div class="text-sm font-bold text-white mono">${n.id}</div>
+          <p class="text-xs text-slate-200 bg-slate-950 p-3 rounded-xl border border-slate-800 leading-relaxed">${n.data.text}</p>
+          <button onclick="selectPersona('${n.lang}'); switchMode('studio');" class="w-full py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold text-white">
+            Open in 4-C Teleprompter →
+          </button>
+        `;
+      } else if (n.group === 'IDIOM') {
+        box.innerHTML = `
+          <div class="text-xs font-bold uppercase tracking-wider text-amber-400">:Idiom Node</div>
+          <div class="text-base font-bold text-white">${n.data.term} (${n.data.lang})</div>
+          <div class="text-xs text-slate-300"><strong>Origin:</strong> ${n.data.origin}</div>
+          <div class="text-xs text-slate-300"><strong>Meaning:</strong> ${n.data.meaning}</div>
+          <div class="text-xs text-emerald-300"><strong>Delivery:</strong> ${n.data.delivery}</div>
+        `;
+      } else {
+        box.innerHTML = `
+          <div class="text-xs font-bold uppercase tracking-wider text-indigo-400">:Persona Node</div>
+          <div class="text-base font-bold text-white">${n.data.flag} ${n.data.name}</div>
+          <div class="text-xs text-slate-300">${n.data.family}</div>
+          <div class="text-xs text-slate-400">${n.data.trick}</div>
+        `;
+      }
+    }
+
+    function inspectGraphEdge(e) {
+      const srcId = typeof e.source === 'object' ? e.source.id : e.source;
+      const tgtId = typeof e.target === 'object' ? e.target.id : e.target;
+      const realEdge = state.edges.find(x => x.id === e.id);
+      const box = document.getElementById('graph-inspector');
+
+      if (!realEdge) {
+        box.innerHTML = `
+          <div class="text-xs font-bold uppercase tracking-wider text-fuchsia-400">:${e.type} Relationship</div>
+          <div class="text-xs mono text-white">${srcId} → ${tgtId}</div>
+          <p class="text-xs text-slate-400">Structural or etymological link connecting shared roots across languages.</p>
+        `;
+        return;
+      }
+
+      state.selectedEdgeId = realEdge.id;
+      box.innerHTML = `
+        <div class="text-xs font-bold uppercase tracking-wider text-emerald-400">:${realEdge.type} SRS Edge</div>
+        <div class="text-xs mono text-white font-bold">${srcId} → ${tgtId}</div>
+        <div class="text-xs text-slate-300">
+          Mastery Weight: <strong>${Math.round(realEdge.weight * 100)}%</strong> • Last Drilled: <strong>${realEdge.daysAgo}d ago</strong>
+        </div>
+        <div class="grid grid-cols-3 gap-1.5 pt-2">
+          <button onclick="gradeActiveTransition(1); inspectGraphEdge({id:'${realEdge.id}', source:'${srcId}', target:'${tgtId}'})" class="py-1.5 rounded bg-rose-950 text-rose-200 text-[11px] font-semibold">1 • Rusty</button>
+          <button onclick="gradeActiveTransition(3); inspectGraphEdge({id:'${realEdge.id}', source:'${srcId}', target:'${tgtId}'})" class="py-1.5 rounded bg-slate-800 text-slate-200 text-[11px] font-semibold">3 • Solid</button>
+          <button onclick="gradeActiveTransition(5); inspectGraphEdge({id:'${realEdge.id}', source:'${srcId}', target:'${tgtId}'})" class="py-1.5 rounded bg-emerald-950 text-emerald-200 text-[11px] font-semibold">5 • Nailed</button>
+        </div>
+      `;
+    }
+
+    function renderRustyQueue() {
+      const rustyEdges = state.edges.filter(isEdgeRusty);
+      const list = document.getElementById('rusty-queue-list');
+      if (rustyEdges.length === 0) {
+        list.innerHTML = `<div class="text-emerald-400 text-xs">All conversational edges are above 60% mastery!</div>`;
+        return;
+      }
+      list.innerHTML = rustyEdges.map(e => `
+        <div onclick="inspectGraphEdge({id:'${e.id}', source:'${e.source}', target:'${e.target}'})" class="p-2 rounded-lg bg-amber-950/30 border border-amber-500/30 flex items-center justify-between cursor-pointer hover:bg-amber-950/50">
+          <span class="mono text-[11px] text-amber-200">${e.source} → ${e.target}</span>
+          <span class="mono text-[11px] text-amber-400 font-bold">${Math.round(e.weight * 100)}%</span>
+        </div>
+      `).join('');
+    }
+
+    function filterGraphByLang(lang) {
+      graphFilterLang = lang;
+      graphRustyOnly = false;
+      renderForceGraph();
+    }
+
+    function filterGraphRustyOnly() {
+      graphRustyOnly = !graphRustyOnly;
+      renderForceGraph();
+    }
+
+    // =========================================================================
+    // 4. CYPHER & JSON DECK BUILDER
+    // =========================================================================
+    function addCustomNodeToGraph() {
+      const lang = document.getElementById('new-card-lang').value;
+      const stage = document.getElementById('new-card-stage').value;
+      const rawText = document.getElementById('new-card-text').value.trim();
+      const idiomTerm = document.getElementById('new-card-idiom').value.trim();
+      const delivery = document.getElementById('new-card-delivery').value.trim() || 'Grounded peer inflection';
+      const fromUid = document.getElementById('new-card-from').value.trim();
+      const etymCousin = document.getElementById('new-card-etym').value.trim();
+
+      if (!rawText) return;
+
+      const uid = `${lang}_${stage.slice(0, 4)}_${Math.floor(100 + Math.random() * 900)}`;
+      let formattedText = rawText;
+      const idiomsList = [];
+
+      if (idiomTerm) {
+        idiomsList.push(idiomTerm);
+        state.idioms[idiomTerm] = {
+          term: idiomTerm,
+          lang,
+          origin: 'Custom User Deck Addition',
+          meaning: 'Custom high-rapport regional trigger',
+          delivery,
+          cousin: etymCousin || null
+        };
+        formattedText = rawText.replace(
+          new RegExp(idiomTerm, 'i'),
+          `<span class="slang-token" data-term="${idiomTerm}">${idiomTerm}</span>`
+        );
+      }
+
+      state.cards.push({ uid, lang, stage, text: formattedText, idioms: idiomsList });
+
+      const sourceNode = fromUid || state.cards.find(c => c.lang === lang && c.uid !== uid)?.uid;
+      if (sourceNode) {
+        state.edges.push({
+          id: `E_CUST_${Date.now()}`,
+          source: sourceNode,
+          target: uid,
+          type: sourceNode.startsWith(lang) ? 'FLOWS_TO' : 'PIVOTS_VIA',
+          weight: 0.72,
+          daysAgo: 0,
+          drills: 1
+        });
+      }
+
+      saveState();
+      selectPersona(lang);
+      refreshExportView(currentExportFormat);
+      document.getElementById('new-card-text').value = '';
+      document.getElementById('new-card-idiom').value = '';
+    }
+
+    function generateCypherExport() {
+      const lines = [
+        '// =====================================================================',
+        '// POLYGLOT INTERPERSONAL RIFF STUDIO — NEO4J CYPHER MIGRATION',
+        `// Exported: ${new Date().toISOString()}`,
+        '// =====================================================================',
+        'CREATE CONSTRAINT card_uid IF NOT EXISTS FOR (c:Card) REQUIRE c.uid IS UNIQUE;',
+        'CREATE CONSTRAINT persona_id IF NOT EXISTS FOR (p:Persona) REQUIRE p.id IS UNIQUE;',
+        ''
+      ];
+
+      Object.values(state.personas).forEach(p => {
+        lines.push(`MERGE (p_${p.id}:Persona {id: '${p.id}'}) SET p_${p.id}.name = '${p.name.replace(/'/g, "\\'")}', p_${p.id}.family = '${p.family.replace(/'/g, "\\'")}';`);
+      });
+
+      lines.push('');
+      state.cards.forEach(c => {
+        const cleanText = c.text.replace(/<[^>]*>/g, '').replace(/'/g, "\\'");
+        lines.push(`MERGE (c_${c.uid}:Card {uid: '${c.uid}'}) SET c_${c.uid}.lang = '${c.lang}', c_${c.uid}.stage = '${c.stage}', c_${c.uid}.text = '${cleanText}';`);
+      });
+
+      lines.push('');
+      state.edges.forEach(e => {
+        lines.push(`MATCH (a:Card {uid: '${e.source}'}), (b:Card {uid: '${e.target}'}) MERGE (a)-[r:${e.type}]->(b) SET r.weight = ${e.weight}, r.days_ago = ${e.daysAgo}, r.drills = ${e.drills || 1};`);
+      });
+
+      lines.push('');
+      Object.values(state.idioms).forEach(idm => {
+        if (idm.cousin) {
+          lines.push(`MERGE (i1:Idiom {term: '${idm.term.replace(/'/g, "\\'")}'}) MERGE (i2:Idiom {term: '${idm.cousin.replace(/'/g, "\\'")}'}) MERGE (i1)-[:SHARES_VIBE_WITH]->(i2);`);
+        }
+      });
+
+      return lines.join('\n');
+    }
+
+    function refreshExportView(fmt) {
+      currentExportFormat = fmt;
+      const box = document.getElementById('export-code-box');
+      document.getElementById('btn-exp-cypher').className = fmt === 'cypher' ? 'px-3 py-1 rounded-lg bg-indigo-600 text-white text-xs font-semibold' : 'px-3 py-1 rounded-lg bg-slate-800 text-slate-300 text-xs font-semibold';
+      document.getElementById('btn-exp-json').className = fmt === 'json' ? 'px-3 py-1 rounded-lg bg-indigo-600 text-white text-xs font-semibold' : 'px-3 py-1 rounded-lg bg-slate-800 text-slate-300 text-xs font-semibold';
+
+      box.value = fmt === 'cypher' ? generateCypherExport() : JSON.stringify(state, null, 2);
+    }
+
+    function copyExportCode() {
+      const box = document.getElementById('export-code-box');
+      box.select();
+      document.execCommand('copy');
+    }
+
+    function importJsonPrompt() {
+      const raw = prompt('Paste a exported Polyglot Studio JSON state below:');
+      if (!raw) return;
+      try {
+        state = JSON.parse(raw);
+        saveState();
+        initApp();
+      } catch (e) {
+        alert('Invalid JSON format.');
+      }
+    }
+
+    function resetGraphToDefaults() {
+      localStorage.removeItem(STORAGE_KEY);
+      state = JSON.parse(JSON.stringify(DEFAULT_STATE));
+      initApp();
+    }
+
+    // =========================================================================
+    // 5. NAVIGATION & INITIALIZATION
+    // =========================================================================
+    function switchMode(mode) {
+      ['studio', 'graph', 'builder'].forEach(m => {
+        document.getElementById(`view-${m}`).classList.toggle('hidden', m !== mode);
+        document.getElementById(`btn-mode-${m}`).className = m === mode
+          ? 'px-3.5 py-1.5 rounded-lg text-xs font-semibold transition bg-indigo-600 text-white'
+          : 'px-3.5 py-1.5 rounded-lg text-xs font-semibold transition text-slate-300 hover:text-white';
+      });
+      if (mode === 'graph') renderForceGraph();
+      if (mode === 'builder') refreshExportView(currentExportFormat);
+    }
+
+    function initApp() {
+      updateHeaderStats();
+      renderPersonaTabs();
+      renderMechanicsBanner();
+      renderCards();
+      updateActiveEdgeBadge();
+      spinRoulette();
+    }
+
+    window.addEventListener('DOMContentLoaded', initApp);
+  </script>
+</body>
+</html>

@@ -1,0 +1,648 @@
+{
+  "db_id": "polyglot.ru_ala",
+  "primary_focus": "RU_ALA (Almaty Insider)",
+  "registers": [
+    "RU_ALA",
+    "RU_STD"
+  ],
+  "personas": {
+    "RU_ALA": {
+      "id": "RU_ALA",
+      "tier": "REGIONAL",
+      "flag": "🇰🇿",
+      "name": "Almaty Insider",
+      "subtitle": "Южная Столица Terrace Warmth",
+      "family": "Slavic-Turkic Contact",
+      "address_form": "Warm Peer Ты + Kinship Vocatives (родной, брат)",
+      "rhythm": "Deep chest resonance, slow warm openings, sharp decisive pivots.",
+      "trick": "Kinship vocatives (родной, брат) + high-trust markers (базару нет, от души, по красоте).",
+      "posture": "Open chest, warm hospitable gesture as if pouring tea at a dastarkhan.",
+      "paired_register_id": "RU_STD"
+    },
+    "RU_STD": {
+      "id": "RU_STD",
+      "tier": "FORMAL",
+      "flag": "🌐",
+      "name": "Деловой русский",
+      "subtitle": "Executive Boardroom • Formal Вы & Strategic Scale",
+      "family": "Standard Literary Russian (Executive Register)",
+      "address_form": "Formal Вы + Name/Patronymic or respectful Name",
+      "rhythm": "Calm chest-supported baritone/alto, measured clause rhythm, crisp verbal nouns.",
+      "trick": "High-respect strategic framing (прозрачная архитектура, запас прочности) without bureaucratic coldness.",
+      "posture": "Composed open shoulders, calm analytical nod.",
+      "paired_register_id": "RU_ALA"
+    }
+  },
+  "idioms": {
+    "базару нет": {
+      "term": "базару нет",
+      "lang": "RU_ALA",
+      "origin": "Almaty / Post-Soviet street-to-executive candor",
+      "meaning": "Undeniably true, no argument there.",
+      "delivery": "Palm briefly open, grounded low voice.",
+      "cousin": "bo"
+    },
+    "без лишних понтов": {
+      "term": "без лишних понтов",
+      "lang": "RU_ALA",
+      "origin": "Almaty urban candor",
+      "meaning": "Zero hollow flexing or status posturing—pure substance.",
+      "delivery": "Calm chest voice, slight dismissive hand wave on \"понтов\".",
+      "cousin": "navoněná bída"
+    },
+    "горный беркут в золотой клетке": {
+      "term": "горный беркут в золотой клетке",
+      "lang": "RU_ALA",
+      "origin": "Kazakh steppe imagery",
+      "meaning": "Keeping a golden eagle locked in a gilded cage (playing too small).",
+      "delivery": "Lean forward, quiet intensity.",
+      "cousin": "69 Mustang collecting dust"
+    },
+    "запас прочности": {
+      "term": "запас прочности",
+      "lang": "RU_STD",
+      "origin": "Engineering & executive structural margin metaphor",
+      "meaning": "Built-in structural resilience and headroom under load.",
+      "delivery": "Calm baritone authority.",
+      "cousin": "Substanz vor Show"
+    },
+    "сделали по красоте": {
+      "term": "сделали по красоте",
+      "lang": "RU_ALA",
+      "origin": "Southern Capital hospitality & craft idiom",
+      "meaning": "Built with real soul, style, and precision.",
+      "delivery": "Warm smile, slow emphasis.",
+      "cousin": "fachat"
+    }
+  },
+  "vocab": [
+    {
+      "uid": "RU_V_ANALIZ",
+      "term": "сопоставительный анализ",
+      "lang_code": "ru",
+      "register_id": "RU_STD",
+      "register_type": "FORMAL_EXAM",
+      "meaning": "Comparative literary breakdown",
+      "ib_source": "Russian A1 Paper 1 HL/SL",
+      "grammar_note": "",
+      "etymology": "",
+      "warning": ""
+    },
+    {
+      "uid": "RU_V_OPIRATSA",
+      "term": "опираться на (+ Acc)",
+      "lang_code": "ru",
+      "register_id": "RU_STD",
+      "register_type": "FORMAL_EXAM",
+      "meaning": "Rely upon / base arguments on",
+      "ib_source": "Russian B Paper 2 SL",
+      "grammar_note": "Mandatory Accusative governance",
+      "etymology": "",
+      "warning": ""
+    },
+    {
+      "uid": "RU_V_SREDSTVA",
+      "term": "изобразительно-выразительные средства",
+      "lang_code": "ru",
+      "register_id": "RU_STD",
+      "register_type": "FORMAL_EXAM",
+      "meaning": "Expressive and poetic devices",
+      "ib_source": "Russian A1 Paper 2 HL",
+      "grammar_note": "",
+      "etymology": "",
+      "warning": ""
+    },
+    {
+      "uid": "RU_V_BAZARU",
+      "term": "базару нет",
+      "lang_code": "ru",
+      "register_id": "RU_ALA",
+      "register_type": "REGIONAL_RIFF",
+      "meaning": "Unquestionably / zero doubt",
+      "ib_source": "Almaty Working Register",
+      "grammar_note": "",
+      "etymology": "Turkic-Russian Southern Capital contact",
+      "warning": ""
+    },
+    {
+      "uid": "RU_V_DASTARKHAN",
+      "term": "за широким дастарханом",
+      "lang_code": "ru",
+      "register_id": "RU_ALA",
+      "register_type": "REGIONAL_RIFF",
+      "meaning": "Around a generous table of high-trust hospitality",
+      "ib_source": "Almaty Working Register",
+      "grammar_note": "",
+      "etymology": "Kazakh hospitality metaphor",
+      "warning": ""
+    },
+    {
+      "uid": "RU_V_KRASOTA",
+      "term": "сделали по красоте",
+      "lang_code": "ru",
+      "register_id": "RU_ALA",
+      "register_type": "REGIONAL_RIFF",
+      "meaning": "Executed flawlessly with aesthetic mastery",
+      "ib_source": "Almaty Working Register",
+      "grammar_note": "",
+      "etymology": "",
+      "warning": ""
+    }
+  ],
+  "songs": [
+    {
+      "uid": "SONG_RU_ALA_ASTUDIO",
+      "title": "Джулия (Julia)",
+      "artist": "A-Studio (Batyrkhan Shukenov)",
+      "city_region": "Almaty (Southern Capital / Медео)",
+      "genre": "Almaty Synth-Pop / Kazakhstani Soul",
+      "bpm": 88,
+      "register_id": "RU_ALA",
+      "original_lang": "RU_ALA",
+      "original_lyric": "Девочка моя Джулия, под тёплыми звёздами Алматы мы всё сделаем по красоте, базару нет, как за широким дастарханом.",
+      "translation_es": "Mi chica Julia, bajo las cálidas estrellas de Almaty lo haremos todo con pura belleza, sin duda alguna, como en un gran dastarhan.",
+      "translation_en": "My girl Julia, under the warm stars of Almaty we will do everything with absolute beauty, zero doubt, like at a wide dastarhan.",
+      "translation_cz": "Moje holka Julie, pod teplými hvězdami Almaty všechno uděláme po kráse, žádné pochyby, jako u širokého dastarhanu.",
+      "translation_de": "Mein Mädchen Julia, unter den warmen Sternen von Almaty machen wir alles in vollendeter Schönheit, ohne Zweifel, wie an einem großen Dastarhan.",
+      "translation_ru": "Девочка моя Джулия, под тёплыми звёздами Алматы мы всё сделаем по красоте, базару нет, как за широким дастарханом.",
+      "cultural_vibe": "Terrace warmth, Kazakhstani hospitality, soul-driven execution",
+      "pivot_line": "Слушай, родной, скажу как есть: то, что ты собрал — сделали по красоте. Базару нет, мы с тобой одной крови, давай поговорим по душам, как за широким дастарханом.",
+      "reinforces_card_uid": "RU_ALA_COMP",
+      "slang_vocab_uids": [
+        "RU_V_KRASOTA",
+        "RU_V_BAZARU"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "uid": "RU_ALA_ADVENTURE_CHAM",
+      "lang": "RU_ALA",
+      "stage": "CHAMELEON",
+      "arena": "adventure",
+      "lens": null,
+      "text": "<span class=\"slang-token\" data-term=\"базару нет\">Базару нет</span>, самые легендарные истории всегда начинаются со слов «а поехали прямо сейчас».",
+      "phonetics": "",
+      "english": "No question, the most legendary stories always start with \"let’s roll right now.\"",
+      "idioms": [
+        "базару нет"
+      ]
+    },
+    {
+      "uid": "RU_ALA_ADVENTURE_COMP",
+      "lang": "RU_ALA",
+      "stage": "COMPLIMENT",
+      "arena": "adventure",
+      "lens": null,
+      "text": "По глазам вижу, родной: в тебе живёт дух первооткрывателя, который всё делает с размахом и <span class=\"slang-token\" data-term=\"сделали по красоте\">по красоте</span>.",
+      "phonetics": "",
+      "english": "I can see it in your eyes, brother: you have an explorer’s spirit that does everything with scale and beauty.",
+      "idioms": [
+        "сделали по красоте"
+      ]
+    },
+    {
+      "uid": "RU_ALA_ADVENTURE_COUNT",
+      "lang": "RU_ALA",
+      "stage": "COUNTERACT",
+      "arena": "adventure",
+      "lens": null,
+      "text": "Откладывать на потом — это снова запереть <span class=\"slang-token\" data-term=\"горный беркут в золотой клетке\">горный беркут в золотой клетке</span>, когда горы уже зовут.",
+      "phonetics": "",
+      "english": "Putting it off for later is locking a mountain eagle back in a golden cage when the mountains are already calling.",
+      "idioms": [
+        "горный беркут в золотой клетке"
+      ]
+    },
+    {
+      "uid": "RU_ALA_ADVENTURE_CUR",
+      "lang": "RU_ALA",
+      "stage": "CURIOSITY",
+      "arena": "adventure",
+      "lens": null,
+      "text": "Давай без долгих сборов: если срываемся с места через пять минут — куда берём курс?",
+      "phonetics": "",
+      "english": "Zero long packing: if we take off in five minutes, where are we setting course?",
+      "idioms": []
+    },
+    {
+      "uid": "RU_ALA_B2B_CHAM",
+      "lang": "RU_ALA",
+      "stage": "CHAMELEON",
+      "arena": "b2b",
+      "lens": null,
+      "text": "<span class=\"slang-token\" data-term=\"базару нет\">Базару нет</span>, давай без галстуков и <span class=\"slang-token\" data-term=\"без лишних понтов\">без лишних понтов</span> перейдём сразу к тому, как дышит продакшн.",
+      "phonetics": "",
+      "english": "No question, let’s drop the ties and zero hollow slides and go straight to how production breathes.",
+      "idioms": [
+        "базару нет",
+        "без лишних понтов"
+      ]
+    },
+    {
+      "uid": "RU_ALA_B2B_COMP",
+      "lang": "RU_ALA",
+      "stage": "COMPLIMENT",
+      "arena": "b2b",
+      "lens": null,
+      "text": "На уровне совета директоров скажу прямо: ядро системы вы собрали крепко и <span class=\"slang-token\" data-term=\"сделали по красоте\">сделали по красоте</span>.",
+      "phonetics": "",
+      "english": "At the boardroom level I’ll say it straight: you built the core system solidly and with real craft.",
+      "idioms": [
+        "сделали по красоте"
+      ]
+    },
+    {
+      "uid": "RU_ALA_B2B_COUNT",
+      "lang": "RU_ALA",
+      "stage": "COUNTERACT",
+      "arena": "b2b",
+      "lens": null,
+      "text": "Грузить сильных инженеров ручной рутиной — это держать <span class=\"slang-token\" data-term=\"горный беркут в золотой клетке\">горный беркут в золотой клетке</span> таблиц и отчётов.",
+      "phonetics": "",
+      "english": "Loading strong engineers with manual drudgery is keeping a mountain golden eagle in a cage of spreadsheets.",
+      "idioms": [
+        "горный беркут в золотой клетке"
+      ]
+    },
+    {
+      "uid": "RU_ALA_B2B_CUR",
+      "lang": "RU_ALA",
+      "stage": "CURIOSITY",
+      "arena": "b2b",
+      "lens": null,
+      "text": "Скажи как технарь технарю: какой самый узкий узел в пайплайне мы развяжем первым уже на этой неделе?",
+      "phonetics": "",
+      "english": "Tell me engineer to engineer: what tightest knot in the pipeline do we untie first this very week?",
+      "idioms": []
+    },
+    {
+      "uid": "RU_STD_CHAM_01",
+      "lang": "RU_STD",
+      "stage": "CHAMELEON",
+      "arena": "b2b",
+      "lens": null,
+      "text": "Прекрасно понимаю ваш приоритет: предсказуемая экономика процесса без лишней бюрократии и ручного контроля.",
+      "phonetics": "",
+      "english": "I completely understand your priority: predictable unit economics without extra bureaucracy or manual oversight.",
+      "idioms": []
+    },
+    {
+      "uid": "RU_STD_COMP_01",
+      "lang": "RU_STD",
+      "stage": "COMPLIMENT",
+      "arena": "b2b",
+      "lens": null,
+      "text": "Мы внимательно посмотрели вашу архитектуру — редкий случай на рынке, когда заложен такой серьёзный <span class=\"slang-token\" data-term=\"запас прочности\">запас прочности</span>.",
+      "phonetics": "",
+      "english": "We examined your architecture closely—a rare case on the market with such serious built-in structural headroom.",
+      "idioms": [
+        "запас прочности"
+      ]
+    },
+    {
+      "uid": "HOCH_RU_ALA_BASE",
+      "lang": "RU_ALA",
+      "stage": "CHAMELEON",
+      "arena": "hochkultur",
+      "lens": null,
+      "text": "На вернисаже все говорят красиво, но <span class=\"slang-token\" data-term=\"базару нет\">базару нет</span> — когда за искусством стоит такая живая энергия, хочется творить вместе.",
+      "phonetics": "",
+      "english": "At the vernissage everyone speaks beautifully, and no question—when there is such living energy behind the art, you want to build together.",
+      "idioms": [
+        "базару нет"
+      ]
+    },
+    {
+      "uid": "RU_ALA_HOCHKULTUR_CHAM",
+      "lang": "RU_ALA",
+      "stage": "CHAMELEON",
+      "arena": "hochkultur",
+      "lens": null,
+      "text": "<span class=\"slang-token\" data-term=\"базару нет\">Базару нет</span>, высокое искусство мы любим, но ценим разговор <span class=\"slang-token\" data-term=\"без лишних понтов\">без лишних понтов</span> в антракте.",
+      "phonetics": "",
+      "english": "No question, we appreciate high art while valuing a conversation with zero hollow posturing at intermission.",
+      "idioms": [
+        "базару нет",
+        "без лишних понтов"
+      ]
+    },
+    {
+      "uid": "RU_ALA_HOCHKULTUR_COMP",
+      "lang": "RU_ALA",
+      "stage": "COMPLIMENT",
+      "arena": "hochkultur",
+      "lens": null,
+      "text": "Под этими люстрами много громких слов, брат, но за твоей идеей чувствуется порода — <span class=\"slang-token\" data-term=\"сделали по красоте\">сделали по красоте</span>.",
+      "phonetics": "",
+      "english": "Under these chandeliers there are plenty of loud words, brother, yet behind your idea you feel real pedigree and craft.",
+      "idioms": [
+        "сделали по красоте"
+      ]
+    },
+    {
+      "uid": "RU_ALA_HOCHKULTUR_COUNT",
+      "lang": "RU_ALA",
+      "stage": "COUNTERACT",
+      "arena": "hochkultur",
+      "lens": null,
+      "text": "Держать такой замысел в камерном формате — это <span class=\"slang-token\" data-term=\"горный беркут в золотой клетке\">горный беркут в золотой клетке</span> под бархатным занавесом.",
+      "phonetics": "",
+      "english": "Keeping a vision of that scale in a tiny chamber format is a mountain eagle in a gilded cage behind velvet curtains.",
+      "idioms": [
+        "горный беркут в золотой клетке"
+      ]
+    },
+    {
+      "uid": "RU_ALA_HOCHKULTUR_CUR",
+      "lang": "RU_ALA",
+      "stage": "CURIOSITY",
+      "arena": "hochkultur",
+      "lens": null,
+      "text": "Скажи мне в антракте: какую самую смелую премьеру мы выведем на главную сцену этой весной?",
+      "phonetics": "",
+      "english": "Tell me at intermission: what boldest premiere are we bringing onto the main stage next?",
+      "idioms": []
+    },
+    {
+      "uid": "POLO_RU_ALA_BASE",
+      "lang": "RU_ALA",
+      "stage": "COUNTERACT",
+      "arena": "polo",
+      "lens": null,
+      "text": "У вас порода и размах на миллион, брат — держать такой темп на привязи как <span class=\"slang-token\" data-term=\"горный беркут в золотой клетке\">горный беркут в золотой клетке</span>. Давай дадим простор.",
+      "phonetics": "",
+      "english": "You have thoroughbred scale, brother—holding that pace on a leash is like a mountain eagle in a golden cage. Let’s give it open field.",
+      "idioms": [
+        "горный беркут в золотой клетке"
+      ]
+    },
+    {
+      "uid": "RU_ALA_POLO_CHAM",
+      "lang": "RU_ALA",
+      "stage": "CHAMELEON",
+      "arena": "polo",
+      "lens": null,
+      "text": "<span class=\"slang-token\" data-term=\"базару нет\">Базару нет</span>, в наших краях коней чувствуют сердцем — всё честно и <span class=\"slang-token\" data-term=\"без лишних понтов\">без лишних понтов</span>.",
+      "phonetics": "",
+      "english": "No question, where we come from you feel horses with your heart—honest and with zero hollow flexing.",
+      "idioms": [
+        "базару нет",
+        "без лишних понтов"
+      ]
+    },
+    {
+      "uid": "RU_ALA_POLO_COMP",
+      "lang": "RU_ALA",
+      "stage": "COMPLIMENT",
+      "arena": "polo",
+      "lens": null,
+      "text": "У кромки поля сразу видна порода и хватка, брат: как вы держите темп в седле — <span class=\"slang-token\" data-term=\"сделали по красоте\">сделали по красоте</span>.",
+      "phonetics": "",
+      "english": "At the edge of the field you immediately see pedigree and grip, brother: your pace in the saddle is pure craft.",
+      "idioms": [
+        "сделали по красоте"
+      ]
+    },
+    {
+      "uid": "RU_ALA_POLO_COUNT",
+      "lang": "RU_ALA",
+      "stage": "COUNTERACT",
+      "arena": "polo",
+      "lens": null,
+      "text": "Придерживать такого скакуна у бортика — всё равно что держать <span class=\"slang-token\" data-term=\"горный беркут в золотой клетке\">горный беркут в золотой клетке</span>.",
+      "phonetics": "",
+      "english": "Holding a thoroughbred like that back by the boards is like keeping a mountain golden eagle in a gilded cage.",
+      "idioms": [
+        "горный беркут в золотой клетке"
+      ]
+    },
+    {
+      "uid": "RU_ALA_POLO_CUR",
+      "lang": "RU_ALA",
+      "stage": "CURIOSITY",
+      "arena": "polo",
+      "lens": null,
+      "text": "Скажи между чаккерами: если сейчас отпустить поводья на полную — какую цель берём сходу?",
+      "phonetics": "",
+      "english": "Tell me between chukkers: if we drop the reins into full gallop right now, what target do we take first?",
+      "idioms": []
+    },
+    {
+      "uid": "RU_ALA_RUNWAY_CHAM",
+      "lang": "RU_ALA",
+      "stage": "CHAMELEON",
+      "arena": "runway",
+      "lens": null,
+      "text": "<span class=\"slang-token\" data-term=\"базару нет\">Базару нет</span>, подиум любит вспышки, а мы с тобой ценим честный крой <span class=\"slang-token\" data-term=\"без лишних понтов\">без лишних понтов</span>.",
+      "phonetics": "",
+      "english": "No question, the runway loves flashbulbs, while we value an honest cut with zero hollow flexing.",
+      "idioms": [
+        "базару нет",
+        "без лишних понтов"
+      ]
+    },
+    {
+      "uid": "RU_ALA_RUNWAY_COMP",
+      "lang": "RU_ALA",
+      "stage": "COMPLIMENT",
+      "arena": "runway",
+      "lens": null,
+      "text": "За кулисами сразу видно руку мастера, родной: каждый шов с изнанки — прямо <span class=\"slang-token\" data-term=\"сделали по красоте\">сделали по красоте</span>.",
+      "phonetics": "",
+      "english": "Backstage you spot the master’s hand right away, brother: every inner seam is built with real beauty.",
+      "idioms": [
+        "сделали по красоте"
+      ]
+    },
+    {
+      "uid": "RU_ALA_RUNWAY_COUNT",
+      "lang": "RU_ALA",
+      "stage": "COUNTERACT",
+      "arena": "runway",
+      "lens": null,
+      "text": "Прятать лучшую коллекцию в чехлах — это как <span class=\"slang-token\" data-term=\"горный беркут в золотой клетке\">горный беркут в золотой клетке</span> посреди недели моды.",
+      "phonetics": "",
+      "english": "Hiding your best collection inside garment bags is like a mountain eagle in a golden cage mid-fashion-week.",
+      "idioms": [
+        "горный беркут в золотой клетке"
+      ]
+    },
+    {
+      "uid": "RU_ALA_RUNWAY_CUR",
+      "lang": "RU_ALA",
+      "stage": "CURIOSITY",
+      "arena": "runway",
+      "lens": null,
+      "text": "Скажи по секрету за кулисами: какой главный выход перевернёт весь зал сегодня вечером?",
+      "phonetics": "",
+      "english": "Tell me backstage: what flagship walk is going to turn the whole hall upside down tonight?",
+      "idioms": []
+    },
+    {
+      "uid": "RUNWAY_RU_ALA_BASE",
+      "lang": "RU_ALA",
+      "stage": "COMPLIMENT",
+      "arena": "runway",
+      "lens": null,
+      "text": "За кулисами сразу видно руку мастера, родной: без лишнего шума, каждый шов на месте — <span class=\"slang-token\" data-term=\"сделали по красоте\">сделали по красоте</span>.",
+      "phonetics": "",
+      "english": "Backstage you immediately see the master’s hand, brother: zero extra noise, every seam in place—built with real beauty.",
+      "idioms": [
+        "сделали по красоте"
+      ]
+    },
+    {
+      "uid": "RU_ALA_SPARK_CHAM",
+      "lang": "RU_ALA",
+      "stage": "CHAMELEON",
+      "arena": "spark",
+      "lens": null,
+      "text": "<span class=\"slang-token\" data-term=\"базару нет\">Базару нет</span>, сразу легко говорить <span class=\"slang-token\" data-term=\"без лишних понтов\">без лишних понтов</span> — будто знакомы уже сто лет.",
+      "phonetics": "",
+      "english": "No question, it’s effortless talking with zero hollow posturing—as if we’ve known each other for ages.",
+      "idioms": [
+        "базару нет",
+        "без лишних понтов"
+      ]
+    },
+    {
+      "uid": "RU_ALA_SPARK_COMP",
+      "lang": "RU_ALA",
+      "stage": "COMPLIMENT",
+      "arena": "spark",
+      "lens": null,
+      "text": "Слушай, с первой секунды видно живой огонёк: весь образ и подача — прямо <span class=\"slang-token\" data-term=\"сделали по красоте\">сделали по красоте</span>.",
+      "phonetics": "",
+      "english": "Listen, from the very first second you see a real spark: your whole vibe is pure craft and beauty.",
+      "idioms": [
+        "сделали по красоте"
+      ]
+    },
+    {
+      "uid": "RU_ALA_SPARK_COUNT",
+      "lang": "RU_ALA",
+      "stage": "COUNTERACT",
+      "arena": "spark",
+      "lens": null,
+      "text": "Но тратить такой вечер на дежурные фразы — это держать <span class=\"slang-token\" data-term=\"горный беркут в золотой клетке\">горный беркут в золотой клетке</span>.",
+      "phonetics": "",
+      "english": "Spending an evening like this on canned small talk is keeping a mountain golden eagle in a gilded cage.",
+      "idioms": [
+        "горный беркут в золотой клетке"
+      ]
+    },
+    {
+      "uid": "RU_ALA_SPARK_CUR",
+      "lang": "RU_ALA",
+      "stage": "CURIOSITY",
+      "arena": "spark",
+      "lens": null,
+      "text": "Скажи честно: ради какого самого яркого момента ты вообще решил заглянуть сюда сегодня?",
+      "phonetics": "",
+      "english": "Tell me honestly: what’s the boldest moment you actually came looking for tonight?",
+      "idioms": []
+    },
+    {
+      "uid": "RU_ALA_CHAM",
+      "lang": "RU_ALA",
+      "stage": "CHAMELEON",
+      "arena": "terrace",
+      "lens": null,
+      "text": "<span class=\"slang-token\" data-term=\"базару нет\">Базару нет</span>, мы с тобой одной крови. Нам не нужны маски, важно чтобы разговор шёл по душам, как за широким дастарханом.",
+      "phonetics": "",
+      "english": "No question about it, we’re cut from the same cloth. No masks—just an honest conversation like around a wide Almaty dastarkhan.",
+      "idioms": [
+        "базару нет"
+      ]
+    },
+    {
+      "uid": "RU_ALA_COMP",
+      "lang": "RU_ALA",
+      "stage": "COMPLIMENT",
+      "arena": "terrace",
+      "lens": null,
+      "text": "Слушай, родной, скажу как есть: то, что ты собрал — <span class=\"slang-token\" data-term=\"сделали по красоте\">сделали по красоте</span>. Чувствуется масштаб и живое тепло.",
+      "phonetics": "",
+      "english": "Listen, brother, I’ll say it like it is: what you put together is built with real beauty and craft. You can feel the scale and warmth.",
+      "idioms": [
+        "сделали по красоте"
+      ]
+    },
+    {
+      "uid": "RU_ALA_COUNT",
+      "lang": "RU_ALA",
+      "stage": "COUNTERACT",
+      "arena": "terrace",
+      "lens": null,
+      "text": "Но тормозить сейчас — это держать <span class=\"slang-token\" data-term=\"горный беркут в золотой клетке\">горный беркут в золотой клетке</span>. Твой размах просит высоты, а не паузы.",
+      "phonetics": "",
+      "english": "But hitting the brakes now is like keeping a mountain golden eagle in a gilded cage. Your scale asks for altitude, not a pause.",
+      "idioms": [
+        "горный беркут в золотой клетке"
+      ]
+    },
+    {
+      "uid": "RU_ALA_CUR",
+      "lang": "RU_ALA",
+      "stage": "CURIOSITY",
+      "arena": "terrace",
+      "lens": null,
+      "text": "Признайся честно: если прямо сейчас рвануть наверх на Медеу без тормозов — какую самую дерзкую идею мы запустим первой?",
+      "phonetics": "",
+      "english": "Admit it honestly: if we floor it up to Medeu right now with zero brakes—what’s the boldest idea we launch first?",
+      "idioms": []
+    },
+    {
+      "uid": "RU_ALA_WIEN_CHAM",
+      "lang": "RU_ALA",
+      "stage": "CHAMELEON",
+      "arena": "wien",
+      "lens": null,
+      "text": "<span class=\"slang-token\" data-term=\"базару нет\">Базару нет</span>, большие дела любят тишину и честное слово <span class=\"slang-token\" data-term=\"без лишних понтов\">без лишних понтов</span>.",
+      "phonetics": "",
+      "english": "No question, serious moves love quiet discretion and an honest word with zero posturing.",
+      "idioms": [
+        "базару нет",
+        "без лишних понтов"
+      ]
+    },
+    {
+      "uid": "RU_ALA_WIEN_COMP",
+      "lang": "RU_ALA",
+      "stage": "COMPLIMENT",
+      "arena": "wien",
+      "lens": null,
+      "text": "За этим угловым столиком в Вене сразу чувствуется школа, родной: тихо, точно и <span class=\"slang-token\" data-term=\"сделали по красоте\">сделали по красоте</span>.",
+      "phonetics": "",
+      "english": "At this corner table in Vienna you immediately feel real pedigree, brother: quiet, exact, and crafted with beauty.",
+      "idioms": [
+        "сделали по красоте"
+      ]
+    },
+    {
+      "uid": "RU_ALA_WIEN_COUNT",
+      "lang": "RU_ALA",
+      "stage": "COUNTERACT",
+      "arena": "wien",
+      "lens": null,
+      "text": "Ждать десять согласований — это держать <span class=\"slang-token\" data-term=\"горный беркут в золотой клетке\">горный беркут в золотой клетке</span> бумажной волокиты.",
+      "phonetics": "",
+      "english": "Waiting on ten committee sign-offs is locking a mountain golden eagle in a cage of red tape.",
+      "idioms": [
+        "горный беркут в золотой клетке"
+      ]
+    },
+    {
+      "uid": "RU_ALA_WIEN_CUR",
+      "lang": "RU_ALA",
+      "stage": "CURIOSITY",
+      "arena": "wien",
+      "lens": null,
+      "text": "Между нами за чашкой кофе: какой тихий ход мы согласуем прямо сейчас одним рукопожатием?",
+      "phonetics": "",
+      "english": "Between us over coffee: what quiet move do we lock in right now with a single handshake?",
+      "idioms": []
+    }
+  ]
+}

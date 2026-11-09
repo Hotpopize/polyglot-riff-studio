@@ -1,0 +1,684 @@
+{
+  "db_id": "polyglot.fabric",
+  "schema_version": "3.3.0",
+  "description": "Cross-language :Arena rooms, :Bridge nodes, :SHARES_VIBE_WITH etymology edges, :State objection nodes, :FalseFriend traps, IB :Vocab :FALSE_FRIEND_ALERT triggers, and Staged Regional Newspaper Webhooks.",
+  "arenas": [
+    {
+      "id": "adventure",
+      "icon": "🔥",
+      "label": "Melting Hesitation into Adventure",
+      "short_label": "Melting Hesitation",
+      "arena_group": "Zero-Corporate Lounge",
+      "description": "Playfully flipping \"maybe later / playing it safe\" into spontaneous co-conspiracy."
+    },
+    {
+      "id": "b2b",
+      "icon": "⚙️",
+      "label": "B2B Boardroom → Trench",
+      "short_label": "B2B Boardroom → Trench",
+      "arena_group": "Executive → Trench",
+      "description": "Controlled Vykání → Tykání register drop from C-suite glass room to engineering floor."
+    },
+    {
+      "id": "hochkultur",
+      "icon": "🏛️",
+      "label": "Staatsoper & Hochkultur",
+      "short_label": "Staatsoper & Hochkultur",
+      "arena_group": "Haute Salon Trio",
+      "description": "Loge & vernissage poise—dropping stiff tuxedo formality into peer-to-peer candor."
+    },
+    {
+      "id": "polo",
+      "icon": "🐎",
+      "label": "Sotogrande & Polo Club Paddock",
+      "short_label": "Polo Club Paddock",
+      "arena_group": "Haute Salon Trio",
+      "description": "High-handicap paddock calm—bridging equestrian finesse with raw engine horsepower."
+    },
+    {
+      "id": "runway",
+      "icon": "🧥",
+      "label": "Fashion Runway & Zákulisí",
+      "short_label": "Runway & Zákulisí",
+      "arena_group": "Haute Salon Trio",
+      "description": "Front-row couture polish vs. honest backstage tailoring where seams actually hold."
+    },
+    {
+      "id": "spark",
+      "icon": "⚡",
+      "label": "First-Impression Spark",
+      "short_label": "First-Impression Spark",
+      "arena_group": "Zero-Corporate Lounge",
+      "description": "Instant magnetic opener—cutting through polite small talk in the first 20 seconds."
+    },
+    {
+      "id": "terrace",
+      "icon": "🥃",
+      "label": "Late-Night Terrace & Deep Chemistry",
+      "short_label": "Late-Night Terrace",
+      "arena_group": "Zero-Corporate Lounge",
+      "description": "Warm chest-voice intimacy, unscripted candor & rooftop/terrace rapport."
+    },
+    {
+      "id": "wien",
+      "icon": "🕵️",
+      "label": "Station Wien Café (Corner Intercept)",
+      "short_label": "Station Wien Café",
+      "arena_group": "Station Wien",
+      "description": "Velvet Central-European Kaffeehaus tradecraft, quiet sovereignty & corner-table trust."
+    }
+  ],
+  "bridges": [
+    {
+      "uid": "BR_ALA_OVA",
+      "from_register": "RU_ALA",
+      "to_register": "CZ_OVA",
+      "from": "RU_ALA_CHAM",
+      "to": "CZ_OVA_COUNT",
+      "bridge_type": "CODE_SWITCH",
+      "text": "Короче говоря, jak by ti řekli chlapi v Ostravě—",
+      "vocal_cue": "Snap immediately to crisp Czech first-syllable stress and short vowels.",
+      "weight": 0.84
+    },
+    {
+      "uid": "BR_CZ_STD_TO_OVA",
+      "from_register": "CZ_STD",
+      "to_register": "CZ_OVA",
+      "from": "CZ_STD_CHAM_01",
+      "to": "CZ_OVA_COUNT_01",
+      "bridge_type": "REGISTER_DROP",
+      "text": "A když teď odložíme kravaty a podíváme se přímo pod kapotu s klukama z vývoje—",
+      "vocal_cue": "Drop half an octave, lean forearms onto the table, clip vowels immediately.",
+      "weight": 0.98
+    },
+    {
+      "uid": "BR_DE_STD_TO_VIE",
+      "from_register": "DE_STD",
+      "to_register": "AT_VIE",
+      "from": "DE_STD_CHAM_01",
+      "to": "AT_VIE_COUNT",
+      "bridge_type": "REGISTER_DROP",
+      "text": "Und wenn wir das steife Protokoll kurz beiseitelassen und ehrlich wie im Wiener Beisl reden—",
+      "vocal_cue": "Lean back 10 degrees, crooked grin, stretch vowels into Wiener Schmäh cadence.",
+      "weight": 0.95
+    },
+    {
+      "uid": "BR_EN_EXEC_TO_YYC",
+      "from_register": "EN_EXEC",
+      "to_register": "EN_YYC",
+      "from": "EN_EXEC_CHAM_01",
+      "to": "EN_YYC_COUNT",
+      "bridge_type": "REGISTER_DROP",
+      "text": "Now if we take the boardroom slide deck off the table for a second and talk brass tacks—",
+      "vocal_cue": "Relax shoulders, accomplice half-smirk, punch monosyllabic verbs.",
+      "weight": 0.94
+    },
+    {
+      "uid": "BR_ES_STD_TO_SOT",
+      "from_register": "ES_STD",
+      "to_register": "ES_SOT",
+      "from": "ES_STD_CHAM_01",
+      "to": "ES_SOT_COUNT",
+      "bridge_type": "REGISTER_DROP",
+      "text": "Y si dejamos ahora el protocolo de sala de juntas y hablamos en confianza como a pie de cancha—",
+      "vocal_cue": "Lean forward warmly, sun-soaked pause before the Andaluz exclamation.",
+      "weight": 0.93
+    },
+    {
+      "uid": "BRIDGE_CZ_FORMAL_TO_OVA",
+      "from_register": "CZ_STD",
+      "to_register": "CZ_OVA",
+      "from": "CZ_EXEC_CHAM",
+      "to": "CZ_OVA_COUNT",
+      "bridge_type": "REGISTER_DROP",
+      "text": "Ale když se na to podíváme pod kapotou...",
+      "vocal_cue": "Drop half an octave, lean in as an engineering peer.",
+      "weight": 0.82
+    },
+    {
+      "uid": "BRIDGE_DE_FORMAL_TO_VIE",
+      "from_register": "DE_STD",
+      "to_register": "AT_VIE",
+      "from": "DE_STD_CHAM_01",
+      "to": "AT_VIE_COUNT",
+      "bridge_type": "REGISTER_DROP",
+      "text": "Wenn wir aber ehrlich sind...",
+      "vocal_cue": "Slight crooked grin, stretch vowels into velvet Viennese candor.",
+      "weight": 0.86
+    },
+    {
+      "uid": "BR_OVA_VIE",
+      "from_register": "CZ_OVA",
+      "to_register": "AT_VIE",
+      "from": "CZ_OVA_CHAM",
+      "to": "AT_VIE_COUNT",
+      "bridge_type": "CODE_SWITCH",
+      "text": "A jak říkají kluci dole ve Vídni u kávy—",
+      "vocal_cue": "Shift from clipped Czech first-syllable punch into stretched Viennese vowel drawl.",
+      "weight": 0.86
+    },
+    {
+      "uid": "BR_RU_STD_TO_ALA",
+      "from_register": "RU_STD",
+      "to_register": "RU_ALA",
+      "from": "RU_STD_CHAM_01",
+      "to": "RU_ALA_COUNT",
+      "bridge_type": "REGISTER_DROP",
+      "text": "А если убрать официоз и сказать по-человечески, от души, как у нас в Алматы за дастарханом—",
+      "vocal_cue": "Open chest resonance, warm palm gesture, slow tempo by 15%.",
+      "weight": 0.95
+    },
+    {
+      "uid": "BR_VIE_ALA",
+      "from_register": "AT_VIE",
+      "to_register": "RU_ALA",
+      "from": "AT_VIE_CHAM",
+      "to": "RU_ALA_COUNT",
+      "bridge_type": "CODE_SWITCH",
+      "text": "Aber weißt eh, как у нас в Алматы говорят от души—",
+      "vocal_cue": "Drop from wry Viennese nasal irony into deep Almaty chest resonance.",
+      "weight": 0.89
+    },
+    {
+      "uid": "BR_YYC_SOT",
+      "from_register": "EN_YYC",
+      "to_register": "ES_SOT",
+      "from": "EN_YYC_CHAM",
+      "to": "ES_SOT_COUNT",
+      "bridge_type": "CODE_SWITCH",
+      "text": "Listen, bud—como decimos en el sur sin filtro—",
+      "vocal_cue": "Pivot from gravel Foothills punch into rapid melodic Spanish burst.",
+      "weight": 0.85
+    }
+  ],
+  "vibe_links": [
+    {
+      "source_term": "69 Mustang collecting dust",
+      "target_term": "mirar los toros desde la barrera",
+      "shared_root": "Stepping Into the Arena",
+      "pivot_tip": "Use an accomplice grin that frames bold action as the natural move."
+    },
+    {
+      "source_term": "bo",
+      "target_term": "базару нет",
+      "shared_root": "Zero-Friction Causal / Trust Particle",
+      "pivot_tip": "Keep unstressed and conversational—signals immediate insider belonging."
+    },
+    {
+      "source_term": "fachat",
+      "target_term": "сделали по красоте",
+      "shared_root": "High-Craft Execution",
+      "pivot_tip": "Both carry grounded engineering respect—drop corporate adjectives and let the verb carry the weight."
+    },
+    {
+      "source_term": "fajront",
+      "target_term": "an der Garderobe abgeben",
+      "shared_root": "Austro-Hungarian Industrial / Kaffeehaus Boundary",
+      "pivot_tip": "Use the exact same downward vocal exhale on both phrases to signal \"stiff shift is over, now we talk like humans.\""
+    },
+    {
+      "source_term": "navoněná bída",
+      "target_term": "Pflanzerei",
+      "shared_root": "Central European Satire of Window-Dressing",
+      "pivot_tip": "Pause 1s before the noun so the deadpan irony lands cleanly."
+    },
+    {
+      "source_term": "navoněná bída",
+      "target_term": "all hat and no cattle",
+      "shared_root": "Anti-Pretension Craft Filter",
+      "pivot_tip": "Deliver with an unbothered wry grin contrasting glossy surface hype with real engine power."
+    },
+    {
+      "source_term": "navoněná bída",
+      "target_term": "без лишних понтов",
+      "shared_root": "Substance Over Status Posturing",
+      "pivot_tip": "Drop volume slightly to invite insider candor."
+    },
+    {
+      "source_term": "odložit smoking",
+      "target_term": "an der Garderobe abgeben",
+      "shared_root": "Central European Salon / Boardroom Register-Drop Ritual",
+      "pivot_tip": "Open palm gesture loosening formal stiffness before pivoting into peer candor."
+    },
+    {
+      "source_term": "tener buena muñeca",
+      "target_term": "fachat",
+      "shared_root": "Effortless Operational Mastery",
+      "pivot_tip": "Connect finesse in the saddle/paddock directly to clean technical execution."
+    },
+    {
+      "source_term": "tiene duende",
+      "target_term": "schwer in Ordnung",
+      "shared_root": "Authentic Soul & Craft Recognition",
+      "pivot_tip": "Slow the tempo on the compliment so it feels earned, never flattering."
+    },
+    {
+      "source_term": "горный беркут в золотой клетке",
+      "target_term": "69 Mustang collecting dust",
+      "shared_root": "Unleashed Potential Metaphor",
+      "pivot_tip": "Lean in and drop half an octave when challenging safe incrementalism."
+    }
+  ],
+  "room_states": [
+    {
+      "id": "CORPORATE_SHIELD",
+      "label": "🛡️ Corporate Shield",
+      "desc": "Stiff executive formality blocking real technical candor",
+      "targetCardUid": "AT_VIE_COUNT",
+      "lang": "AT_VIE",
+      "effectiveness": 0.94,
+      "cue": "Wry grin, coat-check wave"
+    },
+    {
+      "id": "MANUAL_GRIND",
+      "label": "⚙️ Manual Grind",
+      "desc": "Team is burning hours on repetitive manual pipeline handoffs",
+      "targetCardUid": "CZ_OVA_COUNT",
+      "lang": "CZ_OVA",
+      "effectiveness": 0.96,
+      "cue": "Clip vowels, lean forearms on table"
+    },
+    {
+      "id": "OVERTHINKING",
+      "label": "⏳ Overthinking / Stall",
+      "desc": "Analysis paralysis or waiting for the mythical \"ideal moment\"",
+      "targetCardUid": "RU_ALA_COUNT",
+      "lang": "RU_ALA",
+      "effectiveness": 0.95,
+      "cue": "Deep chest voice, slow down"
+    },
+    {
+      "id": "PLAYING_IT_SAFE",
+      "label": "🏎️ Playing It Safe",
+      "desc": "Counterpart is hiding behind legacy workflows or incrementalism",
+      "targetCardUid": "EN_YYC_COUNT",
+      "lang": "EN_YYC",
+      "effectiveness": 0.93,
+      "cue": "Half-octave drop, accomplice smirk"
+    }
+  ],
+  "false_friends": [
+    {
+      "id": "FF_CZ_CERSTVY",
+      "cz": "čerstvý",
+      "ru_trap": "черствый (stale / callous)",
+      "de_calque": "frisch / aktuell",
+      "meaning": "Fresh / real-time (\"čerstvá data\" = live pipeline data)"
+    },
+    {
+      "id": "FF_CZ_HODINA",
+      "cz": "hodina",
+      "ru_trap": "година (year / era)",
+      "de_calque": "Stunde",
+      "meaning": "One hour (\"za hodinu\") — critical for SLA commitments"
+    },
+    {
+      "id": "FF_CZ_NAPAD",
+      "cz": "nápad",
+      "ru_trap": "нападки (attacks)",
+      "de_calque": "Einfall (ná-pad)",
+      "meaning": "Idea / architectural concept (\"skvělý nápad\")"
+    },
+    {
+      "id": "FF_CZ_POZOR",
+      "cz": "pozor",
+      "ru_trap": "позор (shame / disgrace)",
+      "de_calque": "Achtung / Vorsicht",
+      "meaning": "Attention / watch out (\"dávat pozor na\" = achten auf)"
+    },
+    {
+      "id": "FF_CZ_PRESNY",
+      "cz": "přesný",
+      "ru_trap": "пресный (bland / unseasoned)",
+      "de_calque": "präzise / genau",
+      "meaning": "Exact / deterministic (\"přesná data\")"
+    },
+    {
+      "id": "FF_CZ_SMESNY",
+      "cz": "směšný",
+      "ru_trap": "смешной (funny)",
+      "de_calque": "lächerlich",
+      "meaning": "Ridiculous / absurd (carries negative weight in B2B)"
+    },
+    {
+      "id": "FF_CZ_UZASNY",
+      "cz": "úžasný",
+      "ru_trap": "ужасный (terrible)",
+      "de_calque": "erstaunlich / großartig",
+      "meaning": "Amazing / impressive architecture (\"Ten systém je úžasný\")"
+    },
+    {
+      "id": "FF_CZ_VYPRODAT",
+      "cz": "vyprodat",
+      "ru_trap": "распродать (sell out)",
+      "de_calque": "ausverkaufen",
+      "meaning": "Liquidate clearance stock — never use for B2B selling (use prodávat / vyjednat)"
+    },
+    {
+      "id": "FF_CZ_ZAPOMENOUT",
+      "cz": "zapomenout",
+      "ru_trap": "запомнить (to remember)",
+      "de_calque": "vergessen",
+      "meaning": "To forget (exact opposite of Russian запомнить!)"
+    }
+  ],
+  "vocab_alert_nodes": [
+    {
+      "uid": "FF_CZ_CERSTVY",
+      "term": "Čerstvý (CZ) vs Черствый (RU)",
+      "lang_code": "cs",
+      "register_type": "FALSE_FRIEND_ALERT",
+      "meaning": "Czech čerstvý = fresh (čerstvá data) ≠ Russian черствый = stale/hard",
+      "ib_source": "Slavic Interference Shield",
+      "warning": "CRITICAL FALSE FRIEND: Czech \"čerstvý\" means fresh (e.g. čerstvá data), whereas Russian \"черствый\" means stale/hard bread."
+    },
+    {
+      "uid": "FF_CZ_POZOR",
+      "term": "Pozor! (CZ) vs Позор (RU)",
+      "lang_code": "cs",
+      "register_type": "FALSE_FRIEND_ALERT",
+      "meaning": "Czech dávat si pozor = exercise attention ≠ Russian позор = shame/disgrace",
+      "ib_source": "Slavic Interference Shield",
+      "warning": "CRITICAL FALSE FRIEND: Czech \"Dávat si pozor\" means to exercise care/attention, whereas Russian \"позор\" means shame/disgrace."
+    },
+    {
+      "uid": "FF_CZ_UZASNY",
+      "term": "Úžasný (CZ) vs Ужасный (RU)",
+      "lang_code": "cs",
+      "register_type": "FALSE_FRIEND_ALERT",
+      "meaning": "Czech úžasný = amazing/wonderful ≠ Russian ужасный = terrible/horrible",
+      "ib_source": "Slavic Interference Shield",
+      "warning": "CRITICAL FALSE FRIEND: Czech \"úžasný\" means amazing/wonderful, whereas Russian \"ужасный\" means terrible/horrible."
+    }
+  ],
+  "vocab_false_friend_alerts": [
+    {
+      "source_uid": "CZ_V_DATOVAL",
+      "target_uid": "FF_CZ_POZOR"
+    },
+    {
+      "source_uid": "CZ_V_ROZBOR",
+      "target_uid": "FF_CZ_UZASNY"
+    },
+    {
+      "source_uid": "CZ_V_ZAMERIT",
+      "target_uid": "FF_CZ_POZOR"
+    },
+    {
+      "source_uid": "RU_V_ANALIZ",
+      "target_uid": "FF_CZ_CERSTVY"
+    }
+  ],
+  "songs": [
+    {
+      "uid": "SONG_AT_VIE_FALCO",
+      "title": "Vienna Calling",
+      "artist": "Falco (Johann Hölzel)",
+      "city_region": "Vienna (Austro-Bavarian)",
+      "genre": "Austropop / Viennese New Wave",
+      "bpm": 92,
+      "register_id": "AT_VIE",
+      "original_lang": "AT_VIE",
+      "original_lyric": "Vienna Calling! Oida, die Zeit rennt davon. Kein Stress, der Schmäh rennt eh von allein, musst nur die Vorsicht an der Garderobe abgeben.",
+      "translation_es": "¡Llamada desde Viena! Oida, el tiempo se nos va. Cero estrés, el encanto vienés fluye solo de todos modos, solo debes dejar la cautela en el ropero.",
+      "translation_en": "Vienna Calling! Oida, time is running out. No stress, the Schmäh runs by itself anyway, you just have to check your caution at the coat rack.",
+      "translation_cz": "Vídeň volá! Oida, čas utíká. Žádný stres, ten Schmäh stejně běží sám od sebe, jen musíš nechat opatrnost v šatně.",
+      "translation_de": "Vienna Calling! Oida, die Zeit rennt davon. Kein Stress, der Schmäh läuft sowieso von allein, du musst nur die Vorsicht an der Garderobe abgeben.",
+      "translation_ru": "Вена вызывает! Oida, время уходит. Никакого стресса, шме и так работает само по себе, надо только сдать осторожность в гардероб.",
+      "cultural_vibe": "Syncopated coffeehouse charm, theatrical detachment, status equalization",
+      "pivot_line": "Ich sehe, wie professionell Sie das aufgestellt haben... aber geh bitte: jetzt auf Nummer sicher gehen? Da musst du die übertriebene Vorsicht mal an der Garderobe abgeben, Oida!",
+      "reinforces_card_uid": "AT_VIE_CHAM",
+      "slang_vocab_uids": [
+        "DE_V_SCHMAEH",
+        "DE_V_PARTICLES"
+      ]
+    },
+    {
+      "uid": "SONG_CZ_OVA_NOHAVICA",
+      "title": "Ostrava",
+      "artist": "Jaromír Nohavica",
+      "city_region": "Ostrava (Moravian-Silesian Region)",
+      "genre": "Regional Industrial Folk / Bard",
+      "bpm": 130,
+      "register_id": "CZ_OVA",
+      "original_lang": "CZ_OVA",
+      "original_lyric": "Ostrava, Ostrava, město mezi městy, kaj ľudzie fchytaju šichtu a po robotě maju čistý fajront, bo ten motor pojede sám.",
+      "translation_es": "Ostrava, Ostrava, ciudad entre ciudades, donde la gente agarra el turno de trabajo y tras la labor tiene el fajront limpio, porque el motor funcionará solo.",
+      "translation_en": "Ostrava, Ostrava, city among cities, where people catch their shift and after work enjoy clean quitting time, because the engine will run by itself.",
+      "translation_cz": "Ostrava, Ostrava, město mezi městy, kde lidé chytají směnu a po práci mají čistý fajront, protože ten motor pojede sám.",
+      "translation_de": "Ostrava, Ostrava, Stadt unter Städten, wo die Leute ihre Schicht anpacken und nach der Arbeit sauberen Feierabend haben, weil der Motor von alleine läuft.",
+      "translation_ru": "Острава, Острава, город среди городов, где люди берутся за смену, а после работы у них чистый файронт, потому что этот мотор пойдёт сам.",
+      "cultural_vibe": "Industrial pride, miner grit, uncompromising short-vowel pace",
+      "pivot_line": "Sleduji vaše projekty a má to rozbor... ale upřímně, držet to teď při zemi je zbytečná šichta navíc. Když ten strach pustíš, máš čistý fajront, bo ten motor pojede sám.",
+      "reinforces_card_uid": "CZ_OVA_COUNT",
+      "slang_vocab_uids": [
+        "CZ_V_SICHTA",
+        "CZ_V_FAJRONT",
+        "CZ_V_BO"
+      ]
+    },
+    {
+      "uid": "SONG_EN_YYC_LOVERBOY",
+      "title": "Working for the Weekend",
+      "artist": "Loverboy",
+      "city_region": "Calgary & Western Canada",
+      "genre": "Western Canadian Arena Rock",
+      "bpm": 116,
+      "register_id": "EN_YYC",
+      "original_lang": "EN_YYC",
+      "original_lyric": "Everybody is working for the weekend, bud! Stop being all hat and no cattle, kick the garage door open and just give ’er!",
+      "translation_es": "¡Todo el mundo trabaja para el fin de semana, viejo! Déjate de postureo sin sustancia, abre la puerta del garaje y ¡dale a todo trapo!",
+      "translation_en": "Everybody is working for the weekend, bud! Stop being all hat and no cattle, kick the garage door open and just give ’er!",
+      "translation_cz": "Všichni makají na víkend, kámo! Přestaň dělat ramena bez výsledků, otevři vrata garáže a prostě to roztaj na plný plyn!",
+      "translation_de": "Alle arbeiten fürs Wochenende, Kumpel! Hör auf mit der großen Klappe ohne Substanz, mach das Garagentor auf und gib einfach Vollgas!",
+      "translation_ru": "Все пашут ради выходных, старина! Хватит понтоваться без дела, выбивай ворота гаража и жми на всю катушку!",
+      "cultural_vibe": "Mechanical momentum, straight-shooting energy, zero corporate polish",
+      "pivot_line": "Hold on a second, bud—what you’ve got going here is the real deal. In a room full of people who are all hat and no cattle, if we kick the garage doors open tonight and just give ’er, where are we taking this thing first?",
+      "reinforces_card_uid": "EN_YYC_CUR",
+      "slang_vocab_uids": [
+        "EN_V_CATTLE",
+        "EN_V_GIVE_ER"
+      ]
+    },
+    {
+      "uid": "SONG_ES_SOT_CAMARON",
+      "title": "Volando Voy",
+      "artist": "Camarón de la Isla (Kiko Veneno)",
+      "city_region": "Sotogrande & Andalucian Coast",
+      "genre": "Flamenco-Rumba / Andaluz Moderno",
+      "bpm": 104,
+      "register_id": "ES_SOT",
+      "original_lang": "ES_SOT",
+      "original_lyric": "Volando voy, volando vengo, por el camino yo me entretengo. Enamorao de la vida, porque esto tiene duende y no hay que mirar los toros desde la barrera.",
+      "translation_es": "Volando voy, volando vengo, por el camino yo me entretengo. Enamorao de la vida, porque esto tiene duende y no hay que mirar los toros desde la barrera.",
+      "translation_en": "Flying I go, flying I come, along the way I enjoy myself. In love with life, because this has true duende and you shouldn't watch the bulls from the sidelines.",
+      "translation_cz": "Létám sem a tam, cestou se bavím. Zamilovaný do života, bo to má skutočný duende a nemá smysl koukat na býky jen z bariéry.",
+      "translation_de": "Fliegend komme ich, fliegend gehe ich, unterwegs genieße ich das Leben. Verliebt ins Leben, weil das echten Duende hat und man die Stiere nicht von der Tribüne aus beobachten sollte.",
+      "translation_ru": "Лечу туда, лечу обратно, по дороге наслаждаюсь жизнью. Влюблённый в жизнь, потому что в этом есть настоящий дуэнде, и нечего смотреть на быков с трибуны.",
+      "cultural_vibe": "Sensory hyperbole, conspiratorial rhythm, unmanufacturable passion",
+      "pivot_line": "Oye, para el carro un segundo, tío: lo que transmites tiene duende. Eso no se fabrica ni se compra... ¡y ni de coña me digas que vas a mirar los toros desde la barrera!",
+      "reinforces_card_uid": "ES_SOT_COMP",
+      "slang_vocab_uids": [
+        "ES_V_DUENDE",
+        "ES_V_TOROS"
+      ]
+    },
+    {
+      "uid": "SONG_RU_ALA_ASTUDIO",
+      "title": "Джулия (Julia)",
+      "artist": "A-Studio (Batyrkhan Shukenov)",
+      "city_region": "Almaty (Southern Capital / Медео)",
+      "genre": "Almaty Synth-Pop / Kazakhstani Soul",
+      "bpm": 88,
+      "register_id": "RU_ALA",
+      "original_lang": "RU_ALA",
+      "original_lyric": "Девочка моя Джулия, под тёплыми звёздами Алматы мы всё сделаем по красоте, базару нет, как за широким дастарханом.",
+      "translation_es": "Mi chica Julia, bajo las cálidas estrellas de Almaty lo haremos todo con pura belleza, sin duda alguna, como en un gran dastarhan.",
+      "translation_en": "My girl Julia, under the warm stars of Almaty we will do everything with absolute beauty, zero doubt, like at a wide dastarhan.",
+      "translation_cz": "Moje holka Julie, pod teplými hvězdami Almaty všechno uděláme po kráse, žádné pochyby, jako u širokého dastarhanu.",
+      "translation_de": "Mein Mädchen Julia, unter den warmen Sternen von Almaty machen wir alles in vollendeter Schönheit, ohne Zweifel, wie an einem großen Dastarhan.",
+      "translation_ru": "Девочка моя Джулия, под тёплыми звёздами Алматы мы всё сделаем по красоте, базару нет, как за широким дастарханом.",
+      "cultural_vibe": "Terrace warmth, Kazakhstani hospitality, soul-driven execution",
+      "pivot_line": "Слушай, родной, скажу как есть: то, что ты собрал — сделали по красоте. Базару нет, мы с тобой одной крови, давай поговорим по душам, как за широким дастарханом.",
+      "reinforces_card_uid": "RU_ALA_COMP",
+      "slang_vocab_uids": [
+        "RU_V_KRASOTA",
+        "RU_V_BAZARU"
+      ]
+    },
+    {
+      "uid": "SONG_WEEKND_OOTG",
+      "title": "One of the Girls",
+      "artist": "The Weeknd, JENNIE, Lily-Rose Depp",
+      "city_region": "Global / Nightlife High-Stakes Pop",
+      "genre": "Nocturnal R&B / Dark Synthwave",
+      "bpm": 87,
+      "register_id": "EN_YYC",
+      "original_lang": "EN",
+      "original_lyric": "Give me tough love, leave me with no breath... Push me down on my knees, tell me I belong to the world.",
+      "translation_es": "Dame amor duro, déjame sin aliento... Empújame de rodillas, dime que pertenezco al mundo.",
+      "translation_en": "Give me tough love, leave me with no breath... Push me down on my knees, tell me I belong to the world.",
+      "translation_cz": "Dej mi tvrdou lásku, nech mě bez dechu... Sraz mě na kolena, řekni mi, že patřím světu.",
+      "translation_de": "Gib mir harte Liebe, lass mich atemlos... Drück mich auf die Knie, sag mir, dass ich der Welt gehöre.",
+      "translation_ru": "Дай мне суровую любовь, оставь меня без дыхания... Поставь меня на колени, скажи, что я принадлежу миру.",
+      "cultural_vibe": "High-stakes nightlife intensity, intense devotion, chameleon surrender & velvet power dynamics",
+      "pivot_line": "Zero corporate polish... give me tough love and tell me I belong to the world. We’re both cut from that same late-night frequency: addicted to the rush, zero patience for the ordinary.",
+      "reinforces_card_uid": "EN_YYC_CHAM",
+      "slang_vocab_uids": [
+        "EN_V_TOUGH_LOVE"
+      ]
+    }
+  ],
+  "staged_webhooks": [
+    {
+      "id": "WH_OVA_01",
+      "card": {
+        "text": "Lepit to záplatama je <span class=\"slang-token\" data-term=\"šichta\">šichta</span> pro vraha. Pojďme to postavit <span class=\"slang-token\" data-term=\"na první dobrou\">na první dobrou</span>, ať má tým čistý <span class=\"slang-token\" data-term=\"fajront\">fajront</span>.",
+        "stage": "COUNTERACT",
+        "counters_state": "MANUAL_GRIND"
+      },
+      "idiom": {
+        "lang": "CZ_OVA",
+        "term": "na první dobrou",
+        "cousin": "сделали по красоте",
+        "origin": "Czech / Ostravian workshop & stage idiom",
+        "meaning": "Right on the first take / first deployment without endless rework.",
+        "delivery": "Crisp punch on \"první\", confident nod."
+      },
+      "paper": "Patriot Magazín / Moravskoslezský deník (Ostrava)",
+      "headline": "V Dolních Vítkovicích rozjeli novou linku bez papírování: „Když to nefachá na první dobrou, je to jen drahá hračka.“",
+      "published": "2026-11-04 08:15 CET",
+      "target_db": "CZ_OVA"
+    },
+    {
+      "id": "WH_VIE_02",
+      "card": {
+        "text": "Geh bitte, das Hochglanz-PDF ist doch eine nette <span class=\"slang-token\" data-term=\"Pflanzerei\">Pflanzerei</span>. Schauen wir uns lieber an, was wirklich unter der Haube rennt.",
+        "stage": "COUNTERACT",
+        "counters_state": "CORPORATE_SHIELD"
+      },
+      "idiom": {
+        "lang": "AT_VIE",
+        "term": "Pflanzerei",
+        "cousin": "navoněná bída",
+        "origin": "Viennese dialect (jemanden pflanzen)",
+        "meaning": "Good-natured teasing, bluffing, or ornate corporate window-dressing.",
+        "delivery": "Unbothered deadpan eyebrow raise, slow vowel drawl."
+      },
+      "paper": "Falter Wien / Der Standard (Hochkultur & Beisl)",
+      "headline": "Vernissage im Kunsthistorischen: Zwischen Hochkultur und trockenem Schmäh am Stehtisch",
+      "published": "2026-11-04 09:30 CET",
+      "target_db": "AT_VIE"
+    },
+    {
+      "id": "WH_SOT_03",
+      "card": {
+        "text": "En el último chukker es donde se ve quién <span class=\"slang-token\" data-term=\"tener buena muñeca\">tiene buena muñeca</span>, tío—lo habéis llevado con una limpieza brutal.",
+        "stage": "COMPLIMENT",
+        "counters_state": null
+      },
+      "idiom": {
+        "lang": "ES_SOT",
+        "term": "tener buena muñeca",
+        "cousin": "fachat",
+        "origin": "Polo & equestrian dexterity idiom",
+        "meaning": "Having the subtle wrist touch and finesse to steer a high-speed situation effortlessly.",
+        "delivery": "Subtle flick of the wrist, low conspiratorial Andaluz cadence."
+      },
+      "paper": "Europa Sur / Sotogrande Digital (Polo & Puerto)",
+      "headline": "Final de alto hándicap en Santa María Polo Club: templanza, muñeca y caballos que cambian el ritmo en el último chukker",
+      "published": "2026-11-04 10:05 CET",
+      "target_db": "ES_SOT"
+    },
+    {
+      "id": "WH_ALA_04",
+      "card": {
+        "text": "Мне близко, что вы работаете <span class=\"slang-token\" data-term=\"без лишних понтов\">без лишних понтов</span> — тихо, крепко и <span class=\"slang-token\" data-term=\"сделали по красоте\">сделали по красоте</span>.",
+        "stage": "CHAMELEON",
+        "counters_state": null
+      },
+      "idiom": {
+        "lang": "RU_ALA",
+        "term": "без лишних понтов",
+        "cousin": "navoněná bída",
+        "origin": "Almaty urban candor",
+        "meaning": "Zero hollow flexing or status posturing—pure substance.",
+        "delivery": "Calm chest voice, slight dismissive hand wave on \"понтов\"."
+      },
+      "paper": "Vlast.kz / Tengrinews (Almaty)",
+      "headline": "Алматинский тех-хаб выше Аль-Фараби: меньше громких понтов, больше живого результата",
+      "published": "2026-11-04 11:20 ALMT",
+      "target_db": "RU_ALA"
+    },
+    {
+      "id": "STYL_CZ_OVA_2306",
+      "card": {
+        "uid": "CZ_OVA_COUN_2306_20",
+        "text": "Hele, nechceme tu s tímhle systémem fakt šahat, jasný? Chceme, aby to <span class=\"slang-token\" data-term=\"fachat\">fachat</span>ovalo, bez kecání.",
+        "arena": "fashion",
+        "stage": "COUNTERACT",
+        "lens_id": "FERGUSON",
+        "phonetics": "ˈhɛlə, ˈnɛtʃməmː tuː sː tímːhɛlː sːýstɛmːɛmː fʌkt ˈʃaːt, jɑsːnɪ? ˈxʊmɛmː tɑj ˈfɑt͡ʃɑtʊləʊ, bɛz kɛtsænɪ.",
+        "english_gloss": "Listen, we don't want to fuss over this system, you know? We want it to run smoothly, without any fuss.",
+        "counters_state": null
+      },
+      "idiom": {
+        "term": "fachat",
+        "cousin": "Operational efficiency",
+        "origin": "Austrian industrial loan",
+        "meaning": "To run smoothly, fire on all cylinders without babysitting",
+        "delivery": "Short, sharp, delivered with a slight shrug of the shoulders",
+        "register_id": "CZ_OVA"
+      },
+      "paper": "Live Stylizer (ollama:gemma3:4b • FERGUSON)",
+      "headline": "Thought Stylizer [fashion]: Skip the VIP slide deck theatre and let's test the real pipeline on steel.",
+      "published": "2026-11-04 15:25 CET",
+      "target_db": "CZ_OVA"
+    },
+    {
+      "id": "STYL_CZ_OVA_2418",
+      "card": {
+        "uid": "CZ_OVA_COUN_2418_65",
+        "text": "Hele, nechť to fachá, jasný? Žádnej šichty, žádnej fajront, nechceme, aby to zlobilo, že jo?",
+        "arena": "fashion",
+        "stage": "COUNTERACT",
+        "lens_id": "FERGUSON",
+        "phonetics": "ˈhɛlə, ˈnɛt͡ʃt ˈto ˈfaːxa, ˈjæsːn? ˈʒaːdnej ˈʃixta, ˈʒaːdnej ˈfaːjron, ˈnɛxːnmy, ˈaːby ˈto ˈzloːbilɔ, ˈžeːjo?",
+        "english_gloss": "Let it run smoothly, clear? No grueling shifts, no messy finishes, we don't want it to malfunction, you know?",
+        "counters_state": null
+      },
+      "idiom": {
+        "term": "fachat",
+        "cousin": "None",
+        "origin": "Austrian industrial loan",
+        "meaning": "To run smoothly, fire on all cylinders without babysitting.",
+        "delivery": "Short, declarative, with a slight shrug.",
+        "register_id": "CZ_OVA"
+      },
+      "paper": "Live Stylizer (ollama:gemma3:4b • FERGUSON)",
+      "headline": "Thought Stylizer [fashion]: Skip the VIP slide deck theatre and let's test the real pipeline on steel.",
+      "published": "2026-11-04 15:26 CET",
+      "target_db": "CZ_OVA"
+    }
+  ]
+}

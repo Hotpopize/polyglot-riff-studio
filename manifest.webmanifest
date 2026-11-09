@@ -1,0 +1,19 @@
+{
+  "name": "Polyglot Interpersonal Riff Studio & Neo4j SRS Engine",
+  "short_name": "Polyglot Riff",
+  "description": "5-Language 4-C Conversational Riff Studio, Regional Anthems, IB Register Switcher & FSRS Graph Engine.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#060911",
+  "theme_color": "#f59e0b",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='40' fill='%23060911'/%3E%3Ccircle cx='96' cy='96' r='68' fill='none' stroke='%23f59e0b' stroke-width='8'/%3E%3Ctext x='96' y='114' font-family='sans-serif' font-size='56' font-weight='bold' fill='%23f59e0b' text-anchor='middle'%3E4C%3C/text%3E%3C/svg%3E",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
+

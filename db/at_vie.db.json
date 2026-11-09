@@ -1,0 +1,671 @@
+{
+  "db_id": "polyglot.at_vie",
+  "primary_focus": "AT_VIE (Wiener Schmäh)",
+  "registers": [
+    "AT_VIE",
+    "DE_STD"
+  ],
+  "personas": {
+    "AT_VIE": {
+      "id": "AT_VIE",
+      "tier": "REGIONAL",
+      "flag": "🇦🇹",
+      "name": "Wiener Schmäh",
+      "subtitle": "Kaffeehaus Sovereignty & Velvet Irony",
+      "family": "Austro-Bavarian",
+      "address_form": "Peer Duzen / Velvet Kaffeehaus Confidant",
+      "rhythm": "Syncopated waltz cadence; stretch vowels on ironic understatements.",
+      "trick": "Modal particles (eh, halt, ja, wohl) + theatrical disbelief (\"Geh bitte, Oida\").",
+      "posture": "Lean back in the chair, slight crooked grin, unhurried pause.",
+      "paired_register_id": "DE_STD"
+    },
+    "DE_STD": {
+      "id": "DE_STD",
+      "tier": "FORMAL",
+      "flag": "🇩🇪",
+      "name": "Hochdeutsch Executive",
+      "subtitle": "DACH C-Suite • Siezen & Architectural Precision",
+      "family": "Standard High German (Executive Register)",
+      "address_form": "Siezen (Herr/Frau + Titel where appropriate)",
+      "rhythm": "Crisp consonant articulation, structured main-to-subordinate clause cadence.",
+      "trick": "Precision compound framing (Substanz vor Show, belastbare Architektur) before inviting candor.",
+      "posture": "Composed boardroom stillness, deliberate pause after key numbers.",
+      "paired_register_id": "AT_VIE"
+    }
+  },
+  "idioms": {
+    "an der Garderobe abgeben": {
+      "term": "an der Garderobe abgeben",
+      "lang": "AT_VIE",
+      "origin": "Viennese Theater/Opera coat-check trope",
+      "meaning": "Check your stiff caution at the coat check before we talk.",
+      "delivery": "Wry smile, casual wave of the hand.",
+      "cousin": "fajront"
+    },
+    "G’schichtldrucken": {
+      "term": "G’schichtldrucken",
+      "lang": "AT_VIE",
+      "origin": "Viennese dialect",
+      "meaning": "Spinning tall tales or polite corporate excuses.",
+      "delivery": "Drop half an octave, raise one eyebrow.",
+      "cousin": "all hat and no cattle"
+    },
+    "Pflanzerei": {
+      "term": "Pflanzerei",
+      "lang": "AT_VIE",
+      "origin": "Viennese dialect (jemanden pflanzen)",
+      "meaning": "Good-natured teasing, bluffing, or ornate corporate window-dressing.",
+      "delivery": "Unbothered deadpan eyebrow raise, slow vowel drawl.",
+      "cousin": "navoněná bída"
+    },
+    "schwer in Ordnung": {
+      "term": "schwer in Ordnung",
+      "lang": "AT_VIE",
+      "origin": "Viennese understatement",
+      "meaning": "Genuinely impressive / solid character.",
+      "delivery": "Slow, appreciative nod.",
+      "cousin": "сделали по красоте"
+    },
+    "Substanz vor Show": {
+      "term": "Substanz vor Show",
+      "lang": "DE_STD",
+      "origin": "DACH Executive engineering maxim",
+      "meaning": "Architectural substance prioritized over slide-deck theater.",
+      "delivery": "Measured crisp articulation.",
+      "cousin": "без лишних понтов"
+    }
+  },
+  "vocab": [
+    {
+      "uid": "DE_V_AUSWIRKEN",
+      "term": "sich auswirken auf (+ Acc)",
+      "lang_code": "de",
+      "register_id": "DE_STD",
+      "register_type": "FORMAL_EXAM",
+      "meaning": "Exert an impact / influence upon",
+      "ib_source": "German Academic B2B",
+      "grammar_note": "Mandatory Accusative governance",
+      "etymology": "",
+      "warning": ""
+    },
+    {
+      "uid": "DE_V_ERORTERUNG",
+      "term": "die Erörterung",
+      "lang_code": "de",
+      "register_id": "DE_STD",
+      "register_type": "FORMAL_EXAM",
+      "meaning": "Structured argumentative essay / text discussion",
+      "ib_source": "German A Language & Literature Paper 1 HL",
+      "grammar_note": "",
+      "etymology": "",
+      "warning": ""
+    },
+    {
+      "uid": "DE_V_HINBLICK",
+      "term": "im Hinblick auf (+ Acc / Gen)",
+      "lang_code": "de",
+      "register_id": "DE_STD",
+      "register_type": "FORMAL_EXAM",
+      "meaning": "With regard to / in strategic view of",
+      "ib_source": "German A Language & Literature Paper 1 HL",
+      "grammar_note": "High-register prepositional framing",
+      "etymology": "",
+      "warning": ""
+    },
+    {
+      "uid": "DE_V_STILMITTEL",
+      "term": "rhetorische Stilmittel",
+      "lang_code": "de",
+      "register_id": "DE_STD",
+      "register_type": "FORMAL_EXAM",
+      "meaning": "Rhetorical devices and stylistic techniques",
+      "ib_source": "German A2 Paper 1 HL",
+      "grammar_note": "",
+      "etymology": "",
+      "warning": ""
+    },
+    {
+      "uid": "DE_V_GSCHICHTL",
+      "term": "G’schichtldrucken",
+      "lang_code": "de",
+      "register_id": "AT_VIE",
+      "register_type": "REGIONAL_RIFF",
+      "meaning": "Tall-tale spinning / corporate puffery",
+      "ib_source": "Austrian Conversational Register",
+      "grammar_note": "",
+      "etymology": "Viennese colloquial compound",
+      "warning": ""
+    },
+    {
+      "uid": "DE_V_PARTICLES",
+      "term": "eh / halt / ja / mal",
+      "lang_code": "de",
+      "register_id": "AT_VIE",
+      "register_type": "REGIONAL_RIFF",
+      "meaning": "Modal particles modulating speaker stance & rapport",
+      "ib_source": "Subtle Art of German Modal Particles",
+      "grammar_note": "Unstressed mid-clause pragmatic softeners",
+      "etymology": "",
+      "warning": ""
+    },
+    {
+      "uid": "DE_V_SCHMAEH",
+      "term": "Wiener Schmäh",
+      "lang_code": "de",
+      "register_id": "AT_VIE",
+      "register_type": "REGIONAL_RIFF",
+      "meaning": "Charming Viennese irony & status-equalizing wit",
+      "ib_source": "Wiener Schmäh Study",
+      "grammar_note": "",
+      "etymology": "Austro-Bavarian Kaffeehaus tradition",
+      "warning": ""
+    }
+  ],
+  "songs": [
+    {
+      "uid": "SONG_AT_VIE_FALCO",
+      "title": "Vienna Calling",
+      "artist": "Falco (Johann Hölzel)",
+      "city_region": "Vienna (Austro-Bavarian)",
+      "genre": "Austropop / Viennese New Wave",
+      "bpm": 92,
+      "register_id": "AT_VIE",
+      "original_lang": "AT_VIE",
+      "original_lyric": "Vienna Calling! Oida, die Zeit rennt davon. Kein Stress, der Schmäh rennt eh von allein, musst nur die Vorsicht an der Garderobe abgeben.",
+      "translation_es": "¡Llamada desde Viena! Oida, el tiempo se nos va. Cero estrés, el encanto vienés fluye solo de todos modos, solo debes dejar la cautela en el ropero.",
+      "translation_en": "Vienna Calling! Oida, time is running out. No stress, the Schmäh runs by itself anyway, you just have to check your caution at the coat rack.",
+      "translation_cz": "Vídeň volá! Oida, čas utíká. Žádný stres, ten Schmäh stejně běží sám od sebe, jen musíš nechat opatrnost v šatně.",
+      "translation_de": "Vienna Calling! Oida, die Zeit rennt davon. Kein Stress, der Schmäh läuft sowieso von allein, du musst nur die Vorsicht an der Garderobe abgeben.",
+      "translation_ru": "Вена вызывает! Oida, время уходит. Никакого стресса, шме и так работает само по себе, надо только сдать осторожность в гардероб.",
+      "cultural_vibe": "Syncopated coffeehouse charm, theatrical detachment, status equalization",
+      "pivot_line": "Ich sehe, wie professionell Sie das aufgestellt haben... aber geh bitte: jetzt auf Nummer sicher gehen? Da musst du die übertriebene Vorsicht mal an der Garderobe abgeben, Oida!",
+      "reinforces_card_uid": "AT_VIE_CHAM",
+      "slang_vocab_uids": [
+        "DE_V_SCHMAEH",
+        "DE_V_PARTICLES"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "uid": "AT_VIE_ADVENTURE_CHAM",
+      "lang": "AT_VIE",
+      "stage": "CHAMELEON",
+      "arena": "adventure",
+      "lens": null,
+      "text": "Mir geht’s ja genauso: Die besten Nächte in Wien stehen in keinem Kalender und brauchen kein <span class=\"slang-token\" data-term=\"G’schichtldrucken\">G’schichtldrucken</span>.",
+      "phonetics": "",
+      "english": "I’m the exact same way: the best nights in Vienna aren’t in any calendar and need zero excuses.",
+      "idioms": [
+        "G’schichtldrucken"
+      ]
+    },
+    {
+      "uid": "AT_VIE_ADVENTURE_COMP",
+      "lang": "AT_VIE",
+      "stage": "COMPLIMENT",
+      "arena": "adventure",
+      "lens": null,
+      "text": "Du hast diesen Blick drauf, Oida – ruhig nach außen, aber innerlich bereit für ein Abenteuer, das <span class=\"slang-token\" data-term=\"schwer in Ordnung\">schwer in Ordnung</span> ist.",
+      "phonetics": "",
+      "english": "You’ve got that look—calm on the outside, but inwardly ready for a seriously great adventure.",
+      "idioms": [
+        "schwer in Ordnung"
+      ]
+    },
+    {
+      "uid": "AT_VIE_ADVENTURE_COUNT",
+      "lang": "AT_VIE",
+      "stage": "COUNTERACT",
+      "arena": "adventure",
+      "lens": null,
+      "text": "„Vielleicht nächstes Mal“? Geh bitte, diese brave Vernunft geben wir jetzt für eine Stunde <span class=\"slang-token\" data-term=\"an der Garderobe abgeben\">an der Garderobe ab</span>.",
+      "phonetics": "",
+      "english": "\"Maybe next time\"? Come on, let’s hand that well-behaved caution to the coat check for an hour.",
+      "idioms": [
+        "an der Garderobe abgeben"
+      ]
+    },
+    {
+      "uid": "AT_VIE_ADVENTURE_CUR",
+      "lang": "AT_VIE",
+      "stage": "CURIOSITY",
+      "arena": "adventure",
+      "lens": null,
+      "text": "Komm, zwanzig Minuten Umweg auf meine Kappe: Wohin entführen wir diesen Abend jetzt spontan?",
+      "phonetics": "",
+      "english": "Come on, twenty-minute detour on my tab: where are we spontaneously taking this evening right now?",
+      "idioms": []
+    },
+    {
+      "uid": "AT_VIE_B2B_CHAM",
+      "lang": "AT_VIE",
+      "stage": "CHAMELEON",
+      "arena": "b2b",
+      "lens": null,
+      "text": "Lassen wir die Folien-<span class=\"slang-token\" data-term=\"Pflanzerei\">Pflanzerei</span> und das <span class=\"slang-token\" data-term=\"G’schichtldrucken\">G’schichtldrucken</span> weg und reden wir direkt wie im Maschinenraum.",
+      "phonetics": "",
+      "english": "Let’s skip the slide-deck window-dressing and tall tales and talk directly like in the engine room.",
+      "idioms": [
+        "Pflanzerei",
+        "G’schichtldrucken"
+      ]
+    },
+    {
+      "uid": "AT_VIE_B2B_COMP",
+      "lang": "AT_VIE",
+      "stage": "COMPLIMENT",
+      "arena": "b2b",
+      "lens": null,
+      "text": "Im Boardroom sieht man selten ein System mit so sauberer Substanz – technisch ist das <span class=\"slang-token\" data-term=\"schwer in Ordnung\">schwer in Ordnung</span>.",
+      "phonetics": "",
+      "english": "In the boardroom you rarely see a system with such clean substance—technically that is seriously solid.",
+      "idioms": [
+        "schwer in Ordnung"
+      ]
+    },
+    {
+      "uid": "AT_VIE_B2B_COUNT",
+      "lang": "AT_VIE",
+      "stage": "COUNTERACT",
+      "arena": "b2b",
+      "lens": null,
+      "text": "Eure besten Entwickler mit manuellen Freigaben aufzuhalten? Diese Bremse geben wir heute <span class=\"slang-token\" data-term=\"an der Garderobe abgeben\">an der Garderobe ab</span>.",
+      "phonetics": "",
+      "english": "Holding up your best developers with manual approvals? Let’s check that brake at the coat check today.",
+      "idioms": [
+        "an der Garderobe abgeben"
+      ]
+    },
+    {
+      "uid": "AT_VIE_B2B_CUR",
+      "lang": "AT_VIE",
+      "stage": "CURIOSITY",
+      "arena": "b2b",
+      "lens": null,
+      "text": "Von Techniker zu Techniker: Welchen Flaschenhals drehen wir im ersten Zwei-Wochen-Sprint sofort ab?",
+      "phonetics": "",
+      "english": "Engineer to engineer: which bottleneck do we shut off immediately in the first two-week sprint?",
+      "idioms": []
+    },
+    {
+      "uid": "DE_STD_CHAM_01",
+      "lang": "DE_STD",
+      "stage": "CHAMELEON",
+      "arena": "b2b",
+      "lens": null,
+      "text": "Mir ist klar, dass für Sie belastbare Durchlaufzeiten zählen und kein zusätzlicher Abstimmungsaufwand im Tagesgeschäft entstehen darf.",
+      "phonetics": "",
+      "english": "It’s clear to me that reliable throughput counts for you and zero extra coordination overhead can be introduced into daily operations.",
+      "idioms": []
+    },
+    {
+      "uid": "DE_STD_COMP_01",
+      "lang": "DE_STD",
+      "stage": "COMPLIMENT",
+      "arena": "b2b",
+      "lens": null,
+      "text": "Ich verfolge genau, mit welcher Disziplin Sie Ihre Plattform skalieren – man sieht sofort <span class=\"slang-token\" data-term=\"Substanz vor Show\">Substanz vor Show</span>.",
+      "phonetics": "",
+      "english": "I’ve been closely following the discipline with which you are scaling your platform—one immediately sees substance over show.",
+      "idioms": [
+        "Substanz vor Show"
+      ]
+    },
+    {
+      "uid": "AT_VIE_HOCHKULTUR_CHAM",
+      "lang": "AT_VIE",
+      "stage": "CHAMELEON",
+      "arena": "hochkultur",
+      "lens": null,
+      "text": "Zwischen zwei Akten beim Sekt merkt man sofort: Wir brauchen keine <span class=\"slang-token\" data-term=\"Pflanzerei\">Pflanzerei</span> und kein <span class=\"slang-token\" data-term=\"G’schichtldrucken\">G’schichtldrucken</span>.",
+      "phonetics": "",
+      "english": "Between two acts over sparkling wine you notice right away: we need zero gallery bluffing and zero tall tales.",
+      "idioms": [
+        "Pflanzerei",
+        "G’schichtldrucken"
+      ]
+    },
+    {
+      "uid": "AT_VIE_HOCHKULTUR_COMP",
+      "lang": "AT_VIE",
+      "stage": "COMPLIMENT",
+      "arena": "hochkultur",
+      "lens": null,
+      "text": "In der Staatsoper-Loge trifft man viele Blender, Oida, aber deine Linie hat Stil und ist <span class=\"slang-token\" data-term=\"schwer in Ordnung\">schwer in Ordnung</span>.",
+      "phonetics": "",
+      "english": "In the Staatsoper box you meet plenty of bluffers, man, yet your vision has real style and substance.",
+      "idioms": [
+        "schwer in Ordnung"
+      ]
+    },
+    {
+      "uid": "AT_VIE_HOCHKULTUR_COUNT",
+      "lang": "AT_VIE",
+      "stage": "COUNTERACT",
+      "arena": "hochkultur",
+      "lens": null,
+      "text": "Die heilige Ehrfurcht vor dem alten Protokoll sollten wir vor dem dritten Gong <span class=\"slang-token\" data-term=\"an der Garderobe abgeben\">an der Garderobe abgeben</span>.",
+      "phonetics": "",
+      "english": "Let’s check that sacred reverence for old protocol at the coat check before the third intermission gong.",
+      "idioms": [
+        "an der Garderobe abgeben"
+      ]
+    },
+    {
+      "uid": "AT_VIE_HOCHKULTUR_CUR",
+      "lang": "AT_VIE",
+      "stage": "CURIOSITY",
+      "arena": "hochkultur",
+      "lens": null,
+      "text": "Unter uns in der Loge: Welchen mutigen Hauptakt heben wir nach der Pause direkt auf die große Bühne?",
+      "phonetics": "",
+      "english": "Between us in the box: what bold main act are we lifting straight onto the grand stage after intermission?",
+      "idioms": []
+    },
+    {
+      "uid": "HAUTE_HOCH_AT_DEADPAN",
+      "lang": "AT_VIE",
+      "stage": "COUNTERACT",
+      "arena": "hochkultur",
+      "lens": "DEADPAN",
+      "text": "In der Loge klingen große Worte immer herrlich, Oida—aber die heilige Ehrfurcht vor dem Legacy-System sollten wir jetzt mal <span class=\"slang-token\" data-term=\"an der Garderobe abgeben\">an der Garderobe abgeben</span>.",
+      "phonetics": "",
+      "english": "",
+      "idioms": [
+        "an der Garderobe abgeben"
+      ]
+    },
+    {
+      "uid": "HOCH_AT_VIE_BASE",
+      "lang": "AT_VIE",
+      "stage": "COUNTERACT",
+      "arena": "hochkultur",
+      "lens": null,
+      "text": "In der Staatsoper-Loge plaudert es sich herrlich, Oida – geben wir die steife Förmlichkeit kurz <span class=\"slang-token\" data-term=\"an der Garderobe abgeben\">an der Garderobe ab</span> und heben wir das Projekt auf die große Bühne.",
+      "phonetics": "",
+      "english": "In the Staatsoper box it’s lovely to chat—let’s check the stiff formality at the coat check and lift this project onto the main stage.",
+      "idioms": [
+        "an der Garderobe abgeben"
+      ]
+    },
+    {
+      "uid": "AT_VIE_POLO_CHAM",
+      "lang": "AT_VIE",
+      "stage": "CHAMELEON",
+      "arena": "polo",
+      "lens": null,
+      "text": "Keine schicke <span class=\"slang-token\" data-term=\"Pflanzerei\">Pflanzerei</span> am Champagnerzelt, kein <span class=\"slang-token\" data-term=\"G’schichtldrucken\">G’schichtldrucken</span> – nur echtes Timing.",
+      "phonetics": "",
+      "english": "Zero fancy bluffing at the champagne tent, zero tall tales—pure timing.",
+      "idioms": [
+        "Pflanzerei",
+        "G’schichtldrucken"
+      ]
+    },
+    {
+      "uid": "AT_VIE_POLO_COMP",
+      "lang": "AT_VIE",
+      "stage": "COMPLIMENT",
+      "arena": "polo",
+      "lens": null,
+      "text": "Am Polo-Rasen sieht man zwischen zwei Chukkern sofort, wer Ruhe im Sattel hat – euer Tempo ist <span class=\"slang-token\" data-term=\"schwer in Ordnung\">schwer in Ordnung</span>.",
+      "phonetics": "",
+      "english": "On the polo lawn between chukkers you see right away who has calm in the saddle—your pace is genuinely solid.",
+      "idioms": [
+        "schwer in Ordnung"
+      ]
+    },
+    {
+      "uid": "AT_VIE_POLO_COUNT",
+      "lang": "AT_VIE",
+      "stage": "COUNTERACT",
+      "arena": "polo",
+      "lens": null,
+      "text": "Die angezogene Handbremse im letzten Chukker geben wir jetzt aber schleunigst <span class=\"slang-token\" data-term=\"an der Garderobe abgeben\">an der Garderobe ab</span>.",
+      "phonetics": "",
+      "english": "Let’s hand that pulled handbrake to the coat check before the final chukker.",
+      "idioms": [
+        "an der Garderobe abgeben"
+      ]
+    },
+    {
+      "uid": "AT_VIE_POLO_CUR",
+      "lang": "AT_VIE",
+      "stage": "CURIOSITY",
+      "arena": "polo",
+      "lens": null,
+      "text": "Sag ehrlich an der Bande: Welchen weiten Schlag wagen wir sofort beim nächsten Anritt?",
+      "phonetics": "",
+      "english": "Tell me straight by the boards: what long downfield shot are we taking on the very next ride-off?",
+      "idioms": []
+    },
+    {
+      "uid": "POLO_AT_VIE_BASE",
+      "lang": "AT_VIE",
+      "stage": "COMPLIMENT",
+      "arena": "polo",
+      "lens": null,
+      "text": "Am Polo-Rasen zwischen den Chukkern sieht man sofort, wer Ruhe im Sattel hat – euer Tempo ist echt <span class=\"slang-token\" data-term=\"schwer in Ordnung\">schwer in Ordnung</span>.",
+      "phonetics": "",
+      "english": "On the polo lawn between chukkers you see right away who has calm in the saddle—your pace is genuinely solid.",
+      "idioms": [
+        "schwer in Ordnung"
+      ]
+    },
+    {
+      "uid": "AT_VIE_RUNWAY_CHAM",
+      "lang": "AT_VIE",
+      "stage": "CHAMELEON",
+      "arena": "runway",
+      "lens": null,
+      "text": "Vorne blitzen die Kameras, aber wir schauen auf die Naht – ganz ohne PR-<span class=\"slang-token\" data-term=\"G’schichtldrucken\">G’schichtldrucken</span>.",
+      "phonetics": "",
+      "english": "Up front the cameras flash, while we inspect the seam—zero PR tall tales.",
+      "idioms": [
+        "G’schichtldrucken"
+      ]
+    },
+    {
+      "uid": "AT_VIE_RUNWAY_COMP",
+      "lang": "AT_VIE",
+      "stage": "COMPLIMENT",
+      "arena": "runway",
+      "lens": null,
+      "text": "Backstage merkt man sofort: Kein lautes Theater, sondern echtes Handwerk – euer Schnitt ist <span class=\"slang-token\" data-term=\"schwer in Ordnung\">schwer in Ordnung</span>.",
+      "phonetics": "",
+      "english": "Backstage you notice immediately: zero loud theater, just real craft—your cut is seriously solid.",
+      "idioms": [
+        "schwer in Ordnung"
+      ]
+    },
+    {
+      "uid": "AT_VIE_RUNWAY_COUNT",
+      "lang": "AT_VIE",
+      "stage": "COUNTERACT",
+      "arena": "runway",
+      "lens": null,
+      "text": "Die falsche Bescheidenheit vor dem Finale solltet ihr samt Sedcard <span class=\"slang-token\" data-term=\"an der Garderobe abgeben\">an der Garderobe abgeben</span>.",
+      "phonetics": "",
+      "english": "You ought to check that false modesty right at the coat check before the finale.",
+      "idioms": [
+        "an der Garderobe abgeben"
+      ]
+    },
+    {
+      "uid": "AT_VIE_RUNWAY_CUR",
+      "lang": "AT_VIE",
+      "stage": "CURIOSITY",
+      "arena": "runway",
+      "lens": null,
+      "text": "Unter uns im Atelier: Welches geheime Meisterstück schicken wir als Nächstes unangekündigt ins Scheinwerferlicht?",
+      "phonetics": "",
+      "english": "Between us in the atelier: what secret masterpiece are we sending unannounced into the spotlight next?",
+      "idioms": []
+    },
+    {
+      "uid": "RUNWAY_AT_VIE_BASE",
+      "lang": "AT_VIE",
+      "stage": "CHAMELEON",
+      "arena": "runway",
+      "lens": null,
+      "text": "Backstage merkt man eh sofort: Kein lautes Theater, sondern echtes Handwerk – was ihr da auf die Beine stellt, ist <span class=\"slang-token\" data-term=\"schwer in Ordnung\">schwer in Ordnung</span>.",
+      "phonetics": "",
+      "english": "Backstage you notice right away: no loud theater, just real craft—what you’re putting on its feet is seriously impressive.",
+      "idioms": [
+        "schwer in Ordnung"
+      ]
+    },
+    {
+      "uid": "AT_VIE_SPARK_CHAM",
+      "lang": "AT_VIE",
+      "stage": "CHAMELEON",
+      "arena": "spark",
+      "lens": null,
+      "text": "Kein Smalltalk, kein steifes <span class=\"slang-token\" data-term=\"G’schichtldrucken\">G’schichtldrucken</span> – man merkt in zehn Sekunden, dass wir denselben Schmäh haben.",
+      "phonetics": "",
+      "english": "Zero small talk, zero tall tales—you can tell in ten seconds we share the same dry wit.",
+      "idioms": [
+        "G’schichtldrucken"
+      ]
+    },
+    {
+      "uid": "AT_VIE_SPARK_COMP",
+      "lang": "AT_VIE",
+      "stage": "COMPLIMENT",
+      "arena": "spark",
+      "lens": null,
+      "text": "Servus, eines fällt sofort auf: Während der halbe Raum posiert, hast du eine Ausstrahlung, die echt <span class=\"slang-token\" data-term=\"schwer in Ordnung\">schwer in Ordnung</span> ist.",
+      "phonetics": "",
+      "english": "Hello there, one thing stands out immediately: while half the room poses, you carry a presence that is genuinely solid.",
+      "idioms": [
+        "schwer in Ordnung"
+      ]
+    },
+    {
+      "uid": "AT_VIE_SPARK_COUNT",
+      "lang": "AT_VIE",
+      "stage": "COUNTERACT",
+      "arena": "spark",
+      "lens": null,
+      "text": "Geh bitte, das höfliche Kennenlern-Protokoll können wir direkt <span class=\"slang-token\" data-term=\"an der Garderobe abgeben\">an der Garderobe abgeben</span>.",
+      "phonetics": "",
+      "english": "Come on now, let’s hand the polite introductory protocol straight to the coat check.",
+      "idioms": [
+        "an der Garderobe abgeben"
+      ]
+    },
+    {
+      "uid": "AT_VIE_SPARK_CUR",
+      "lang": "AT_VIE",
+      "stage": "CURIOSITY",
+      "arena": "spark",
+      "lens": null,
+      "text": "Verrat mir eines: Was ist die spannendste Geschichte in diesem Raum, die außer dir noch keiner bemerkt hat?",
+      "phonetics": "",
+      "english": "Tell me one thing: what is the best story in this room that nobody besides you has spotted yet?",
+      "idioms": []
+    },
+    {
+      "uid": "AT_VIE_CHAM",
+      "lang": "AT_VIE",
+      "stage": "CHAMELEON",
+      "arena": "terrace",
+      "lens": null,
+      "text": "Ich merk eh sofort, wir ticken da gleich. Kein Theater, kein <span class=\"slang-token\" data-term=\"G’schichtldrucken\">G’schichtldrucken</span>, sondern Substanz mit Schmäh.",
+      "phonetics": "",
+      "english": "I can tell right away we tick the same way. Zero theater, zero tall tales—just substance with Viennese charm.",
+      "idioms": [
+        "G’schichtldrucken"
+      ]
+    },
+    {
+      "uid": "AT_VIE_COMP",
+      "lang": "AT_VIE",
+      "stage": "COMPLIMENT",
+      "arena": "terrace",
+      "lens": null,
+      "text": "Oida, eines muss man dir lassen: Wie du das aufgestellt hast, das ist <span class=\"slang-token\" data-term=\"schwer in Ordnung\">schwer in Ordnung</span>. Da steckt echtes Herzblut drin.",
+      "phonetics": "",
+      "english": "Man, one has to hand it to you: the way you set this up is seriously solid. There is real heart and soul in it.",
+      "idioms": [
+        "schwer in Ordnung"
+      ]
+    },
+    {
+      "uid": "AT_VIE_COUNT",
+      "lang": "AT_VIE",
+      "stage": "COUNTERACT",
+      "arena": "terrace",
+      "lens": null,
+      "text": "Aber geh bitte: Jetzt auf Nummer sicher gehen? Da musst du die übertriebene Vorsicht mal <span class=\"slang-token\" data-term=\"an der Garderobe abgeben\">an der Garderobe abgeben</span>.",
+      "phonetics": "",
+      "english": "But come on now: playing it safe right now? You ought to check that excessive caution at the coat check.",
+      "idioms": [
+        "an der Garderobe abgeben"
+      ]
+    },
+    {
+      "uid": "AT_VIE_CUR",
+      "lang": "AT_VIE",
+      "stage": "CURIOSITY",
+      "arena": "terrace",
+      "lens": null,
+      "text": "Hand aufs Herz: Wenn wir heute Abend alle Ausreden streichen – was ist der schönste Bledsinn, den wir als Nächstes anreißen?",
+      "phonetics": "",
+      "english": "Hand on heart: if we cross out all excuses tonight—what is the boldest move we kick off next?",
+      "idioms": []
+    },
+    {
+      "uid": "AT_VIE_WIEN_CHAM",
+      "lang": "AT_VIE",
+      "stage": "CHAMELEON",
+      "arena": "wien",
+      "lens": null,
+      "text": "Unter vier Augen am Marmortisch braucht’s kein <span class=\"slang-token\" data-term=\"G’schichtldrucken\">G’schichtldrucken</span> und keine <span class=\"slang-token\" data-term=\"Pflanzerei\">Pflanzerei</span> – ein Nicken reicht.",
+      "phonetics": "",
+      "english": "Under four eyes at the marble table there’s zero need for tall tales or bluffing—one nod suffices.",
+      "idioms": [
+        "G’schichtldrucken",
+        "Pflanzerei"
+      ]
+    },
+    {
+      "uid": "AT_VIE_WIEN_COMP",
+      "lang": "AT_VIE",
+      "stage": "COMPLIMENT",
+      "arena": "wien",
+      "lens": null,
+      "text": "Hier hinten in der Kaffeehaus-Loge bei einer Melange merkt man gleich: Deine Ruhe im Spiel ist <span class=\"slang-token\" data-term=\"schwer in Ordnung\">schwer in Ordnung</span>.",
+      "phonetics": "",
+      "english": "Back here in the corner Kaffeehaus booth over a Melange you notice right away: your quiet poise is seriously solid.",
+      "idioms": [
+        "schwer in Ordnung"
+      ]
+    },
+    {
+      "uid": "AT_VIE_WIEN_COUNT",
+      "lang": "AT_VIE",
+      "stage": "COUNTERACT",
+      "arena": "wien",
+      "lens": null,
+      "text": "Das offizielle Ausschuss-Theater lassen wir draußen im Regen stehen und geben es <span class=\"slang-token\" data-term=\"an der Garderobe abgeben\">an der Garderobe ab</span>.",
+      "phonetics": "",
+      "english": "Let’s leave the official committee theater out in the rain and check it at the coat check.",
+      "idioms": [
+        "an der Garderobe abgeben"
+      ]
+    },
+    {
+      "uid": "AT_VIE_WIEN_CUR",
+      "lang": "AT_VIE",
+      "stage": "CURIOSITY",
+      "arena": "wien",
+      "lens": null,
+      "text": "Ganz diskret beim kleinen Braunen: Welchen leisen Schachzug setzen wir vor Freitag auf die Schiene?",
+      "phonetics": "",
+      "english": "Quietly over an espresso: what subtle chess move do we put on the rails before Friday?",
+      "idioms": []
+    }
+  ]
+}

@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#060911" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <title>Polyglot Sales &amp; Riff Studio — Unified Suite Launcher</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="polyglot_api_client.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #060911;
+      color: #f1f5f9;
+      height: 100dvh;
+      width: 100vw;
+      overflow: hidden;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+    .safe-bottom { padding-bottom: max(0.35rem, env(safe-area-inset-bottom)); }
+    button { touch-action: manipulation; }
+  </style>
+</head>
+<body class="flex flex-col">
+
+  <!-- TOP SUITE HEADER BAR (Compact on Mobile, Full Switcher on Desktop) -->
+  <nav class="bg-slate-950 border-b border-slate-800/90 px-2.5 sm:px-3 py-1.5 flex items-center justify-between gap-2 shrink-0 z-40">
+    <div class="flex items-center gap-2 min-w-0">
+      <span id="hub-status-dot" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse shrink-0"></span>
+      <span class="text-xs font-bold tracking-wide text-slate-200 uppercase mono truncate">Polyglot Suite</span>
+      <span id="hub-backend-pill" class="text-[10px] mono px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-slate-400 truncate max-w-[175px] sm:max-w-none">
+        Checking Stack...
+      </span>
+    </div>
+
+    <!-- DESKTOP APP TABS (md and up) -->
+    <div class="hidden md:flex flex-wrap items-center gap-1 bg-slate-900 p-1 rounded-lg border border-slate-800">
+      <button data-app-url="regional_lyric_flashcards.html" onclick="loadApp('regional_lyric_flashcards.html')"
+        class="app-tab px-2.5 py-1 rounded-md text-xs font-semibold transition text-slate-300 hover:text-white whitespace-nowrap">
+        🎵 Anthems &amp; 4-C Flashcards
+      </button>
+      <button data-app-url="polyglot_audio_rhythm_studio_v4_5.html" onclick="loadApp('polyglot_audio_rhythm_studio_v4_5.html')"
+        class="app-tab px-2.5 py-1 rounded-md text-xs font-semibold transition text-slate-300 hover:text-white whitespace-nowrap">
+        🎛️ Audio-Rhythm v4.5
+      </button>
+      <button data-app-url="polyglot_riff_studio_v3_1_atelier_edition.html" onclick="loadApp('polyglot_riff_studio_v3_1_atelier_edition.html')"
+        class="app-tab px-2.5 py-1 rounded-md text-xs font-semibold transition bg-emerald-600 text-white whitespace-nowrap">
+        ★ Atelier v3.1 (Full Engine)
+      </button>
+      <button data-app-url="czech_register_switcher_widget.html" onclick="loadApp('czech_register_switcher_widget.html')"
+        class="app-tab px-2.5 py-1 rounded-md text-xs font-semibold transition text-slate-300 hover:text-white whitespace-nowrap">
+        ⇄ 5-Lang Switcher
+      </button>
+      <button data-app-url="polyglot_riff_studio_v3_0_neo4j_srs_heatmap.html" onclick="loadApp('polyglot_riff_studio_v3_0_neo4j_srs_heatmap.html')"
+        class="app-tab px-2.5 py-1 rounded-md text-xs font-semibold transition text-slate-300 hover:text-white whitespace-nowrap">
+        SRS Heatmap v3.0
+      </button>
+      <button data-app-url="polyglot_riff_studio_v1_zero_corporate.html" onclick="loadApp('polyglot_riff_studio_v1_zero_corporate.html')"
+        class="app-tab px-2.5 py-1 rounded-md text-xs font-semibold transition text-slate-300 hover:text-white whitespace-nowrap">
+        Lounge v1.0
+      </button>
+    </div>
+
+    <div class="flex items-center gap-1.5 text-xs mono shrink-0">
+      <!-- GLOBAL CROSS-TAB CULTURE SYNC BAR -->
+      <div id="hub-culture-sync-bar" class="flex items-center gap-0.5 bg-slate-900 px-1 py-0.5 rounded-lg border border-slate-800" title="Global Culture Sync Bus (locks active language across all 6 Studio views)">
+        <button data-sync-reg="CZ_OVA" onclick="syncGlobalCulture('CZ_OVA')" class="hub-cult-btn px-1.5 py-0.5 rounded text-[11px] bg-amber-500 text-slate-950 font-bold transition">🇨🇿</button>
+        <button data-sync-reg="AT_VIE" onclick="syncGlobalCulture('AT_VIE')" class="hub-cult-btn px-1.5 py-0.5 rounded text-[11px] text-slate-400 hover:text-white transition">🇦🇹</button>
+        <button data-sync-reg="RU_ALA" onclick="syncGlobalCulture('RU_ALA')" class="hub-cult-btn px-1.5 py-0.5 rounded text-[11px] text-slate-400 hover:text-white transition">🇰🇿</button>
+        <button data-sync-reg="EN_YYC" onclick="syncGlobalCulture('EN_YYC')" class="hub-cult-btn px-1.5 py-0.5 rounded text-[11px] text-slate-400 hover:text-white transition">🇨🇦</button>
+        <button data-sync-reg="ES_SOT" onclick="syncGlobalCulture('ES_SOT')" class="hub-cult-btn px-1.5 py-0.5 rounded text-[11px] text-slate-400 hover:text-white transition">🇪🇸</button>
+      </div>
+      <button onclick="openMobileSyncModal()" id="outbox-sync-btn"
+        class="px-2 py-1 rounded bg-slate-900 hover:bg-slate-800 border border-slate-700 text-amber-300 hover:text-white transition whitespace-nowrap flex items-center gap-1">
+        <span>🌐 Mobile / Sync</span>
+        <span id="outbox-count-badge" class="hidden px-1.5 py-0.2 rounded-full bg-amber-500 text-slate-950 text-[10px] font-bold">0</span>
+      </button>
+      <a href="http://127.0.0.1:7474/browser/?connectURL=neo4j%3A%2F%2Fneo4j%40127.0.0.1%3A7687" target="_blank"
+        title="Neo4j Browser — User: neo4j | Password: polyglot_atelier_dev"
+        class="hidden sm:inline-block px-2 py-1 rounded bg-slate-900 hover:bg-slate-800 border border-slate-800 text-indigo-300 hover:text-white transition whitespace-nowrap">
+        Neo4j :7474
+      </a>
+      <a id="open-direct-link" href="polyglot_riff_studio_v3_1_atelier_edition.html" target="_blank"
+        class="px-2 py-1 rounded bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-white transition whitespace-nowrap">
+        ↗
+      </a>
+    </div>
+  </nav>
+
+  <!-- ACTIVE APPLICATION VIEWPORT -->
+  <iframe id="suite-frame" src="polyglot_riff_studio_v3_1_atelier_edition.html" class="flex-1 w-full border-0 bg-slate-950"></iframe>
+
+  <!-- MOBILE-FRIENDLY BOTTOM THUMB NAVIGATION DOCK (< 768px) -->
+  <nav class="md:hidden bg-slate-950/95 backdrop-blur border-t border-slate-800 px-1.5 pt-1.5 safe-bottom grid grid-cols-6 gap-1 shrink-0 z-40">
+    <button data-app-url="regional_lyric_flashcards.html" onclick="loadApp('regional_lyric_flashcards.html')"
+      class="app-tab-mobile flex flex-col items-center justify-center py-1.5 rounded-lg text-[10px] font-semibold text-slate-400">
+      <span class="text-sm leading-none mb-0.5">🎵</span>
+      <span class="truncate max-w-full">Anthems</span>
+    </button>
+    <button data-app-url="polyglot_audio_rhythm_studio_v4_5.html" onclick="loadApp('polyglot_audio_rhythm_studio_v4_5.html')"
+      class="app-tab-mobile flex flex-col items-center justify-center py-1.5 rounded-lg text-[10px] font-semibold text-slate-400">
+      <span class="text-sm leading-none mb-0.5">🎛️</span>
+      <span class="truncate max-w-full">Rhythm</span>
+    </button>
+    <button data-app-url="polyglot_riff_studio_v3_1_atelier_edition.html" onclick="loadApp('polyglot_riff_studio_v3_1_atelier_edition.html')"
+      class="app-tab-mobile flex flex-col items-center justify-center py-1.5 rounded-lg text-[10px] font-semibold bg-emerald-600/20 text-emerald-300 border border-emerald-500/40">
+      <span class="text-sm leading-none mb-0.5">★</span>
+      <span class="truncate max-w-full">Atelier</span>
+    </button>
+    <button data-app-url="czech_register_switcher_widget.html" onclick="loadApp('czech_register_switcher_widget.html')"
+      class="app-tab-mobile flex flex-col items-center justify-center py-1.5 rounded-lg text-[10px] font-semibold text-slate-400">
+      <span class="text-sm leading-none mb-0.5">⇄</span>
+      <span class="truncate max-w-full">Switcher</span>
+    </button>
+    <button data-app-url="polyglot_riff_studio_v3_0_neo4j_srs_heatmap.html" onclick="loadApp('polyglot_riff_studio_v3_0_neo4j_srs_heatmap.html')"
+      class="app-tab-mobile flex flex-col items-center justify-center py-1.5 rounded-lg text-[10px] font-semibold text-slate-400">
+      <span class="text-sm leading-none mb-0.5">🔥</span>
+      <span class="truncate max-w-full">SRS Map</span>
+    </button>
+    <button data-app-url="polyglot_riff_studio_v1_zero_corporate.html" onclick="loadApp('polyglot_riff_studio_v1_zero_corporate.html')"
+      class="app-tab-mobile flex flex-col items-center justify-center py-1.5 rounded-lg text-[10px] font-semibold text-slate-400">
+      <span class="text-sm leading-none mb-0.5">🍷</span>
+      <span class="truncate max-w-full">Lounge</span>
+    </button>
+  </nav>
+
+  <!-- MOBILE / LAN ACCESS & OFFLINE OUTBOX MODAL -->
+  <div id="mobile-sync-modal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div>
+          <h2 class="text-sm font-bold text-white uppercase tracking-wide mono">🌐 Mobile Web &amp; Offline Sync</h2>
+          <p class="text-[11px] text-slate-400">Access on any phone/tablet browser or sync offline FSRS drills</p>
+        </div>
+        <button onclick="closeMobileSyncModal()" class="text-slate-400 hover:text-white text-sm px-2 py-1 rounded bg-slate-800">✕</button>
+      </div>
+
+      <div class="space-y-1.5 text-xs">
+        <label class="text-slate-400 font-semibold uppercase text-[10px] mono">Wi-Fi LAN Browser URL (Same Network):</label>
+        <div class="flex items-center gap-2">
+          <input id="lan-url-input" type="text" readonly value="http://127.0.0.1:8765/index.html"
+            class="flex-1 bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-amber-300 mono text-xs" />
+          <button onclick="copyLanUrl()" class="px-3 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs">
+            Copy
+          </button>
+        </div>
+        <p class="text-[11px] text-slate-400">
+          Open this URL in any mobile browser on your Wi-Fi, or use the site offline via pre-cached <code>db/*.db.json</code> shards.
+        </p>
+      </div>
+
+      <div class="bg-slate-950 border border-slate-800 rounded-xl p-3.5 space-y-2 text-xs">
+        <div class="flex items-center justify-between">
+          <span class="text-slate-300 font-semibold">Offline Outbox Queue:</span>
+          <span id="modal-outbox-status" class="mono text-emerald-400 font-bold">0 pending events</span>
+        </div>
+        <button onclick="flushOutboxFromModal()" class="w-full py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs transition">
+          ↻ Sync Offline Grades &amp; Cards to Postgres + Neo4j
+        </button>
+      </div>
+
+      <div class="space-y-1.5 text-xs pt-1 border-t border-slate-800">
+        <label class="text-slate-400 font-semibold uppercase text-[10px] mono">Custom API Server Origin (Optional):</label>
+        <div class="flex items-center gap-2">
+          <input id="custom-origin-input" type="text" placeholder="http://192.168.1.x:8765"
+            class="flex-1 bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 mono text-xs" />
+          <button onclick="saveCustomOrigin()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs">
+            Save
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function loadApp(url) {
+      if (window.PolyglotMobile) window.PolyglotMobile.haptic(10);
+      document.getElementById('suite-frame').src = url;
+      document.getElementById('open-direct-link').href = url;
+
+      document.querySelectorAll('.app-tab').forEach(b => {
+        const isCurrent = b.getAttribute('data-app-url') === url;
+        b.className = isCurrent
+          ? 'app-tab px-2.5 py-1 rounded-md text-xs font-semibold transition bg-emerald-600 text-white whitespace-nowrap'
+          : 'app-tab px-2.5 py-1 rounded-md text-xs font-semibold transition text-slate-300 hover:text-white whitespace-nowrap';
+      });
+
+      document.querySelectorAll('.app-tab-mobile').forEach(b => {
+        const isCurrent = b.getAttribute('data-app-url') === url;
+        b.className = isCurrent
+          ? 'app-tab-mobile flex flex-col items-center justify-center py-1.5 rounded-lg text-[10px] font-semibold bg-emerald-600/20 text-emerald-300 border border-emerald-500/40'
+          : 'app-tab-mobile flex flex-col items-center justify-center py-1.5 rounded-lg text-[10px] font-semibold text-slate-400';
+      });
+    }
+
+    function updateOutboxBadge() {
+      if (!window.PolyglotAPI) return;
+      const count = window.PolyglotAPI.getOutboxCount();
+      const badge = document.getElementById('outbox-count-badge');
+      const modalStatus = document.getElementById('modal-outbox-status');
+      if (badge) {
+        badge.textContent = String(count);
+        badge.classList.toggle('hidden', count === 0);
+      }
+      if (modalStatus) {
+        modalStatus.textContent = `${count} pending event${count === 1 ? '' : 's'}`;
+        modalStatus.className = count > 0 ? 'mono text-amber-400 font-bold' : 'mono text-emerald-400 font-bold';
+      }
+    }
+
+    async function refreshBackendBadge() {
+      const dot = document.getElementById('hub-status-dot');
+      const pill = document.getElementById('hub-backend-pill');
+      if (!window.PolyglotAPI) return;
+      updateOutboxBadge();
+      const health = await window.PolyglotAPI.health();
+      if (health && health.ok) {
+        const pgCards = health.postgres?.counts?.cards ?? '?';
+        const neoNodes = health.neo4j?.counts?.nodes ?? '?';
+        dot.className = 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0';
+        pill.className = 'text-[10px] mono px-2 py-0.5 rounded bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 truncate max-w-[175px] sm:max-w-none';
+        pill.textContent = `PG (${pgCards} cards) • Neo4j (${neoNodes} nodes)`;
+      } else {
+        dot.className = 'w-2 h-2 rounded-full bg-amber-400 shrink-0';
+        pill.className = 'text-[10px] mono px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-amber-300 truncate max-w-[175px] sm:max-w-none';
+        pill.textContent = 'Offline Shard Mode (db/*.db.json)';
+      }
+      updateOutboxBadge();
+    }
+
+    async function openMobileSyncModal() {
+      document.getElementById('mobile-sync-modal').classList.remove('hidden');
+      updateOutboxBadge();
+      if (window.PolyglotAPI) {
+        document.getElementById('custom-origin-input').value = window.PolyglotAPI.baseOrigin;
+        const net = await window.PolyglotAPI.fetchNetworkInfo();
+        if (net && net.primary_lan_url) {
+          document.getElementById('lan-url-input').value = net.primary_lan_url;
+        }
+      }
+    }
+
+    function closeMobileSyncModal() {
+      document.getElementById('mobile-sync-modal').classList.add('hidden');
+    }
+
+    function copyLanUrl() {
+      const inp = document.getElementById('lan-url-input');
+      if (!inp) return;
+      navigator.clipboard?.writeText(inp.value);
+      inp.select();
+    }
+
+    async function flushOutboxFromModal() {
+      if (!window.PolyglotAPI) return;
+      const res = await window.PolyglotAPI.flushClientOutbox();
+      updateOutboxBadge();
+      await refreshBackendBadge();
+      const modalStatus = document.getElementById('modal-outbox-status');
+      if (modalStatus) {
+        modalStatus.textContent = res.ok
+          ? `✓ Synced (${res.applied_count || 0} applied)`
+          : `Offline (${res.remaining || 0} queued locally)`;
+      }
+    }
+
+    async function saveCustomOrigin() {
+      if (!window.PolyglotAPI) return;
+      const val = document.getElementById('custom-origin-input').value;
+      window.PolyglotAPI.setBaseOrigin(val);
+      await refreshBackendBadge();
+      closeMobileSyncModal();
+    }
+
+    function syncGlobalCulture(regId) {
+      if (window.PolyglotMobile) window.PolyglotMobile.haptic(10);
+      if (window.PolyglotSyncBus) {
+        const ctx = window.PolyglotSyncBus.setContext({ registerId: regId });
+        renderHubCultureBar(ctx.registerId);
+      }
+    }
+
+    function renderHubCultureBar(activeRegId) {
+      document.querySelectorAll('.hub-cult-btn').forEach(btn => {
+        const isAct = btn.getAttribute('data-sync-reg') === activeRegId;
+        btn.className = isAct
+          ? 'hub-cult-btn px-1.5 py-0.5 rounded text-[11px] bg-amber-500 text-slate-950 font-bold transition shadow-sm'
+          : 'hub-cult-btn px-1.5 py-0.5 rounded text-[11px] text-slate-400 hover:text-white transition';
+      });
+    }
+
+    window.addEventListener('polyglot:context-changed', (e) => {
+      if (e && e.detail && e.detail.registerId) {
+        renderHubCultureBar(e.detail.registerId);
+      }
+    });
+
+    window.addEventListener('polyglot:outbox-updated', updateOutboxBadge);
+
+    window.addEventListener('DOMContentLoaded', () => {
+      refreshBackendBadge();
+      if (window.PolyglotSyncBus) {
+        const ctx = window.PolyglotSyncBus.getContext();
+        renderHubCultureBar(ctx.registerId || 'CZ_OVA');
+      }
+      const frame = document.getElementById('suite-frame');
+      if (frame) {
+        frame.addEventListener('load', () => {
+          if (window.PolyglotSyncBus && frame.contentWindow) {
+            frame.contentWindow.postMessage({
+              type: 'POLYGLOT_CONTEXT_SYNC',
+              context: window.PolyglotSyncBus.getContext()
+            }, '*');
+          }
+        });
+      }
+      if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      }
+    });
+  </script>
+</body>
+</html>

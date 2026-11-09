@@ -1,0 +1,632 @@
+{
+  "db_id": "polyglot.en_yyc",
+  "primary_focus": "EN_YYC (Calgary Flair)",
+  "registers": [
+    "EN_YYC",
+    "EN_EXEC"
+  ],
+  "personas": {
+    "EN_YYC": {
+      "id": "EN_YYC",
+      "tier": "REGIONAL",
+      "flag": "🇨🇦",
+      "name": "Calgary Flair",
+      "subtitle": "Foothills Backstage & Straight-Shooter",
+      "family": "Anglo-Germanic (Western Canadian)",
+      "address_form": "Warm Foothills Solidarity (\"bud\")",
+      "rhythm": "Percussive monosyllabic punch, warm gravel, zero pretension.",
+      "trick": "Disarming \"bud\" address + high-horsepower mechanical metaphors.",
+      "posture": "Relaxed shoulders, half-smirk, leaning in like you are sharing backstage passes.",
+      "paired_register_id": "EN_EXEC"
+    },
+    "EN_EXEC": {
+      "id": "EN_EXEC",
+      "tier": "FORMAL",
+      "flag": "🇨🇦",
+      "name": "Executive Boardroom",
+      "subtitle": "C-Suite Capital & Architecture Framing",
+      "family": "North American Executive English",
+      "address_form": "Crisp First-Name Executive Peer",
+      "rhythm": "Clean downward declarative endings, high signal-to-noise ratio, zero filler.",
+      "trick": "Acknowledge operational discipline and unit economics before cutting to ground truth.",
+      "posture": "Calm boardroom stillness, hands visible, concise sentences.",
+      "paired_register_id": "EN_YYC"
+    }
+  },
+  "idioms": {
+    "69 Mustang collecting dust": {
+      "term": "69 Mustang collecting dust",
+      "lang": "EN_YYC",
+      "origin": "Calgary garage culture",
+      "meaning": "Sitting on world-class talent/energy and refusing to take it out on the highway.",
+      "delivery": "Drop voice, grin like an accomplice.",
+      "cousin": "горный беркут в золотой клетке"
+    },
+    "all hat and no cattle": {
+      "term": "all hat and no cattle",
+      "lang": "EN_YYC",
+      "origin": "Alberta ranch & foothills idiom",
+      "meaning": "All flash and big talk with zero horsepower underneath.",
+      "delivery": "Dry chuckle, shake head.",
+      "cousin": "G’schichtldrucken"
+    },
+    "signal-to-noise": {
+      "term": "signal-to-noise",
+      "lang": "EN_EXEC",
+      "origin": "North American systems & boardroom framing",
+      "meaning": "Cutting executive overhead to maximize real engineering throughput.",
+      "delivery": "Crisp declarative cadence.",
+      "cousin": "Substanz vor Show"
+    }
+  },
+  "vocab": [
+    {
+      "uid": "EN_V_HINGE",
+      "term": "hinge upon (+ Noun)",
+      "lang_code": "en",
+      "register_id": "EN_EXEC",
+      "register_type": "FORMAL_EXAM",
+      "meaning": "Depend fundamentally on a pivotal condition",
+      "ib_source": "English B Paper 2 HL",
+      "grammar_note": "Formal prepositional verb",
+      "etymology": "",
+      "warning": ""
+    },
+    {
+      "uid": "EN_V_RECONCILE",
+      "term": "reconcile tension",
+      "lang_code": "en",
+      "register_id": "EN_EXEC",
+      "register_type": "FORMAL_EXAM",
+      "meaning": "Synthesize competing strategic propositions cleanly",
+      "ib_source": "English A Language & Literature Paper 1 SL",
+      "grammar_note": "",
+      "etymology": "",
+      "warning": ""
+    },
+    {
+      "uid": "EN_V_RHETORIC",
+      "term": "rhetorical appeal & authorial choice",
+      "lang_code": "en",
+      "register_id": "EN_EXEC",
+      "register_type": "FORMAL_EXAM",
+      "meaning": "Persuasive strategy and stylistic decisions",
+      "ib_source": "English A Language & Literature Paper 1 SL",
+      "grammar_note": "",
+      "etymology": "",
+      "warning": ""
+    },
+    {
+      "uid": "EN_V_CATTLE",
+      "term": "all hat and no cattle",
+      "lang_code": "en",
+      "register_id": "EN_YYC",
+      "register_type": "REGIONAL_RIFF",
+      "meaning": "All talk and posture without underlying substance",
+      "ib_source": "Calgary Foothills Register",
+      "grammar_note": "",
+      "etymology": "Western ranching idiom",
+      "warning": ""
+    },
+    {
+      "uid": "EN_V_GIVE_ER",
+      "term": "give ’er",
+      "lang_code": "en",
+      "register_id": "EN_YYC",
+      "register_type": "REGIONAL_RIFF",
+      "meaning": "Go all out / execute at full throttle",
+      "ib_source": "Calgary Foothills Register",
+      "grammar_note": "",
+      "etymology": "Western Canadian vernacular",
+      "warning": ""
+    },
+    {
+      "uid": "EN_V_TOUGH_LOVE",
+      "term": "tough love & high-stakes surrender",
+      "lang_code": "en",
+      "register_id": "EN_YYC",
+      "register_type": "REGIONAL_RIFF",
+      "meaning": "Uncompromising emotional intensity and velvet submission to the flow",
+      "ib_source": "The Weeknd - One of the Girls",
+      "grammar_note": "",
+      "etymology": "Global Nightlife Chameleon Register",
+      "warning": ""
+    }
+  ],
+  "songs": [
+    {
+      "uid": "SONG_EN_YYC_LOVERBOY",
+      "title": "Working for the Weekend",
+      "artist": "Loverboy",
+      "city_region": "Calgary & Western Canada",
+      "genre": "Western Canadian Arena Rock",
+      "bpm": 116,
+      "register_id": "EN_YYC",
+      "original_lang": "EN_YYC",
+      "original_lyric": "Everybody is working for the weekend, bud! Stop being all hat and no cattle, kick the garage door open and just give ’er!",
+      "translation_es": "¡Todo el mundo trabaja para el fin de semana, viejo! Déjate de postureo sin sustancia, abre la puerta del garaje y ¡dale a todo trapo!",
+      "translation_en": "Everybody is working for the weekend, bud! Stop being all hat and no cattle, kick the garage door open and just give ’er!",
+      "translation_cz": "Všichni makají na víkend, kámo! Přestaň dělat ramena bez výsledků, otevři vrata garáže a prostě to roztaj na plný plyn!",
+      "translation_de": "Alle arbeiten fürs Wochenende, Kumpel! Hör auf mit der großen Klappe ohne Substanz, mach das Garagentor auf und gib einfach Vollgas!",
+      "translation_ru": "Все пашут ради выходных, старина! Хватит понтоваться без дела, выбивай ворота гаража и жми на всю катушку!",
+      "cultural_vibe": "Mechanical momentum, straight-shooting energy, zero corporate polish",
+      "pivot_line": "Hold on a second, bud—what you’ve got going here is the real deal. In a room full of people who are all hat and no cattle, if we kick the garage doors open tonight and just give ’er, where are we taking this thing first?",
+      "reinforces_card_uid": "EN_YYC_CUR",
+      "slang_vocab_uids": [
+        "EN_V_CATTLE",
+        "EN_V_GIVE_ER"
+      ]
+    },
+    {
+      "uid": "SONG_WEEKND_OOTG",
+      "title": "One of the Girls",
+      "artist": "The Weeknd, JENNIE, Lily-Rose Depp",
+      "city_region": "Global / Nightlife High-Stakes Pop",
+      "genre": "Nocturnal R&B / Dark Synthwave",
+      "bpm": 87,
+      "register_id": "EN_YYC",
+      "original_lang": "EN",
+      "original_lyric": "Give me tough love, leave me with no breath... Push me down on my knees, tell me I belong to the world.",
+      "translation_es": "Dame amor duro, déjame sin aliento... Empújame de rodillas, dime que pertenezco al mundo.",
+      "translation_en": "Give me tough love, leave me with no breath... Push me down on my knees, tell me I belong to the world.",
+      "translation_cz": "Dej mi tvrdou lásku, nech mě bez dechu... Sraz mě na kolena, řekni mi, že patřím světu.",
+      "translation_de": "Gib mir harte Liebe, lass mich atemlos... Drück mich auf die Knie, sag mir, dass ich der Welt gehöre.",
+      "translation_ru": "Дай мне суровую любовь, оставь меня без дыхания... Поставь меня на колени, скажи, что я принадлежу миру.",
+      "cultural_vibe": "High-stakes nightlife intensity, intense devotion, chameleon surrender & velvet power dynamics",
+      "pivot_line": "Zero corporate polish... give me tough love and tell me I belong to the world. We’re both cut from that same late-night frequency: addicted to the rush, zero patience for the ordinary.",
+      "reinforces_card_uid": "EN_YYC_CHAM",
+      "slang_vocab_uids": [
+        "EN_V_TOUGH_LOVE"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "uid": "EN_YYC_ADVENTURE_CHAM",
+      "lang": "EN_YYC",
+      "stage": "CHAMELEON",
+      "arena": "adventure",
+      "lens": null,
+      "text": "Best nights from Calgary to Europe always start the exact second you throw the itinerary in the glovebox.",
+      "phonetics": "",
+      "english": "Co-conspirator alignment around spontaneous detours.",
+      "idioms": []
+    },
+    {
+      "uid": "EN_YYC_ADVENTURE_COMP",
+      "lang": "EN_YYC",
+      "stage": "COMPLIMENT",
+      "arena": "adventure",
+      "lens": null,
+      "text": "You’ve got way too much maverick in you, bud, to pretend you came out tonight for a predictable script—nothing <span class=\"slang-token\" data-term=\"all hat and no cattle\">all hat and no cattle</span> about your vibe.",
+      "phonetics": "",
+      "english": "Warm challenge celebrating the counterpart’s adventurous streak.",
+      "idioms": [
+        "all hat and no cattle"
+      ]
+    },
+    {
+      "uid": "EN_YYC_ADVENTURE_COUNT",
+      "lang": "EN_YYC",
+      "stage": "COUNTERACT",
+      "arena": "adventure",
+      "lens": null,
+      "text": "Saying \"let’s rain-check\" right now is keeping a <span class=\"slang-token\" data-term=\"69 Mustang collecting dust\">69 Mustang collecting dust</span> while the highway’s wide open.",
+      "phonetics": "",
+      "english": "Playful pattern interrupt melting hesitation.",
+      "idioms": [
+        "69 Mustang collecting dust"
+      ]
+    },
+    {
+      "uid": "EN_YYC_ADVENTURE_CUR",
+      "lang": "EN_YYC",
+      "stage": "CURIOSITY",
+      "arena": "adventure",
+      "lens": null,
+      "text": "Thirty-minute audible, zero overthinking—if we duck out that side door right now, what’s chapter one?",
+      "phonetics": "",
+      "english": "Spontaneous low-pressure adventure invitation.",
+      "idioms": []
+    },
+    {
+      "uid": "EN_EXEC_CHAM_01",
+      "lang": "EN_EXEC",
+      "stage": "CHAMELEON",
+      "arena": "b2b",
+      "lens": null,
+      "text": "You’re optimizing for clean margin and resilient uptime—not adding another vendor layer your leads have to babysit.",
+      "phonetics": "",
+      "english": "Executive metric alignment before dropping into Foothills candor.",
+      "idioms": []
+    },
+    {
+      "uid": "EN_EXEC_COMP_01",
+      "lang": "EN_EXEC",
+      "stage": "COMPLIMENT",
+      "arena": "b2b",
+      "lens": null,
+      "text": "Looking at your deployment velocity this quarter, the <span class=\"slang-token\" data-term=\"signal-to-noise\">signal-to-noise</span> ratio in your engineering org is genuinely rare.",
+      "phonetics": "",
+      "english": "Boardroom recognition of disciplined operational throughput.",
+      "idioms": [
+        "signal-to-noise"
+      ]
+    },
+    {
+      "uid": "EN_YYC_B2B_CHAM",
+      "lang": "EN_YYC",
+      "stage": "CHAMELEON",
+      "arena": "b2b",
+      "lens": null,
+      "text": "Let’s loosen the ties and talk shop floor: clean APIs, deterministic pipelines, zero death-by-PowerPoint.",
+      "phonetics": "",
+      "english": "Clean register drop from boardroom formality to trench candor.",
+      "idioms": []
+    },
+    {
+      "uid": "EN_YYC_B2B_COMP",
+      "lang": "EN_YYC",
+      "stage": "COMPLIMENT",
+      "arena": "b2b",
+      "lens": null,
+      "text": "Stepping out of the C-suite slide deck, bud—your core engineering team is zero <span class=\"slang-token\" data-term=\"all hat and no cattle\">all hat and no cattle</span>; that architecture is rock-solid.",
+      "phonetics": "",
+      "english": "Executive-to-engineering praise validating real technical horsepower.",
+      "idioms": [
+        "all hat and no cattle"
+      ]
+    },
+    {
+      "uid": "EN_YYC_B2B_COUNT",
+      "lang": "EN_YYC",
+      "stage": "COUNTERACT",
+      "arena": "b2b",
+      "lens": null,
+      "text": "Having senior devs babysit manual handoffs is like using a <span class=\"slang-token\" data-term=\"69 Mustang collecting dust\">69 Mustang collecting dust</span> just to haul groceries.",
+      "phonetics": "",
+      "english": "Sharp B2B pattern interrupt against manual engineering waste.",
+      "idioms": [
+        "69 Mustang collecting dust"
+      ]
+    },
+    {
+      "uid": "EN_YYC_B2B_CUR",
+      "lang": "EN_YYC",
+      "stage": "CURIOSITY",
+      "arena": "b2b",
+      "lens": null,
+      "text": "Whiteboard to production—if we wire up a clean two-week pilot tomorrow, which bottleneck are we knocking out first?",
+      "phonetics": "",
+      "english": "Concrete B2B pilot open-loop hook.",
+      "idioms": []
+    },
+    {
+      "uid": "EN_YYC_HOCHKULTUR_CHAM",
+      "lang": "EN_YYC",
+      "stage": "CHAMELEON",
+      "arena": "hochkultur",
+      "lens": null,
+      "text": "Appreciate the black-tie craft, love the straight-shooting conversation at the champagne bar even more.",
+      "phonetics": "",
+      "english": "Peer alignment blending salon poise with Foothills directness.",
+      "idioms": []
+    },
+    {
+      "uid": "EN_YYC_HOCHKULTUR_COMP",
+      "lang": "EN_YYC",
+      "stage": "COMPLIMENT",
+      "arena": "hochkultur",
+      "lens": null,
+      "text": "Even under crystal chandeliers, bud, it takes five seconds to spot someone with real substance in a gallery full of <span class=\"slang-token\" data-term=\"all hat and no cattle\">all hat and no cattle</span>.",
+      "phonetics": "",
+      "english": "Disarming Calgary candor cutting warmly through velvet-rope formality.",
+      "idioms": [
+        "all hat and no cattle"
+      ]
+    },
+    {
+      "uid": "EN_YYC_HOCHKULTUR_COUNT",
+      "lang": "EN_YYC",
+      "stage": "COUNTERACT",
+      "arena": "hochkultur",
+      "lens": null,
+      "text": "Keeping your flagship move behind velvet ropes is like parking a <span class=\"slang-token\" data-term=\"69 Mustang collecting dust\">69 Mustang collecting dust</span> in a museum.",
+      "phonetics": "",
+      "english": "Playful challenge bringing museum-locked ideas into live motion.",
+      "idioms": [
+        "69 Mustang collecting dust"
+      ]
+    },
+    {
+      "uid": "EN_YYC_HOCHKULTUR_CUR",
+      "lang": "EN_YYC",
+      "stage": "CURIOSITY",
+      "arena": "hochkultur",
+      "lens": null,
+      "text": "Before the third chime calls us back—what’s the headline act we’re greenlighting once the tuxedos come off?",
+      "phonetics": "",
+      "english": "Intermission open-loop hook.",
+      "idioms": []
+    },
+    {
+      "uid": "HOCH_EN_YYC_BASE",
+      "lang": "EN_YYC",
+      "stage": "COUNTERACT",
+      "arena": "hochkultur",
+      "lens": null,
+      "text": "Standing under these chandeliers is great, bud, but keeping your best idea on the shelf is like a <span class=\"slang-token\" data-term=\"69 Mustang collecting dust\">69 Mustang collecting dust</span>—let’s take it for a spin.",
+      "phonetics": "",
+      "english": "Warm high-culture invitation to bring a great idea out from behind the velvet rope.",
+      "idioms": [
+        "69 Mustang collecting dust"
+      ]
+    },
+    {
+      "uid": "EN_YYC_POLO_CHAM",
+      "lang": "EN_YYC",
+      "stage": "CHAMELEON",
+      "arena": "polo",
+      "lens": null,
+      "text": "Different hemisphere, same rule from Spruce Meadows to Sotogrande: trust the horse, keep clean hands, let the pace breathe.",
+      "phonetics": "",
+      "english": "Equestrian peer bond across Calgary and Sotogrande.",
+      "idioms": []
+    },
+    {
+      "uid": "EN_YYC_POLO_COMP",
+      "lang": "EN_YYC",
+      "stage": "COMPLIMENT",
+      "arena": "polo",
+      "lens": null,
+      "text": "Out here by the paddock rail, bud, it’s clear in two seconds who actually rides—zero <span class=\"slang-token\" data-term=\"all hat and no cattle\">all hat and no cattle</span> in your saddle.",
+      "phonetics": "",
+      "english": "Paddock-side respect connecting Alberta horsemanship with high-goal polo.",
+      "idioms": [
+        "all hat and no cattle"
+      ]
+    },
+    {
+      "uid": "EN_YYC_POLO_COUNT",
+      "lang": "EN_YYC",
+      "stage": "COUNTERACT",
+      "arena": "polo",
+      "lens": null,
+      "text": "Holding that horsepower back in the fourth chukker is like leaving a <span class=\"slang-token\" data-term=\"69 Mustang collecting dust\">69 Mustang collecting dust</span> in the barn.",
+      "phonetics": "",
+      "english": "Playful challenge unlocking full-field pace.",
+      "idioms": [
+        "69 Mustang collecting dust"
+      ]
+    },
+    {
+      "uid": "EN_YYC_POLO_CUR",
+      "lang": "EN_YYC",
+      "stage": "CURIOSITY",
+      "arena": "polo",
+      "lens": null,
+      "text": "Bell’s about to ring for the final chukker—where are we sending the long ball right off the throw-in?",
+      "phonetics": "",
+      "english": "High-momentum paddock open loop.",
+      "idioms": []
+    },
+    {
+      "uid": "POLO_EN_YYC_BASE",
+      "lang": "EN_YYC",
+      "stage": "COMPLIMENT",
+      "arena": "polo",
+      "lens": null,
+      "text": "Out here by the paddock, bud, you can tell who actually knows horses—nothing <span class=\"slang-token\" data-term=\"all hat and no cattle\">all hat and no cattle</span> about how your team rides.",
+      "phonetics": "",
+      "english": "Paddock-side respect connecting Calgary equestrian/ranch roots with the Polo Club.",
+      "idioms": [
+        "all hat and no cattle"
+      ]
+    },
+    {
+      "uid": "EN_YYC_RUNWAY_CHAM",
+      "lang": "EN_YYC",
+      "stage": "CHAMELEON",
+      "arena": "runway",
+      "lens": null,
+      "text": "Love the backstage vibe here—steamers running, zero ego, everyone focused on how the fabric actually moves.",
+      "phonetics": "",
+      "english": "Maker-to-maker backstage rapport.",
+      "idioms": []
+    },
+    {
+      "uid": "EN_YYC_RUNWAY_COMP",
+      "lang": "EN_YYC",
+      "stage": "COMPLIMENT",
+      "arena": "runway",
+      "lens": null,
+      "text": "In a fashion tent where half the front row is <span class=\"slang-token\" data-term=\"all hat and no cattle\">all hat and no cattle</span>, bud, your tailoring actually carries real horsepower.",
+      "phonetics": "",
+      "english": "Backstage Foothills praise separating real structural craft from front-row hype.",
+      "idioms": [
+        "all hat and no cattle"
+      ]
+    },
+    {
+      "uid": "EN_YYC_RUNWAY_COUNT",
+      "lang": "EN_YYC",
+      "stage": "COUNTERACT",
+      "arena": "runway",
+      "lens": null,
+      "text": "Keeping your boldest silhouette on the rack right now is like a <span class=\"slang-token\" data-term=\"69 Mustang collecting dust\">69 Mustang collecting dust</span> behind the curtain.",
+      "phonetics": "",
+      "english": "Playful challenge pushing the signature piece onto the runway.",
+      "idioms": [
+        "69 Mustang collecting dust"
+      ]
+    },
+    {
+      "uid": "EN_YYC_RUNWAY_CUR",
+      "lang": "EN_YYC",
+      "stage": "CURIOSITY",
+      "arena": "runway",
+      "lens": null,
+      "text": "Before the house lights drop—what’s the wildcard piece you’re dying to send down that catwalk first?",
+      "phonetics": "",
+      "english": "Backstage open-loop hook right before curtain.",
+      "idioms": []
+    },
+    {
+      "uid": "RUNWAY_EN_YYC_BASE",
+      "lang": "EN_YYC",
+      "stage": "COUNTERACT",
+      "arena": "runway",
+      "lens": null,
+      "text": "In a fashion tent where half the room is <span class=\"slang-token\" data-term=\"all hat and no cattle\">all hat and no cattle</span>, bud, your crew actually built something with real horsepower.",
+      "phonetics": "",
+      "english": "Warm Calgary backstage praise contrasting real craft against superficial hype.",
+      "idioms": [
+        "all hat and no cattle"
+      ]
+    },
+    {
+      "uid": "EN_YYC_SPARK_CHAM",
+      "lang": "EN_YYC",
+      "stage": "CHAMELEON",
+      "arena": "spark",
+      "lens": null,
+      "text": "Zero elevator pitch, zero rehearsed script—just quick wit and straight talk right out of the gate.",
+      "phonetics": "",
+      "english": "Direct alignment dropping corporate networking armor immediately.",
+      "idioms": []
+    },
+    {
+      "uid": "EN_YYC_SPARK_COMP",
+      "lang": "EN_YYC",
+      "stage": "COMPLIMENT",
+      "arena": "spark",
+      "lens": null,
+      "text": "Alright, time-out, bud—thirty seconds in and you’ve got more genuine spark than a whole room of folks who are <span class=\"slang-token\" data-term=\"all hat and no cattle\">all hat and no cattle</span>.",
+      "phonetics": "",
+      "english": "Instant warm Foothills opener contrasting real presence against superficial networking.",
+      "idioms": [
+        "all hat and no cattle"
+      ]
+    },
+    {
+      "uid": "EN_YYC_SPARK_COUNT",
+      "lang": "EN_YYC",
+      "stage": "COUNTERACT",
+      "arena": "spark",
+      "lens": null,
+      "text": "Sticking to polite weather chat right now would be like leaving a <span class=\"slang-token\" data-term=\"69 Mustang collecting dust\">69 Mustang collecting dust</span> in the driveway.",
+      "phonetics": "",
+      "english": "Playful pushback steering away from safe small talk.",
+      "idioms": [
+        "69 Mustang collecting dust"
+      ]
+    },
+    {
+      "uid": "EN_YYC_SPARK_CUR",
+      "lang": "EN_YYC",
+      "stage": "CURIOSITY",
+      "arena": "spark",
+      "lens": null,
+      "text": "Skip the LinkedIn bio for me—what’s got you genuinely fired up this week?",
+      "phonetics": "",
+      "english": "Clean open-loop curiosity question inviting genuine passion.",
+      "idioms": []
+    },
+    {
+      "uid": "EN_YYC_CHAM",
+      "lang": "EN_YYC",
+      "stage": "CHAMELEON",
+      "arena": "terrace",
+      "lens": null,
+      "text": "And look, I love how your mind works—zero corporate polish, straight to the point, ready to crank the amp to eleven.",
+      "phonetics": "",
+      "english": "Direct alignment: zero corporate polish, ready to turn the amplifier all the way up.",
+      "idioms": []
+    },
+    {
+      "uid": "EN_YYC_COMP",
+      "lang": "EN_YYC",
+      "stage": "COMPLIMENT",
+      "arena": "terrace",
+      "lens": null,
+      "text": "Hold on a second, bud—what you’ve got going here is the real deal. In a room full of people who are <span class=\"slang-token\" data-term=\"all hat and no cattle\">all hat and no cattle</span>, you actually built an engine.",
+      "phonetics": "",
+      "english": "Genuine Foothills respect: in a room full of talkers, you actually built a working engine.",
+      "idioms": [
+        "all hat and no cattle"
+      ]
+    },
+    {
+      "uid": "EN_YYC_COUNT",
+      "lang": "EN_YYC",
+      "stage": "COUNTERACT",
+      "arena": "terrace",
+      "lens": null,
+      "text": "Which is why playing it safe right now is like keeping a <span class=\"slang-token\" data-term=\"69 Mustang collecting dust\">69 Mustang collecting dust</span> in the garage all summer.",
+      "phonetics": "",
+      "english": "Playful challenge: holding back now is like leaving a classic ’69 Mustang in the garage all summer.",
+      "idioms": [
+        "69 Mustang collecting dust"
+      ]
+    },
+    {
+      "uid": "EN_YYC_CUR",
+      "lang": "EN_YYC",
+      "stage": "CURIOSITY",
+      "arena": "terrace",
+      "lens": null,
+      "text": "Between you and me—if we kick the garage doors open tonight and just give ’er, where are we taking this thing first?",
+      "phonetics": "",
+      "english": "Accomplice open-loop hook: kick the garage doors open and take it out on the highway.",
+      "idioms": []
+    },
+    {
+      "uid": "EN_YYC_WIEN_CHAM",
+      "lang": "EN_YYC",
+      "stage": "CHAMELEON",
+      "arena": "wien",
+      "lens": null,
+      "text": "Best calls never happen on a thirty-person Zoom; they happen over two espressos and a napkin sketch right here.",
+      "phonetics": "",
+      "english": "Corner-table conspiracy alignment.",
+      "idioms": []
+    },
+    {
+      "uid": "EN_YYC_WIEN_COMP",
+      "lang": "EN_YYC",
+      "stage": "COMPLIMENT",
+      "arena": "wien",
+      "lens": null,
+      "text": "Gotta love a quiet Vienna corner booth, bud—zero noise, zero <span class=\"slang-token\" data-term=\"all hat and no cattle\">all hat and no cattle</span>, just two people who actually move the needle.",
+      "phonetics": "",
+      "english": "Warm Station Wien corner-booth rapport with grounded Calgary candor.",
+      "idioms": [
+        "all hat and no cattle"
+      ]
+    },
+    {
+      "uid": "EN_YYC_WIEN_COUNT",
+      "lang": "EN_YYC",
+      "stage": "COUNTERACT",
+      "arena": "wien",
+      "lens": null,
+      "text": "Letting committee red tape stall this play is like leaving a <span class=\"slang-token\" data-term=\"69 Mustang collecting dust\">69 Mustang collecting dust</span> in diplomatic parking.",
+      "phonetics": "",
+      "english": "Wry Station Wien pushback against bureaucratic drift.",
+      "idioms": [
+        "69 Mustang collecting dust"
+      ]
+    },
+    {
+      "uid": "EN_YYC_WIEN_CUR",
+      "lang": "EN_YYC",
+      "stage": "CURIOSITY",
+      "arena": "wien",
+      "lens": null,
+      "text": "Off the record before the waiter brings the check—what’s the quiet move we’re locking in first?",
+      "phonetics": "",
+      "english": "Discreet corner-table open loop.",
+      "idioms": []
+    }
+  ]
+}

@@ -1,0 +1,3262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="artifact-type" content="tool">
+  <meta name="design-style" content="neon_noir">
+  <title>Polyglot Audio-Rhythm Riff Studio &amp; SRS Telemetry Engine</title>
+
+  <!-- Google Fonts: Sora, Inter, Space Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Inter:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Approved CDN Libraries -->
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://unpkg.com/lucide@1.43.0/dist/umd/lucide.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tone@14.9.17/build/Tone.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+  <script src="polyglot_api_client.js"></script>
+
+  <style>
+    :root {
+      color-scheme: dark;
+
+      /* Page and surfaces: hierarchy by lightness */
+      --background: #0a0a12;
+      --surface-container-low: #111118;
+      --surface-container: #141422;
+      --surface-container-high: #1e1e30;
+
+      /* Text */
+      --on-surface: #e8e0f0;
+      --on-surface-variant: #a098b0;
+
+      /* Lines */
+      --outline: #5a5068;
+      --outline-variant: #302840;
+
+      /* Neon accents */
+      --primary: #ff2d78;           /* hot pink: active, compliments, key figure */
+      --on-primary: #1a0010;
+      --primary-container: #b3004e;
+      --on-primary-container: #ffe0ec;
+      --secondary: #00ffcc;         /* cyan: chameleon, flow, secondary */
+      --tertiary: #ffe04a;          /* neon yellow: curiosity, warnings, accents */
+      --quaternary: #b388ff;        /* ultraviolet: counteract, code-switching */
+      --emerald: #34d399;           /* mastered SRS */
+      --error: #ff4444;
+      --on-error: #1a0000;
+
+      /* Data series */
+      --data-1: #ff2d78;
+      --data-2: #00ffcc;
+      --data-3: #ffe04a;
+      --data-4: #b388ff;
+      --data-context: #6e6680;
+
+      /* Fonts */
+      --font-headline: 'Sora', sans-serif;
+      --font-body: 'Inter', sans-serif;
+      --font-label: 'Space Mono', monospace;
+
+      /* Shape */
+      --rounded: 0.125rem;
+      --rounded-lg: 0.25rem;
+      --rounded-full: 0.75rem;
+
+      /* Spacing Scale */
+      --space-xs: 0.25rem;
+      --space-sm: 0.5rem;
+      --space-md: 1rem;
+      --space-lg: 1.5rem;
+      --space-xl: 2rem;
+      --space-2xl: 3rem;
+
+      /* Animations */
+      --dur-micro: 100ms;
+      --dur-short: 200ms;
+      --dur-medium: 350ms;
+      --ease-out: cubic-bezier(0, 0, 0.2, 1);
+      --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+      /* Style effects */
+      --glow-text: 0 0 8px currentColor;
+      --glow-primary: 0 0 16px color-mix(in srgb, var(--primary) 40%, transparent);
+      --glow-secondary: 0 0 16px color-mix(in srgb, var(--secondary) 35%, transparent);
+      --neon-border: 1px solid color-mix(in srgb, var(--primary) 30%, transparent);
+      --neon-border-lit: 1px solid color-mix(in srgb, var(--primary) 50%, transparent);
+      --neon-border-cyan: 1px solid color-mix(in srgb, var(--secondary) 30%, transparent);
+      --neon-inset: inset 0 0 12px color-mix(in srgb, var(--primary) 10%, transparent);
+      --neon-inset-cyan: inset 0 0 12px color-mix(in srgb, var(--secondary) 10%, transparent);
+      --glow-line: drop-shadow(0 0 4px currentColor);
+      --scanlines: repeating-linear-gradient(to bottom, transparent 0 3px, color-mix(in srgb, var(--on-surface) 3%, transparent) 3px 4px);
+    }
+
+    * {
+      box-sizing: border-box;
+      min-width: 0;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--background);
+      color: var(--on-surface);
+      font-family: var(--font-body);
+      overflow-x: clip;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Scanlines backdrop on page wrapper */
+    .bg-scanlines {
+      background-image: var(--scanlines);
+    }
+
+    h1, h2, h3, h4, .font-headline {
+      font-family: var(--font-headline);
+      letter-spacing: -0.02em;
+    }
+
+    .font-label, .hud-label, .mono-hud {
+      font-family: var(--font-label);
+      letter-spacing: 0.08em;
+    }
+
+    /* Neon Noir Panels */
+    .neon-panel {
+      background: var(--surface-container);
+      border: var(--neon-border);
+      box-shadow: var(--neon-inset);
+      border-radius: var(--rounded-lg);
+    }
+
+    .neon-panel-cyan {
+      background: var(--surface-container);
+      border: var(--neon-border-cyan);
+      box-shadow: var(--neon-inset-cyan);
+      border-radius: var(--rounded-lg);
+    }
+
+    .neon-panel-subtle {
+      background: var(--surface-container-low);
+      border: 1px solid var(--outline-variant);
+      border-radius: var(--rounded-lg);
+    }
+
+    /* Glowing text utility */
+    .neon-pink {
+      color: var(--primary);
+      text-shadow: var(--glow-text);
+    }
+
+    .neon-cyan {
+      color: var(--secondary);
+      text-shadow: var(--glow-text);
+    }
+
+    .neon-yellow {
+      color: var(--tertiary);
+      text-shadow: var(--glow-text);
+    }
+
+    .neon-purple {
+      color: var(--quaternary);
+      text-shadow: var(--glow-text);
+    }
+
+    .neon-emerald {
+      color: var(--emerald);
+      text-shadow: var(--glow-text);
+    }
+
+    /* Neon Buttons */
+    .btn-neon-pink {
+      background: var(--surface-container);
+      color: var(--primary);
+      border: var(--neon-border-lit);
+      border-radius: var(--rounded);
+      font-family: var(--font-label);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      transition: box-shadow var(--dur-short) var(--ease-out),
+                  border-color var(--dur-short) var(--ease-out),
+                  background-color var(--dur-short) var(--ease-out);
+    }
+
+    .btn-neon-pink:hover {
+      border-color: var(--primary);
+      box-shadow: var(--glow-primary);
+      text-shadow: var(--glow-text);
+    }
+
+    .btn-neon-pink.active-glow {
+      background: color-mix(in srgb, var(--primary) 15%, var(--surface-container));
+      border-color: var(--primary);
+      box-shadow: var(--glow-primary);
+    }
+
+    .btn-neon-cyan {
+      background: var(--surface-container);
+      color: var(--secondary);
+      border: 1px solid color-mix(in srgb, var(--secondary) 40%, transparent);
+      border-radius: var(--rounded);
+      font-family: var(--font-label);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      transition: box-shadow var(--dur-short) var(--ease-out),
+                  border-color var(--dur-short) var(--ease-out);
+    }
+
+    .btn-neon-cyan:hover {
+      border-color: var(--secondary);
+      box-shadow: var(--glow-secondary);
+      text-shadow: var(--glow-text);
+    }
+
+    .btn-neon-cyan.active-glow {
+      background: color-mix(in srgb, var(--secondary) 15%, var(--surface-container));
+      border-color: var(--secondary);
+      box-shadow: var(--glow-secondary);
+    }
+
+    /* Custom range sliders */
+    input[type=range] {
+      -webkit-appearance: none;
+      background: var(--surface-container-high);
+      height: 6px;
+      border-radius: 2px;
+      outline: none;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 2px;
+      background: var(--secondary);
+      cursor: pointer;
+      box-shadow: 0 0 8px var(--secondary);
+      border: none;
+    }
+
+    /* Step sequencer indicators */
+    .step-led {
+      width: 100%;
+      height: 6px;
+      background: var(--surface-container-high);
+      border-radius: 1px;
+      transition: background var(--dur-micro) var(--ease-out);
+    }
+    .step-led.current {
+      background: var(--primary);
+      box-shadow: 0 0 10px var(--primary);
+    }
+    .step-led.downbeat {
+      border-bottom: 2px solid var(--secondary);
+    }
+
+    /* Idiom token highlighting */
+    .idiom-token {
+      cursor: pointer;
+      color: var(--tertiary);
+      border-bottom: 1.5px dashed var(--tertiary);
+      transition: color var(--dur-micro) var(--ease-out), text-shadow var(--dur-micro) var(--ease-out);
+    }
+    .idiom-token:hover {
+      color: #fff;
+      text-shadow: 0 0 8px var(--tertiary);
+    }
+
+    /* Focus visible rings */
+    button:focus-visible, input:focus-visible, select:focus-visible {
+      outline: 2px solid var(--secondary);
+      outline-offset: 2px;
+    }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      *, ::before, ::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* Scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--surface-container-low);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--outline);
+      border-radius: 2px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--primary);
+    }
+  </style>
+</head>
+<body class="bg-scanlines min-h-screen flex flex-col antialiased selection:bg-rose-900 selection:text-white">
+
+  <!-- ==================================================================== -->
+  <!-- TOP HEADER & TELEMETRY HUD -->
+  <!-- ==================================================================== -->
+  <header class="border-b border-[#302840] bg-[#111118]/90 backdrop-blur px-4 lg:px-8 py-3">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3">
+      <!-- Title & Kicker -->
+      <div class="flex items-center gap-3 w-full md:w-auto justify-between md:justify-start">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded bg-[#141422] border border-[#ff2d78]/50 flex items-center justify-center text-[#ff2d78] shadow-[0_0_12px_rgba(255,45,120,0.3)]">
+            <i data-lucide="radio" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <div class="hud-label text-[10px] text-[#00ffcc] tracking-widest uppercase flex items-center gap-1.5">
+              <span>RIFF PROTOCOL v4.5</span>
+              <span class="px-1.5 py-0.2 rounded bg-[#00ffcc]/20 text-[#00ffcc] font-mono text-[9px]">ONLINE</span>
+              <span class="text-[#a098b0]">• POLYGLOT 4-C ENGINE</span>
+            </div>
+            <h1 class="text-base font-bold text-[#e8e0f0] tracking-tight">
+              Audio-Rhythm Code-Switching Studio
+            </h1>
+          </div>
+        </div>
+
+        <!-- Mobile Audio Trigger -->
+        <button onclick="toggleMasterAudio()" id="btn-audio-master-mobile" class="md:hidden px-3 py-1.5 btn-neon-pink text-xs flex items-center gap-1.5">
+          <i data-lucide="play" class="w-3.5 h-3.5"></i>
+          <span id="label-audio-mobile">START AUDIO</span>
+        </button>
+      </div>
+
+      <!-- Live Master Telemetry Badges -->
+      <div class="flex flex-wrap items-center gap-2 text-xs hud-label">
+        <div class="bg-[#141422] border border-[#302840] px-3 py-1.5 rounded flex items-center gap-2">
+          <span class="text-[#a098b0]">ACTIVE CADENCE:</span>
+          <span id="hud-persona-name" class="text-[#ff2d78] font-bold">Ostravian Czech</span>
+        </div>
+        <div class="bg-[#141422] border border-[#302840] px-3 py-1.5 rounded flex items-center gap-2">
+          <span class="text-[#a098b0]">TEMPO:</span>
+          <span id="hud-bpm-val" class="text-[#00ffcc] font-bold">130 BPM</span>
+        </div>
+        <div class="bg-[#141422] border border-[#302840] px-3 py-1.5 rounded flex items-center gap-2">
+          <span class="text-[#a098b0]">RETRIEVABILITY (R):</span>
+          <span id="hud-fsrs-avg" class="text-[#34d399] font-bold">92% (STABLE)</span>
+        </div>
+        <!-- Desktop Audio Toggle -->
+        <button onclick="toggleMasterAudio()" id="btn-audio-master-desktop" class="hidden md:flex px-4 py-1.5 btn-neon-pink text-xs items-center gap-2">
+          <i data-lucide="play" id="icon-audio-master" class="w-3.5 h-3.5"></i>
+          <span id="label-audio-desktop">START ENGINE</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================================================================== -->
+  <!-- MASTER AUDIO-RHYTHM TRANSPORT DOCK -->
+  <!-- ==================================================================== -->
+  <section class="border-b border-[#302840] bg-[#141422] px-4 lg:px-8 py-3.5 shadow-lg">
+    <div class="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-4">
+      
+      <!-- Left: Audio Controls & Groove Selector -->
+      <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+        <!-- Play / Pause -->
+        <button onclick="toggleRhythmPlay()" id="btn-rhythm-play" class="px-4 py-2 btn-neon-cyan flex items-center gap-2 text-xs font-bold" title="Toggle Cadence Beat Loop">
+          <i data-lucide="play" id="icon-rhythm-play" class="w-4 h-4"></i>
+          <span id="label-rhythm-play">PLAY CADENCE BEAT</span>
+        </button>
+
+        <!-- Rhythm Track Groove Preset -->
+        <div class="flex items-center gap-2 bg-[#111118] border border-[#302840] rounded px-2.5 py-1">
+          <label for="select-groove-track" class="hud-label text-[10px] text-[#a098b0] uppercase">Groove:</label>
+          <select id="select-groove-track" onchange="changeGrooveTrack(this.value)" class="bg-transparent text-xs text-[#e8e0f0] font-medium outline-none cursor-pointer">
+            <option value="CZ_OVA" class="bg-[#141422]">🇨🇿 Ostravian Industrial (130 BPM)</option>
+            <option value="AT_VIE" class="bg-[#141422]">🇦🇹 Viennese Kaffeehaus Waltz (92 BPM)</option>
+            <option value="RU_ALA" class="bg-[#141422]">🇰🇿 Almaty Terrace Chillhop (88 BPM)</option>
+            <option value="EN_YYC" class="bg-[#141422]">🇨🇦 Calgary Backstage Rock (116 BPM)</option>
+            <option value="ES_SOT" class="bg-[#141422]">🇪🇸 Sotogrande Duende Compás (104 BPM)</option>
+            <option value="WEEKND" class="bg-[#141422]">✨ The Weeknd - One of the Girls (87 BPM)</option>
+          </select>
+        </div>
+
+        <!-- BPM Slider & Tap Tempo -->
+        <div class="flex items-center gap-2 bg-[#111118] border border-[#302840] rounded px-3 py-1">
+          <span class="hud-label text-[10px] text-[#a098b0]">BPM:</span>
+          <input type="range" id="input-bpm" min="60" max="160" value="130" oninput="updateBpm(this.value)" class="w-20 accent-[#00ffcc]">
+          <span id="val-bpm" class="hud-label text-xs text-[#00ffcc] font-bold w-9 text-right">130</span>
+          <button onclick="tapTempo()" class="hud-label text-[10px] px-1.5 py-0.5 rounded bg-[#1e1e30] hover:bg-[#302840] text-[#a098b0] hover:text-white" title="Click rhythmically to set BPM">TAP</button>
+        </div>
+
+        <!-- Metronome & Vocal Pitch Meter Toggle -->
+        <button onclick="toggleMetronome()" id="btn-metronome" class="px-2.5 py-1.5 rounded bg-[#111118] border border-[#302840] text-[11px] hud-label text-[#a098b0] hover:text-[#00ffcc] flex items-center gap-1.5" title="Toggle Accent Click">
+          <i data-lucide="bell" class="w-3.5 h-3.5"></i>
+          <span id="label-metro">METRO: OFF</span>
+        </button>
+
+        <button onclick="toggleProsodyMicrophone()" id="btn-prosody-mic" class="px-2.5 py-1.5 rounded bg-[#111118] border border-[#302840] text-[11px] hud-label text-[#a098b0] hover:text-[#ff2d78] flex items-center gap-1.5" title="Real-Time Vocal Cadence & Pitch Drop Detection">
+          <i data-lucide="mic" class="w-3.5 h-3.5"></i>
+          <span id="label-mic">PITCH METER: OFF</span>
+        </button>
+      </div>
+
+      <!-- Right: Real-time Visualizer & 16-Step Sequencer Indicator -->
+      <div class="flex items-center gap-3 w-full lg:w-auto justify-end">
+        <!-- Live Pitch Readout (when active) -->
+        <div id="live-prosody-box" class="hidden flex items-center gap-2 bg-[#111118] border border-[#ff2d78]/40 px-2.5 py-1 rounded text-xs hud-label">
+          <span class="text-[#a098b0]">VOICE:</span>
+          <span id="prosody-pitch-hz" class="text-[#ff2d78] font-bold">--- Hz</span>
+          <span id="prosody-drop-tag" class="px-1.5 py-0.2 rounded text-[10px] bg-[#302840] text-[#00ffcc] font-mono">ST: 0.0</span>
+        </div>
+
+        <!-- Audio Frequency Oscilloscope Canvas -->
+        <div class="bg-[#0a0a12] border border-[#302840] rounded p-1 flex items-center">
+          <canvas id="visualizer-canvas" width="160" height="32" class="w-40 h-8"></canvas>
+        </div>
+
+        <!-- Master Volume -->
+        <div class="flex items-center gap-1.5 bg-[#111118] border border-[#302840] rounded px-2 py-1">
+          <i data-lucide="volume-2" class="w-3.5 h-3.5 text-[#a098b0]"></i>
+          <input type="range" id="input-volume" min="-30" max="6" value="0" oninput="updateMasterVolume(this.value)" class="w-16 accent-[#ff2d78]">
+        </div>
+      </div>
+    </div>
+
+    <!-- 16-Step LED Pulse Rail -->
+    <div class="max-w-7xl mx-auto mt-2.5 grid grid-cols-16 gap-1" id="step-led-rail">
+      <!-- 16 LEDs generated via JS -->
+    </div>
+  </section>
+
+  <!-- ==================================================================== -->
+  <!-- MAIN APPLICATION NAVIGATION BAR -->
+  <!-- ==================================================================== -->
+  <nav class="border-b border-[#302840] bg-[#111118] px-4 lg:px-8 py-2">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
+      <!-- Persona Tabs Selector -->
+      <div class="flex flex-wrap items-center gap-1.5" id="persona-quick-tabs">
+        <!-- Rendered by JS -->
+      </div>
+
+      <!-- App View Modes -->
+      <div class="flex items-center gap-1 bg-[#141422] p-1 rounded border border-[#302840] overflow-x-auto max-w-full">
+        <button onclick="switchView('studio')" id="tab-nav-studio" class="px-3 py-1 rounded text-xs hud-label font-bold text-[#ff2d78] bg-[#1e1e30] transition flex items-center gap-1.5 whitespace-nowrap">
+          <i data-lucide="layers" class="w-3.5 h-3.5"></i>
+          <span>1. 4-C STUDIO</span>
+        </button>
+        <button onclick="switchView('weeknd')" id="tab-nav-weeknd" class="px-3 py-1 rounded text-xs hud-label text-[#a098b0] hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
+          <i data-lucide="disc" class="w-3.5 h-3.5"></i>
+          <span>2. 6-ANTHEM LYRICS</span>
+        </button>
+        <button onclick="switchView('roulette')" id="tab-nav-roulette" class="px-3 py-1 rounded text-xs hud-label text-[#a098b0] hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
+          <i data-lucide="shuffle" class="w-3.5 h-3.5"></i>
+          <span>3. CHAMELEON PIVOTS</span>
+        </button>
+        <button onclick="switchView('graph')" id="tab-nav-graph" class="px-3 py-1 rounded text-xs hud-label text-[#a098b0] hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
+          <i data-lucide="share-2" class="w-3.5 h-3.5"></i>
+          <span>4. SRS GRAPH</span>
+        </button>
+        <button onclick="switchView('shield')" id="tab-nav-shield" class="px-3 py-1 rounded text-xs hud-label text-[#a098b0] hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
+          <i data-lucide="shield-alert" class="w-3.5 h-3.5"></i>
+          <span>5. SHIELD BLITZ</span>
+        </button>
+        <button onclick="switchView('builder')" id="tab-nav-builder" class="px-3 py-1 rounded text-xs hud-label text-[#a098b0] hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
+          <i data-lucide="code" class="w-3.5 h-3.5"></i>
+          <span>6. WORKBENCH</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ==================================================================== -->
+  <!-- MAIN CONTENT AREA -->
+  <!-- ==================================================================== -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-8 space-y-6">
+
+    <!-- ================================================================ -->
+    <!-- VIEW 1: 4-C STUDIO & AUDIO-RHYTHM TELEPROMPTER -->
+    <!-- ================================================================ -->
+    <section id="view-studio" class="space-y-6">
+      
+      <!-- Live Room-Friction Objection Resolver (:COUNTERS_STATE) -->
+      <div class="neon-panel p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-l-4 border-l-[#ff2d78]">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="hud-label text-xs font-bold uppercase tracking-wider text-[#ff2d78]">⚡ Live Room-Friction Objection Resolver (`:COUNTERS_STATE`)</span>
+            <span class="hud-label text-[10px] px-2 py-0.5 rounded bg-[#ff2d78]/10 text-[#ffe0ec] border border-[#ff2d78]/30">1-Hop Traversal</span>
+          </div>
+          <p class="text-xs text-[#a098b0] mt-1">
+            Counterpart hesitating or shielding? Tap any state below to immediately cue the highest-weighted <strong class="text-[#e8e0f0]">[COUNTERACT]</strong> pattern interrupt and vocal cadence:
+          </p>
+        </div>
+        <div id="friction-hotkeys" class="flex flex-wrap items-center gap-2">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+
+      <!-- Friction Resolution Trigger Banner (Hidden until activated) -->
+      <div id="friction-resolution-banner" class="hidden neon-panel p-4 border border-[#ff2d78] flex items-center justify-between gap-4 bg-[#141422]/90">
+        <div id="friction-resolution-text" class="text-xs text-[#e8e0f0] space-y-1"></div>
+        <button onclick="dismissFrictionBanner()" class="hud-label text-xs text-[#a098b0] hover:text-white px-2 py-1 bg-[#1e1e30] rounded">✕ Close</button>
+      </div>
+
+      <!-- Persona Acoustic & Linguistic Profile Banner -->
+      <div id="persona-profile-banner" class="neon-panel-subtle p-5 grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
+        <!-- Rendered by JS -->
+      </div>
+
+      <!-- 4-C Cards Grid & Practice Controls -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Left 2 Cols: 4-C Card Stack -->
+        <div class="lg:col-span-2 space-y-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="hud-label text-xs font-bold uppercase text-[#00ffcc]">Interactive 4-C Riff Stack</span>
+              <span class="text-xs text-[#a098b0]">(Click any card to spotlight &amp; grade)</span>
+            </div>
+            <button onclick="openFullTeleprompter()" class="btn-neon-pink px-3 py-1 text-xs flex items-center gap-1.5">
+              <i data-lucide="maximize-2" class="w-3.5 h-3.5"></i>
+              <span>Full Teleprompter</span>
+            </button>
+          </div>
+
+          <div id="cards-container" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- 4 Cards: Compliment, Chameleon, Counteract, Curiosity -->
+          </div>
+        </div>
+
+        <!-- Right Col: SRS Transition Grader & Audio Cadence Coaching -->
+        <div class="space-y-4">
+          
+          <!-- SRS Mastery Grader Box -->
+          <div class="neon-panel p-5 space-y-4">
+            <div class="flex items-center justify-between">
+              <span class="hud-label text-xs font-bold uppercase text-[#34d399]">SRS Edge Mastery Grader</span>
+              <span class="hud-label text-[10px] text-[#a098b0] px-2 py-0.5 rounded bg-[#111118] border border-[#302840]">v4.0 FSRS</span>
+            </div>
+
+            <div class="bg-[#0a0a12] border border-[#302840] p-3 rounded space-y-1.5 text-xs hud-label">
+              <div class="flex items-center justify-between">
+                <span class="text-[#a098b0]">CURRENT TRANSITION:</span>
+                <span id="active-edge-label" class="text-[#00ffcc] font-bold">COMP → CHAM</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-[#a098b0]">EDGE WEIGHT:</span>
+                <span id="active-edge-weight" class="text-[#ff2d78] font-bold">0.92</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-[#a098b0]">RETRIEVABILITY / STABILITY:</span>
+                <span id="active-edge-fsrs" class="text-[#34d399] font-bold">R: 98% • S: 14.2d</span>
+              </div>
+            </div>
+
+            <p class="text-xs text-[#a098b0] leading-relaxed">
+              Recite the active transition out loud, locked to the rhythm track. Rate how naturally your phonetic rhythm and vocal drop landed:
+            </p>
+
+            <div class="grid grid-cols-3 gap-2">
+              <button onclick="gradeActiveTransition(1)" class="py-2.5 px-2 rounded bg-[#141422] hover:bg-[#ff4444]/20 border border-[#ff4444]/40 text-[#ff4444] text-xs font-bold hud-label transition">
+                1 • Rusty (-14%)
+              </button>
+              <button onclick="gradeActiveTransition(3)" class="py-2.5 px-2 rounded bg-[#141422] hover:bg-[#00ffcc]/20 border border-[#00ffcc]/40 text-[#00ffcc] text-xs font-bold hud-label transition">
+                3 • Solid (+FSRS)
+              </button>
+              <button onclick="gradeActiveTransition(5)" class="py-2.5 px-2 rounded bg-[#141422] hover:bg-[#34d399]/20 border border-[#34d399]/40 text-[#34d399] text-xs font-bold hud-label transition">
+                5 • Nailed (+14%)
+              </button>
+            </div>
+
+            <div id="srs-grade-feedback" class="text-[11px] hud-label text-[#a098b0] bg-[#111118] p-2.5 rounded border border-[#302840]">
+              Grade your delivery to recalculate FSRS retrievability and update the live D3 network heatmap.
+            </div>
+          </div>
+
+          <!-- Regional Slang & Delivery Spotlight -->
+          <div class="neon-panel-cyan p-5 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="hud-label text-xs font-bold uppercase text-[#00ffcc]">Idiom &amp; Slang Spotlight</span>
+              <span class="text-[10px] text-[#a098b0]">Click underlined slang</span>
+            </div>
+            <div id="idiom-spotlight-box" class="text-xs text-[#a098b0] space-y-2">
+              <p class="italic text-[#a098b0]">
+                Tap any <span class="idiom-token font-bold">highlighted regional idiom</span> inside the cards to inspect its acoustic delivery, literal etymology, and cross-language cousins.
+              </p>
+            </div>
+          </div>
+
+          <!-- Acoustic Prosody Cue Card -->
+          <div class="neon-panel-subtle p-4 space-y-2 text-xs">
+            <div class="hud-label text-[10px] text-[#ffe04a] uppercase font-bold flex items-center gap-1.5">
+              <i data-lucide="waveform" class="w-3.5 h-3.5"></i>
+              <span>Vocal Prosody Rule</span>
+            </div>
+            <div id="prosody-cue-text" class="text-[#e8e0f0] leading-relaxed">
+              Drop fundamental frequency (F0) by -4 to -6 semitones on Counteract. Keep Compliment relaxed and curious.
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ================================================================ -->
+    <!-- VIEW 2: 6 REGIONAL & GLOBAL ANTHEMS + "ONE OF THE GIRLS" LYRIC LAB -->
+    <!-- ================================================================ -->
+    <section id="view-weeknd" class="hidden space-y-6">
+      
+      <!-- 6-Anthem Regional Track Selector Bar -->
+      <div class="neon-panel p-4 space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <span class="hud-label text-xs font-bold uppercase text-[#00ffcc]">🎵 Regional &amp; Global Anthem Selector (6 Tracks)</span>
+          <span id="anthem-sync-badge" class="hud-label text-[10px] px-2 py-0.5 rounded bg-[#141422] border border-[#00ffcc]/30 text-[#00ffcc]">Neo4j :Song v3.4</span>
+        </div>
+        <div id="v45-anthem-tabs" class="flex items-center gap-2 overflow-x-auto pb-1"></div>
+        <div id="v45-selected-anthem-box" class="bg-[#0a0a12] border border-[#302840] p-4 rounded space-y-2 text-xs"></div>
+      </div>
+
+      <!-- Track Header & Sonic Vibe Card -->
+      <div class="neon-panel p-6 border-l-4 border-l-[#ff2d78] space-y-4">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div class="hud-label text-[10px] text-[#ff2d78] uppercase tracking-widest flex items-center gap-2">
+              <span>SPECIAL CADENCE MODULE</span>
+              <span>•</span>
+              <span>SYNTHWAVE R&amp;B CODE-SWITCHING</span>
+            </div>
+            <h2 class="text-2xl font-bold text-[#e8e0f0] mt-1">
+              The Weeknd — "One of the Girls" (Polyglot Riff Translation Lab)
+            </h2>
+            <p class="text-xs text-[#a098b0] mt-1">
+              87 BPM Sensual Glide • Cm7 – Ebmaj7 – Bb – Abmaj7 progression • 4-C Monologue Riff &amp; Multi-Language Lyric Transposition.
+            </p>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button onclick="playWeekndHookAudio()" class="btn-neon-pink px-4 py-2 text-xs flex items-center gap-2">
+              <i data-lucide="music" class="w-4 h-4"></i>
+              <span>PLAY SYNTH HOOK MELODY</span>
+            </button>
+            <button onclick="loadPersona('WEEKND')" class="btn-neon-cyan px-4 py-2 text-xs flex items-center gap-2">
+              <i data-lucide="play-circle" class="w-4 h-4"></i>
+              <span>LOAD 4-C CARDS</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 4-Stage Weeknd Monologue Breakdown -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-3 text-xs pt-2">
+          <div class="bg-[#111118] border border-[#302840] p-3 rounded space-y-1">
+            <span class="hud-label text-[10px] text-[#ff2d78] font-bold block">[1. COMPLIMENT]</span>
+            <p class="text-[#e8e0f0]">"Lock eyes for a second—the way you move through this noise, nobody else has this gravity."</p>
+          </div>
+          <div class="bg-[#111118] border border-[#302840] p-3 rounded space-y-1">
+            <span class="hud-label text-[10px] text-[#00ffcc] font-bold block">[2. CHAMELEON]</span>
+            <p class="text-[#e8e0f0]">"I see right through the act. We're both cut from that same late-night frequency: addicted to the rush."</p>
+          </div>
+          <div class="bg-[#111118] border border-[#302840] p-3 rounded space-y-1">
+            <span class="hud-label text-[10px] text-[#b388ff] font-bold block">[3. COUNTERACT]</span>
+            <p class="text-[#e8e0f0]">"So don't pull back into the shadows now. Pretending you don't want this edge is just lying to yourself."</p>
+          </div>
+          <div class="bg-[#111118] border border-[#302840] p-3 rounded space-y-1">
+            <span class="hud-label text-[10px] text-[#ffe04a] font-bold block">[4. CURIOSITY]</span>
+            <p class="text-[#e8e0f0]">"If we kill the lights and step past the line tonight... tell me how far you really want to let this go?"</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Multi-Language Lyric Translation & Syllable Cadence Grid -->
+      <div class="neon-panel-subtle p-6 space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#302840] pb-3">
+          <div>
+            <h3 class="text-base font-bold text-white flex items-center gap-2">
+              <i data-lucide="globe" class="w-4 h-4 text-[#00ffcc]"></i>
+              <span>Multi-Lingual Hook Translations Across Personas</span>
+            </h3>
+            <p class="text-xs text-[#a098b0]">
+              Practice singing or speaking the iconic refrain adapted into the authentic slang and rhythmic meter of each language:
+            </p>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <span class="hud-label text-[10px] text-[#a098b0]">CADENCE FILTER:</span>
+            <button onclick="filterLyricLang('ALL')" class="hud-label text-[10px] px-2 py-1 bg-[#1e1e30] text-white rounded">ALL (5)</button>
+          </div>
+        </div>
+
+        <!-- 5-Language Lyric Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="weeknd-lyrics-grid">
+          <!-- Rendered by JS -->
+        </div>
+
+        <!-- Cross-Language Code-Switching Riff Challenge -->
+        <div class="bg-[#141422] border border-[#b388ff]/40 p-4 rounded-lg space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="hud-label text-xs text-[#b388ff] font-bold uppercase flex items-center gap-1.5">
+              <i data-lucide="zap" class="w-3.5 h-3.5"></i>
+              <span>Master Code-Switching Challenge: The 5-Language One-Breath Riff</span>
+            </span>
+            <span class="hud-label text-[10px] text-[#00ffcc]">87 BPM Beat Synced</span>
+          </div>
+          <p class="text-xs text-[#e8e0f0] leading-relaxed font-mono bg-[#0a0a12] p-3 rounded border border-[#302840]">
+            <span class="text-[#ff2d78]">[EN]</span> "Give me tough love, leave me with no breath—" <br>
+            <span class="text-[#00ffcc]">[CZ_OVA]</span> "bo tady není čas na prázdné kecy, čistá šichta—" <br>
+            <span class="text-[#ffe04a]">[AT_VIE]</span> "Oida, die Vernunft an der Garderobe abgeben—" <br>
+            <span class="text-[#b388ff]">[RU_ALA]</span> "сделали по красоте, родной, базару нет—" <br>
+            <span class="text-[#34d399]">[ES_SOT]</span> "y que este duende nos lleve hasta el amanecer."
+          </p>
+          <div class="flex items-center justify-between text-xs">
+            <span class="text-[#a098b0]">Practice this 5-stage transition smoothly without dropping the tempo.</span>
+            <button onclick="playFiveLanguageChainAudio()" class="btn-neon-cyan px-3 py-1 text-xs">Play Syllable Chime Guide</button>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ================================================================ -->
+    <!-- VIEW 3: CHAMELEON ROULETTE & CODE-SWITCHING PIVOTS -->
+    <!-- ================================================================ -->
+    <section id="view-roulette" class="hidden space-y-6">
+      
+      <div class="neon-panel p-6 space-y-4">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div class="hud-label text-[10px] text-[#00ffcc] uppercase tracking-widest">
+              DYNAMIC CODE-SWITCHING GENERATOR
+            </div>
+            <h2 class="text-2xl font-bold text-[#e8e0f0] mt-1">
+              Polyglot Chameleon Roulette
+            </h2>
+            <p class="text-xs text-[#a098b0] mt-1">
+              Traverses <code class="text-[#00ffcc]">:PIVOTS_VIA</code> syntactic bridges connecting all 5 regional personas and The Weeknd's cadence.
+            </p>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button onclick="spinChameleonRoulette()" class="btn-neon-pink px-4 py-2.5 text-xs font-bold flex items-center gap-2">
+              <i data-lucide="dice-5" class="w-4 h-4"></i>
+              <span>🎲 SPIN 4-C MASHUP</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Lock controls for each stage -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 pt-2 text-xs hud-label">
+          <div class="bg-[#111118] border border-[#302840] p-2.5 rounded flex items-center justify-between">
+            <span class="text-[#ff2d78]">1. COMPLIMENT</span>
+            <select id="lock-stage-1" class="bg-[#141422] text-[#e8e0f0] border border-[#302840] text-[10px] rounded px-1.5 py-0.5">
+              <option value="RANDOM">🎲 Any Lang</option>
+              <option value="CZ_OVA">🇨🇿 Ostravian</option>
+              <option value="AT_VIE">🇦🇹 Viennese</option>
+              <option value="RU_ALA">🇰🇿 Almaty</option>
+              <option value="EN_YYC">🇨🇦 Calgary</option>
+              <option value="ES_SOT">🇪🇸 Sotogrande</option>
+              <option value="WEEKND">✨ Weeknd</option>
+            </select>
+          </div>
+          <div class="bg-[#111118] border border-[#302840] p-2.5 rounded flex items-center justify-between">
+            <span class="text-[#00ffcc]">2. CHAMELEON</span>
+            <select id="lock-stage-2" class="bg-[#141422] text-[#e8e0f0] border border-[#302840] text-[10px] rounded px-1.5 py-0.5">
+              <option value="RANDOM">🎲 Any Lang</option>
+              <option value="CZ_OVA">🇨🇿 Ostravian</option>
+              <option value="AT_VIE">🇦🇹 Viennese</option>
+              <option value="RU_ALA">🇰🇿 Almaty</option>
+              <option value="EN_YYC">🇨🇦 Calgary</option>
+              <option value="ES_SOT">🇪🇸 Sotogrande</option>
+              <option value="WEEKND">✨ Weeknd</option>
+            </select>
+          </div>
+          <div class="bg-[#111118] border border-[#302840] p-2.5 rounded flex items-center justify-between">
+            <span class="text-[#b388ff]">3. COUNTERACT</span>
+            <select id="lock-stage-3" class="bg-[#141422] text-[#e8e0f0] border border-[#302840] text-[10px] rounded px-1.5 py-0.5">
+              <option value="RANDOM">🎲 Any Lang</option>
+              <option value="CZ_OVA">🇨🇿 Ostravian</option>
+              <option value="AT_VIE">🇦🇹 Viennese</option>
+              <option value="RU_ALA">🇰🇿 Almaty</option>
+              <option value="EN_YYC">🇨🇦 Calgary</option>
+              <option value="ES_SOT">🇪🇸 Sotogrande</option>
+              <option value="WEEKND">✨ Weeknd</option>
+            </select>
+          </div>
+          <div class="bg-[#111118] border border-[#302840] p-2.5 rounded flex items-center justify-between">
+            <span class="text-[#ffe04a]">4. CURIOSITY</span>
+            <select id="lock-stage-4" class="bg-[#141422] text-[#e8e0f0] border border-[#302840] text-[10px] rounded px-1.5 py-0.5">
+              <option value="RANDOM">🎲 Any Lang</option>
+              <option value="CZ_OVA">🇨🇿 Ostravian</option>
+              <option value="AT_VIE">🇦🇹 Viennese</option>
+              <option value="RU_ALA">🇰🇿 Almaty</option>
+              <option value="EN_YYC">🇨🇦 Calgary</option>
+              <option value="ES_SOT">🇪🇸 Sotogrande</option>
+              <option value="WEEKND">✨ Weeknd</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Generated 4-C Mashup Sequence -->
+      <div id="roulette-flow-display" class="space-y-4">
+        <!-- Rendered by JS -->
+      </div>
+
+    </section>
+
+    <!-- ================================================================ -->
+    <!-- VIEW 4: NEO4J SRS GRAPH & HEATMAP EXPLORER -->
+    <!-- ================================================================ -->
+    <section id="view-graph" class="hidden space-y-6">
+      
+      <!-- Graph Legend & Controls Bar -->
+      <div class="neon-panel-subtle p-4 flex flex-wrap items-center justify-between gap-4">
+        <div class="flex flex-wrap items-center gap-4 text-xs hud-label">
+          <span class="font-bold text-white">GRAPH TOPOLOGY &amp; SRS HEATMAP:</span>
+          <span class="flex items-center gap-1.5"><span class="w-3.5 h-1 bg-[#34d399] inline-block rounded"></span> Mastered (≥85%)</span>
+          <span class="flex items-center gap-1.5"><span class="w-3.5 h-1 bg-[#00ffcc] inline-block rounded"></span> Active (60–84%)</span>
+          <span class="flex items-center gap-1.5"><span class="w-3.5 h-1 bg-[#ffe04a] inline-block rounded border-b border-dashed"></span> Rusty (&lt;60% / ≥7d)</span>
+          <span class="flex items-center gap-1.5"><span class="w-3.5 h-1 bg-[#ff2d78] inline-block"></span> `:SHARES_VIBE_WITH`</span>
+          <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 bg-[#ff4444] rotate-45 inline-block"></span> `:State` (Objection)</span>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button onclick="filterGraphView('ALL')" class="hud-label text-xs px-2.5 py-1 rounded bg-[#1e1e30] hover:bg-[#302840] text-white">All Nodes</button>
+          <button onclick="filterGraphRustyOnly()" class="hud-label text-xs px-2.5 py-1 rounded bg-[#ffe04a]/20 border border-[#ffe04a]/40 text-[#ffe04a] hover:bg-[#ffe04a]/30">Highlight Rusty</button>
+          <button onclick="resetGraphSimulation()" class="btn-neon-cyan px-3 py-1 text-xs">Re-Center</button>
+        </div>
+      </div>
+
+      <!-- Graph Canvas + Side Inspector -->
+      <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        
+        <!-- Graph SVG Canvas -->
+        <div class="lg:col-span-3 neon-panel relative overflow-hidden min-h-[560px] h-[560px]" id="d3-graph-wrapper">
+          <svg id="svg-force-graph" class="w-full h-full cursor-grab active:cursor-grabbing"></svg>
+          <div class="absolute bottom-3 left-3 bg-[#111118]/90 backdrop-blur border border-[#302840] px-3 py-2 rounded text-[11px] hud-label text-[#a098b0] pointer-events-none">
+            Drag nodes • Scroll to Zoom • Click any node/edge to inspect &amp; drill
+          </div>
+        </div>
+
+        <!-- Right Side: Node/Edge Property Inspector & Rusty Queue -->
+        <div class="neon-panel-subtle p-5 flex flex-col justify-between min-h-[560px] h-[560px] overflow-y-auto space-y-4">
+          <div id="graph-inspector-pane" class="space-y-4">
+            <div class="hud-label text-xs font-bold uppercase text-[#00ffcc] flex items-center justify-between">
+              <span>Graph Node Inspector</span>
+              <i data-lucide="info" class="w-3.5 h-3.5 text-[#a098b0]"></i>
+            </div>
+            <p class="text-xs text-[#a098b0] leading-relaxed">
+              Click any <code class="text-[#00ffcc]">:Persona</code>, <code class="text-[#ff2d78]">:Card</code>, <code class="text-[#ffe04a]">:Idiom</code>, or <code class="text-[#ff4444]">:State</code> in the simulation to view Cypher properties and update transition fluency.
+            </p>
+          </div>
+
+          <!-- Rusty Transitions Warm-Up Queue -->
+          <div class="border-t border-[#302840] pt-4 space-y-2">
+            <div class="hud-label text-xs font-bold text-[#ffe04a] uppercase flex items-center justify-between">
+              <span>Rusty Transitions Queue</span>
+              <span id="badge-rusty-count" class="px-1.5 py-0.5 rounded text-[10px] bg-[#ffe04a]/20 text-[#ffe04a]">0 Rusty</span>
+            </div>
+            <div id="rusty-queue-items" class="space-y-1.5 text-xs max-h-48 overflow-y-auto">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ================================================================ -->
+    <!-- VIEW 5: TRILINGUAL INTERFERENCE SHIELD & BLITZ DRILL -->
+    <!-- ================================================================ -->
+    <section id="view-shield" class="hidden space-y-6">
+      
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Left: 60-Second Blitz Drill Card -->
+        <div class="neon-panel p-6 flex flex-col justify-between space-y-4 border-l-4 border-l-[#ffe04a]">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="hud-label text-xs font-bold uppercase text-[#ffe04a] flex items-center gap-1.5">
+                <i data-lucide="zap" class="w-4 h-4"></i>
+                <span>60s Interference Blitz</span>
+              </span>
+              <span id="blitz-timer" class="hud-label text-xs text-[#00ffcc] font-bold bg-[#111118] px-2 py-0.5 rounded border border-[#302840]">60s</span>
+            </div>
+            <p class="text-xs text-[#a098b0]">
+              Slavic false-friends (<em>mezijazyková homonymie</em>) can derail high-stakes pitches. Test your reflexes before dialing in:
+            </p>
+
+            <div id="blitz-sparring-card" class="bg-[#0a0a12] border border-[#302840] rounded p-4 space-y-3 min-h-[170px] flex flex-col justify-between">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+
+          <div class="space-y-2 pt-2">
+            <div class="flex items-center justify-between text-xs hud-label">
+              <span class="text-[#a098b0]">Score Streak:</span>
+              <span id="blitz-streak-val" class="text-[#34d399] font-bold">0</span>
+            </div>
+            <button onclick="startOrResetBlitz()" id="btn-start-blitz" class="w-full btn-neon-pink py-2.5 text-xs font-bold">
+              START 60s BLITZ DRILL
+            </button>
+          </div>
+        </div>
+
+        <!-- Right 2 Cols: Complete 9-Item Interference & Preposition Table -->
+        <div class="lg:col-span-2 neon-panel-subtle p-6 space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-[#302840] pb-3">
+            <div>
+              <h3 class="text-base font-bold text-white flex items-center gap-2">
+                <i data-lucide="shield" class="w-4 h-4 text-[#ffe04a]"></i>
+                <span>Tri-Lingual Interference Shield (`:FalseFriend` Nodes)</span>
+              </h3>
+              <p class="text-xs text-[#a098b0]">Czech (`CZ_STD` / `CZ_OVA`) vs. Russian Trap (`RU`) vs. German Calque (`DE`)</p>
+            </div>
+            <span class="hud-label text-[10px] text-[#00ffcc] bg-[#111118] px-2.5 py-1 rounded border border-[#302840]">
+              Vocative Lock: Petře • Radku • Martine
+            </span>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr class="border-b border-[#302840] text-[#a098b0] hud-label text-[10px]">
+                  <th class="py-2 px-3">Czech Term</th>
+                  <th class="py-2 px-3 text-[#ff4444]">Russian False Friend Trap</th>
+                  <th class="py-2 px-3 text-[#00ffcc]">German Structural Calque</th>
+                  <th class="py-2 px-3 text-[#34d399]">Authentic Meaning &amp; Pitch Rule</th>
+                </tr>
+              </thead>
+              <tbody id="table-false-friends" class="divide-y divide-[#302840]/60">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ================================================================ -->
+    <!-- VIEW 6: DECK WORKBENCH & CYPHER EXPORTER -->
+    <!-- ================================================================ -->
+    <section id="view-builder" class="hidden space-y-6">
+      
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- Left: Inject Custom Card or Bridge -->
+        <div class="neon-panel p-6 space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="text-base font-bold text-white flex items-center gap-2">
+              <i data-lucide="plus-circle" class="w-4 h-4 text-[#ff2d78]"></i>
+              <span>Inject Custom Riff Card into Graph</span>
+            </h3>
+            <span class="hud-label text-[10px] text-[#34d399]">Notebook State Auto-Sync</span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3 text-xs">
+            <div>
+              <label for="new-card-lang" class="hud-label text-[10px] text-[#a098b0] block mb-1">Target Persona</label>
+              <select id="new-card-lang" class="w-full bg-[#111118] border border-[#302840] rounded px-3 py-2 text-[#e8e0f0] outline-none">
+                <option value="CZ_OVA">🇨🇿 Ostravian Czech</option>
+                <option value="AT_VIE">🇦🇹 Viennese German</option>
+                <option value="RU_ALA">🇰🇿 Almaty Russian</option>
+                <option value="EN_YYC">🇨🇦 Calgary English</option>
+                <option value="ES_SOT">🇪🇸 Sotogrande Spanish</option>
+                <option value="WEEKND">✨ The Weeknd Cadence</option>
+              </select>
+            </div>
+            <div>
+              <label for="new-card-stage" class="hud-label text-[10px] text-[#a098b0] block mb-1">4-C Stage</label>
+              <select id="new-card-stage" class="w-full bg-[#111118] border border-[#302840] rounded px-3 py-2 text-[#e8e0f0] outline-none">
+                <option value="COMPLIMENT">1. COMPLIMENT</option>
+                <option value="CHAMELEON">2. CHAMELEON</option>
+                <option value="COUNTERACT">3. COUNTERACT</option>
+                <option value="CURIOSITY">4. CURIOSITY</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="text-xs">
+            <label for="new-card-text" class="hud-label text-[10px] text-[#a098b0] block mb-1">Card Monologue Script</label>
+            <textarea id="new-card-text" rows="3" placeholder="Enter monologue with authentic regional slang..." class="w-full bg-[#111118] border border-[#302840] rounded p-3 text-[#e8e0f0] outline-none focus:border-[#ff2d78]"></textarea>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3 text-xs">
+            <div>
+              <label for="new-card-idiom" class="hud-label text-[10px] text-[#a098b0] block mb-1">Key Slang / Idiom Term</label>
+              <input type="text" id="new-card-idiom" placeholder="e.g. fajront, duende, oida" class="w-full bg-[#111118] border border-[#302840] rounded px-3 py-2 text-[#e8e0f0] outline-none">
+            </div>
+            <div>
+              <label for="new-card-cue" class="hud-label text-[10px] text-[#a098b0] block mb-1">Acoustic / Prosody Delivery Cue</label>
+              <input type="text" id="new-card-cue" placeholder="e.g. -5 ST drop, clipped vowels" class="w-full bg-[#111118] border border-[#302840] rounded px-3 py-2 text-[#e8e0f0] outline-none">
+            </div>
+          </div>
+
+          <button onclick="injectCustomCard()" class="btn-neon-pink w-full py-2.5 text-xs font-bold flex items-center justify-center gap-2">
+            <i data-lucide="check" class="w-4 h-4"></i>
+            <span>Commit Node &amp; Update Graph</span>
+          </button>
+        </div>
+
+        <!-- Right: Cypher & JSON Export Station -->
+        <div class="neon-panel-subtle p-6 space-y-4 flex flex-col justify-between">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <h3 class="text-base font-bold text-white flex items-center gap-2">
+                <i data-lucide="download" class="w-4 h-4 text-[#00ffcc]"></i>
+                <span>Production Cypher &amp; JSON Migration Exporter</span>
+              </h3>
+            </div>
+            <p class="text-xs text-[#a098b0]">
+              Export your live graph topology, SRS mastery weights (<code class="text-[#00ffcc]">r.weight</code>), and drill timestamps to feed your production Neo4j 5.x database or backup JSON state.
+            </p>
+
+            <div class="bg-[#0a0a12] border border-[#302840] rounded p-3 h-48 overflow-y-auto font-mono text-[11px] text-[#00ffcc]/90" id="cypher-preview-box">
+              <!-- Live Cypher script preview -->
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3 pt-2">
+            <button onclick="exportCypherMigration()" class="btn-neon-cyan py-2.5 text-xs font-bold flex items-center justify-center gap-2">
+              <i data-lucide="file-code" class="w-4 h-4"></i>
+              <span>Download .cypher Script</span>
+            </button>
+            <button onclick="exportJsonGraphState()" class="btn-neon-pink py-2.5 text-xs font-bold flex items-center justify-center gap-2">
+              <i data-lucide="file-json" class="w-4 h-4"></i>
+              <span>Download graph.json</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ==================================================================== -->
+  <!-- FULLSCREEN TELEPROMPTER MODAL -->
+  <!-- ==================================================================== -->
+  <div id="teleprompter-modal" class="fixed inset-0 z-50 bg-[#0a0a12]/95 backdrop-blur-md hidden flex flex-col justify-between p-6 md:p-12">
+    <!-- Top Modal Bar -->
+    <div class="flex items-center justify-between border-b border-[#302840] pb-4">
+      <div class="flex items-center gap-3">
+        <span class="hud-label text-xs font-bold text-[#ff2d78] px-2.5 py-1 rounded bg-[#ff2d78]/10 border border-[#ff2d78]/30" id="tp-stage-badge">
+          STAGE 1: COMPLIMENT
+        </span>
+        <span class="hud-label text-xs text-[#00ffcc]" id="tp-persona-badge">
+          Ostravian Czech
+        </span>
+        <span class="text-xs text-[#a098b0] hidden sm:inline">• Locked Cadence: 130 BPM</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="toggleRhythmPlay()" class="btn-neon-cyan px-3 py-1.5 text-xs flex items-center gap-1.5">
+          <i data-lucide="play" class="w-3.5 h-3.5"></i>
+          <span>Beat Loop</span>
+        </button>
+        <button onclick="closeFullTeleprompter()" class="hud-label text-xs text-[#a098b0] hover:text-white px-3 py-1.5 bg-[#141422] border border-[#302840] rounded">
+          ESC / Close [✕]
+        </button>
+      </div>
+    </div>
+
+    <!-- Center Giant Text -->
+    <div class="max-w-4xl mx-auto my-auto text-center space-y-6 py-8">
+      <div class="hud-label text-xs text-[#ffe04a] tracking-widest uppercase" id="tp-cue-badge">
+        ACOUSTIC CUE: Clip vowels, lean forward on elbows
+      </div>
+      <p id="tp-giant-text" class="text-2xl sm:text-4xl md:text-5xl font-bold leading-tight text-[#e8e0f0] tracking-tight transition-all">
+        "Čau, díval jsem se, jak to máte postavené..."
+      </p>
+      <div id="tp-bridge-note" class="text-sm font-mono text-[#00ffcc] hidden">
+        Bridge Transition: Code-switch smoothly into Viennese German on the downbeat.
+      </div>
+    </div>
+
+    <!-- Bottom Teleprompter Controls -->
+    <div class="flex flex-col sm:flex-row items-center justify-between border-t border-[#302840] pt-4 gap-4">
+      <div class="flex items-center gap-2 text-xs hud-label text-[#a098b0]">
+        <span>Nav Keys:</span>
+        <kbd class="px-2 py-1 bg-[#1e1e30] border border-[#302840] rounded text-[#e8e0f0]">← Prev</kbd>
+        <kbd class="px-2 py-1 bg-[#1e1e30] border border-[#302840] rounded text-[#e8e0f0]">→ Next</kbd>
+        <kbd class="px-2 py-1 bg-[#1e1e30] border border-[#302840] rounded text-[#e8e0f0]">Space (Play)</kbd>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button onclick="prevTeleprompterCard()" class="px-4 py-2 bg-[#141422] border border-[#302840] rounded text-xs text-[#e8e0f0] hover:border-[#00ffcc]">← Previous</button>
+        <button onclick="gradeActiveTransition(5); nextTeleprompterCard();" class="btn-neon-pink px-5 py-2 text-xs font-bold">Nailed It (5) → Next</button>
+        <button onclick="nextTeleprompterCard()" class="px-4 py-2 bg-[#141422] border border-[#302840] rounded text-xs text-[#e8e0f0] hover:border-[#00ffcc]">Skip Next →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================================================================== -->
+  <!-- NOTEBOOK SHIM API -->
+  <!-- ==================================================================== -->
+  <api-shim></api-shim>
+
+  <!-- ==================================================================== -->
+  <!-- COMPLETE DEFENSIVE JAVASCRIPT ENGINE -->
+  <!-- ==================================================================== -->
+  <script>
+    // ========================================================================
+    // 1. DATA MODEL & SCHEMA STATE
+    // ========================================================================
+    const APP_DATA = {
+      personas: {
+        CZ_OVA: {
+          id: 'CZ_OVA',
+          name: 'Ostravian Czech',
+          flag: '🇨🇿',
+          register: 'Ostravština / Tech Peer',
+          family: 'West Slavic + Austrian Industrial Contact',
+          bpm: 130,
+          meter: '4/4 Percussive',
+          rhythmCue: 'Clipped short vowels ("krátké zobáky"), fixed 1st-syllable punch, blue-collar candor.',
+          postureCue: 'Forearms on table, slight forward lean, unapologetic gaze.',
+          grooveStyle: 'industrial'
+        },
+        AT_VIE: {
+          id: 'AT_VIE',
+          name: 'Viennese German',
+          flag: '🇦🇹',
+          register: 'Wiener Schmäh / Kaffeehaus',
+          family: 'Austro-Bavarian',
+          bpm: 92,
+          meter: '3/4 Syncopated Waltz',
+          rhythmCue: 'Syncopated waltz cadence, stretched vowels on ironic understatement, modal particles (eh, halt, ja).',
+          postureCue: 'Leaned back in bentwood chair, wry half-smile, coat-check wave.',
+          grooveStyle: 'waltz'
+        },
+        RU_ALA: {
+          id: 'RU_ALA',
+          name: 'Almaty Russian',
+          flag: '🇰🇿',
+          register: 'Южная Столица Insider',
+          family: 'Slavic-Turkic Contact',
+          bpm: 88,
+          meter: '4/4 Downtempo Soul',
+          rhythmCue: 'Deep chest resonance, zero-copula high-trust candor, kinship vocatives (родной, брат).',
+          postureCue: 'Open chest, broad hospitality gesture, grounded stillness.',
+          grooveStyle: 'chillhop'
+        },
+        EN_YYC: {
+          id: 'EN_YYC',
+          name: 'Calgary English',
+          flag: '🇨🇦',
+          register: 'Backstage Arena-Rock',
+          family: 'Anglo-Germanic (Western Canadian)',
+          bpm: 116,
+          meter: '4/4 Rock Drive',
+          rhythmCue: 'Percussive monosyllabic punch, warm gravel, disarming "bud", zero corporate padding.',
+          postureCue: 'Relaxed shoulders, beer-at-the-bar stance, accomplice smirk.',
+          grooveStyle: 'rock'
+        },
+        ES_SOT: {
+          id: 'ES_SOT',
+          name: 'Sotogrande Spanish',
+          flag: '🇪🇸',
+          register: 'Andaluz High Register',
+          family: 'Iberian Romance',
+          bpm: 104,
+          meter: '12-Beat Compás',
+          rhythmCue: 'Rapid melodic bursts followed by sun-soaked pauses, conspiratorial subjunctive, duende.',
+          postureCue: 'Expressive hands, quick eyebrow raise, Mediterranean confidence.',
+          grooveStyle: 'flamenco'
+        },
+        WEEKND: {
+          id: 'WEEKND',
+          name: 'The Weeknd R&B',
+          flag: '✨',
+          register: 'One of the Girls / Nocturne',
+          family: 'Sensual Synthwave R&B',
+          bpm: 87,
+          meter: '4/4 Hypnotic Glide',
+          rhythmCue: 'Nocturnal half-time R&B bounce, silky legato phrasing, syncopated off-beat punch.',
+          postureCue: 'Sultry chin tilt, heavy-lidded direct eye contact, relaxed cool.',
+          grooveStyle: 'synthwave'
+        }
+      },
+
+      cards: [
+        // CZ_OVA
+        {
+          uid: 'CZ_OVA_COMP',
+          lang: 'CZ_OVA',
+          stage: 'COMPLIMENT',
+          text: 'Čau, díval jsem se, jak to máte postavené, a klobouk dolů – žádná navoněná bída, ale poctivý základ, co má hlavu a patu.',
+          idiom: 'žádná navoněná bída',
+          cue: 'Warm appreciation, crisp 1st-syllable delivery'
+        },
+        {
+          uid: 'CZ_OVA_CHAM',
+          lang: 'CZ_OVA',
+          stage: 'CHAMELEON',
+          text: 'Mně je hned jasné, kaj míříš. My taky nehrajeme na prázdné kecy – věci mají čistě fachat a nebrzdit lidi.',
+          idiom: 'fachat',
+          cue: 'Silesian particle "kaj", short clipped vowels'
+        },
+        {
+          uid: 'CZ_OVA_COUNT',
+          lang: 'CZ_OVA',
+          stage: 'COUNTERACT',
+          text: 'Ale upřímně: držet to teď při zemi je zbytečná šichta navíc. Když ten strach pustíš, máš čistý fajront, bo ten motor pojede sám.',
+          idiom: 'fajront',
+          cue: '-5 ST pitch drop on "šichta", causal "bo" (strictly because)'
+        },
+        {
+          uid: 'CZ_OVA_CUR',
+          lang: 'CZ_OVA',
+          stage: 'CURIOSITY',
+          text: 'Řekni mi na rovinu – kdybychom tenhle brzdič zítra ráno vyhodili z okna, do čeho by ses pustil s plnou parou?',
+          idiom: 's plnou parou',
+          cue: 'Open-loop hook, direct unblinking stare'
+        },
+
+        // AT_VIE
+        {
+          uid: 'AT_VIE_COMP',
+          lang: 'AT_VIE',
+          stage: 'COMPLIMENT',
+          text: 'Oida, eines muss man dir lassen: Wie du das aufgestellt hast, das ist schwer in Ordnung. Da steckt echtes Herzblut drin.',
+          idiom: 'schwer in Ordnung',
+          cue: 'Disarming "Oida", slow waltz cadence'
+        },
+        {
+          uid: 'AT_VIE_CHAM',
+          lang: 'AT_VIE',
+          stage: 'CHAMELEON',
+          text: 'Ich merk eh sofort, wir ticken da gleich. Kein Theater, kein G’schichtldrucken, sondern Substanz mit Schmäh.',
+          idiom: 'G’schichtldrucken',
+          cue: 'Modal particle "eh", wry conspiratorial smile'
+        },
+        {
+          uid: 'AT_VIE_COUNT',
+          lang: 'AT_VIE',
+          stage: 'COUNTERACT',
+          text: 'Aber geh bitte: Jetzt auf Nummer sicher gehen? Da musst du die übertriebene Vorsicht mal an der Garderobe abgeben.',
+          idiom: 'an der Garderobe abgeben',
+          cue: '-4 ST drop on "Geh bitte", coat-check hand gesture'
+        },
+        {
+          uid: 'AT_VIE_CUR',
+          lang: 'AT_VIE',
+          stage: 'CURIOSITY',
+          text: 'Hand aufs Herz: Wenn wir heute Abend alle Ausreden streichen – was ist der schönste Bledsinn, den wir als Nächstes anreißen?',
+          idiom: 'der schönste Bledsinn',
+          cue: 'Playful grin, lingering pause on "Bledsinn"'
+        },
+
+        // RU_ALA
+        {
+          uid: 'RU_ALA_COMP',
+          lang: 'RU_ALA',
+          stage: 'COMPLIMENT',
+          text: 'Слушай, родной, скажу как есть: то, что ты собрал — сделали по красоте. Чувствуется масштаб и живое тепло.',
+          idiom: 'сделали по красоте',
+          cue: 'Deep chest resonance, kinship vocative "родной"'
+        },
+        {
+          uid: 'RU_ALA_CHAM',
+          lang: 'RU_ALA',
+          stage: 'CHAMELEON',
+          text: 'Базару нет, мы с тобой одной крови. Нам не нужны маски, важно чтобы разговор шёл по душам, как за широким дастарханом.',
+          idiom: 'базару нет',
+          cue: 'Steady eye contact, hospitality cadence'
+        },
+        {
+          uid: 'RU_ALA_COUNT',
+          lang: 'RU_ALA',
+          stage: 'COUNTERACT',
+          text: 'Но тормозить сейчас — это держать горный беркут в золотой клетке. Твой размах просит высоты, а не паузы.',
+          idiom: 'горный беркут в золотой клетке',
+          cue: '-6 ST pitch drop, slow deliberate pushback'
+        },
+        {
+          uid: 'RU_ALA_CUR',
+          lang: 'RU_ALA',
+          stage: 'CURIOSITY',
+          text: 'Признайся честно: если прямо сейчас рвануть наверх на Медеу без тормозов — какую самую дерзкую идею мы запустим первой?',
+          idiom: 'рвануть на Медеу',
+          cue: 'Forward lean, adventurous hook'
+        },
+
+        // EN_YYC
+        {
+          uid: 'EN_YYC_COMP',
+          lang: 'EN_YYC',
+          stage: 'COMPLIMENT',
+          text: 'Hold on a second, bud—what you’ve got going here is the real deal. In a room full of people who are all hat and no cattle, you actually built an engine.',
+          idiom: 'all hat and no cattle',
+          cue: 'Percussive gravel, disarming "bud"'
+        },
+        {
+          uid: 'EN_YYC_CHAM',
+          lang: 'EN_YYC',
+          stage: 'CHAMELEON',
+          text: 'And look, I love how your mind works—zero corporate polish, straight to the point, ready to crank the amp to eleven.',
+          idiom: 'crank the amp to eleven',
+          cue: 'Accomplice smirk, driving tempo'
+        },
+        {
+          uid: 'EN_YYC_COUNT',
+          lang: 'EN_YYC',
+          stage: 'COUNTERACT',
+          text: 'Which is why playing it safe right now is like keeping a \'69 Mustang collecting dust in the garage all summer.',
+          idiom: '\'69 Mustang collecting dust',
+          cue: '-5 ST vocal drop, head tilt'
+        },
+        {
+          uid: 'EN_YYC_CUR',
+          lang: 'EN_YYC',
+          stage: 'CURIOSITY',
+          text: 'Between you and me—if we kick the garage doors open tonight and just give ’er, where are we taking this thing first?',
+          idiom: 'give ’er',
+          cue: 'Warm laugh, high-energy hook'
+        },
+
+        // ES_SOT
+        {
+          uid: 'ES_SOT_COMP',
+          lang: 'ES_SOT',
+          stage: 'COMPLIMENT',
+          text: 'Oye, para el carro un segundo, tío: lo que transmites tiene duende. Eso no se fabrica ni se compra.',
+          idiom: 'tiene duende',
+          cue: 'Rapid opening, warm resonant pause on "duende"'
+        },
+        {
+          uid: 'ES_SOT_CHAM',
+          lang: 'ES_SOT',
+          stage: 'CHAMELEON',
+          text: 'Se nota que vamos en la misma onda—como charlar en el puerto de Sotogrande al amanecer, sin postureo y con las cartas sobre la mesa.',
+          idiom: 'sin postureo',
+          cue: 'Melodic flow, expressive hand movement'
+        },
+        {
+          uid: 'ES_SOT_COUNT',
+          lang: 'ES_SOT',
+          stage: 'COUNTERACT',
+          text: '¡Anda ya, ni de coña me digas que vas a ir despacio! Quedarse ahí es mirar los toros desde la barrera.',
+          idiom: 'mirar los toros desde la barrera',
+          cue: '-4 ST drop, playful Andaluz challenge'
+        },
+        {
+          uid: 'ES_SOT_CUR',
+          lang: 'ES_SOT',
+          stage: 'CURIOSITY',
+          text: 'Mójate un poco conmigo: si nos olvidamos de lo prudente ahora mismo, ¿cuál es la jugada que de verdad te pide el cuerpo?',
+          idiom: 'mójate un poco',
+          cue: 'Subjunctive conspiracy, inviting grin'
+        },
+
+        // WEEKND
+        {
+          uid: 'WEEKND_COMP',
+          lang: 'WEEKND',
+          stage: 'COMPLIMENT',
+          text: 'Lock eyes for a second—the way you move through this noise, nobody else has this gravity. You own the whole room without saying a word.',
+          idiom: 'nobody else has this gravity',
+          cue: 'Silky intimate whisper, slow 87 BPM pocket'
+        },
+        {
+          uid: 'WEEKND_CHAM',
+          lang: 'WEEKND',
+          stage: 'CHAMELEON',
+          text: 'I see right through the act. We\'re both cut from that same late-night frequency: addicted to the rush, zero patience for the ordinary.',
+          idiom: 'same late-night frequency',
+          cue: 'Smooth vocal glide, syncopated off-beat'
+        },
+        {
+          uid: 'WEEKND_COUNT',
+          lang: 'WEEKND',
+          stage: 'COUNTERACT',
+          text: 'So don\'t pull back into the shadows now. Pretending you don\'t want this edge is just lying to yourself—give in to the feeling.',
+          idiom: 'give in to the feeling',
+          cue: '-5 ST sultry drop, lingering breath'
+        },
+        {
+          uid: 'WEEKND_CUR',
+          lang: 'WEEKND',
+          stage: 'CURIOSITY',
+          text: 'If we kill the lights and step past the line tonight... tell me how far you really want to let this go?',
+          idiom: 'step past the line',
+          cue: 'Open sensual loop, melodic falsetto lift'
+        }
+      ],
+
+      bridges: [
+        { uid: 'BR_OVA_VIE', from: 'CZ_OVA', to: 'AT_VIE', text: 'A jak říkají v kavárnách ve Vídni, když je potřeba sundat masku—' },
+        { uid: 'BR_VIE_ALA', from: 'AT_VIE', to: 'RU_ALA', text: 'Aber weißt eh, как у нас в Алматы говорят на террасе—' },
+        { uid: 'BR_ALA_YYC', from: 'RU_ALA', to: 'EN_YYC', text: 'Слушай, родной, but like they say back in the Alberta foothills—' },
+        { uid: 'BR_YYC_SOT', from: 'EN_YYC', to: 'ES_SOT', text: 'Listen bud, pero como decimos en el puerto de Sotogrande—' },
+        { uid: 'BR_SOT_WEEKND', from: 'ES_SOT', to: 'WEEKND', text: 'Y cuando la noche se pone seria, you just slip right into the groove—' },
+        { uid: 'BR_WEEKND_OVA', from: 'WEEKND', to: 'CZ_OVA', text: 'Drop the smooth melody and let the real engine work—bo věci mají fachat!' },
+        { uid: 'BR_CZ_STD_OVA', from: 'CZ_STD', to: 'CZ_OVA', text: 'A když teď odložíme kravaty a podíváme se přímo pod kapotu s vývojem—' }
+      ],
+
+      idioms: {
+        'fachat': { term: 'fachat', lang: 'CZ_OVA', origin: 'Austrian German (Fach/fachen)', meaning: 'To work/run reliably without breakdowns', cousin: 'сделали по красоте' },
+        'fajront': { term: 'fajront', lang: 'CZ_OVA', origin: 'Austrian German (Feierabend)', meaning: 'Clean quitting time; work wrapped up properly', cousin: 'an der Garderobe abgeben' },
+        'šichta': { term: 'šichta', lang: 'CZ_OVA', origin: 'German (Schicht)', meaning: 'Heavy grind / shift; unnecessary manual drag', cousin: 'G’schichtldrucken' },
+        'bo': { term: 'bo', lang: 'CZ_OVA', origin: 'Silesian particle', meaning: 'Causal "because" (NEVER "or" as in Ukrainian/Russian)', cousin: 'eh / halt' },
+        'schwer in Ordnung': { term: 'schwer in Ordnung', lang: 'AT_VIE', origin: 'Viennese Kaffeehaus idiom', meaning: 'High praise: profoundly solid & admirable', cousin: 'poctivý základ' },
+        'G’schichtldrucken': { term: 'G’schichtldrucken', lang: 'AT_VIE', origin: 'Viennese colloquial', meaning: 'Pressing out tall tales / corporate spin', cousin: 'prázdné kecy' },
+        'an der Garderobe abgeben': { term: 'an der Garderobe abgeben', lang: 'AT_VIE', origin: 'Burgtheater / Opera metaphor', meaning: 'Check your ego or hesitations at the coat check', cousin: 'fajront' },
+        'сделали по красоте': { term: 'сделали по красоте', lang: 'RU_ALA', origin: 'Urban Eurasian slang', meaning: 'Executed with craft, soul, and zero shortcuts', cousin: 'fachat' },
+        'горный беркут в золотой клетке': { term: 'горный беркут в золотой клетке', lang: 'RU_ALA', origin: 'Kazakh steppe / Tien Shan falconry', meaning: 'Great talent constrained by tiny bureaucratic boundaries', cousin: '\'69 Mustang in the garage' },
+        'all hat and no cattle': { term: 'all hat and no cattle', lang: 'EN_YYC', origin: 'Prairie / Foothills rancher lore', meaning: 'All talk and posture, zero substantive execution', cousin: 'navoněná bída' },
+        'give ’er': { term: 'give ’er', lang: 'EN_YYC', origin: 'Western Canadian rock/backstage', meaning: 'Put the pedal down; commit 100% without hesitation', cousin: 'рвануть на Медеу' },
+        'tiene duende': { term: 'tiene duende', lang: 'ES_SOT', origin: 'Andaluz flamenco & poetry', meaning: 'Possesses ineffable soul, raw magic, and presence', cousin: 'живое тепло' },
+        'mirar los toros desde la barrera': { term: 'mirar los toros desde la barrera', lang: 'ES_SOT', origin: 'Spanish taurine proverb', meaning: 'Playing it safe on the sidelines while others take the arena', cousin: 'držet to při zemi' }
+      },
+
+      objectionStates: [
+        { id: 'PLAYING_IT_SAFE', title: 'Playing It Safe', desc: 'Counterpart hiding behind incrementalism or legacy comfort', targetCard: 'EN_YYC_COUNT' },
+        { id: 'OVERTHINKING', title: 'Overthinking / Delay', desc: 'Analysis paralysis or waiting for an imaginary perfect moment', targetCard: 'RU_ALA_COUNT' },
+        { id: 'CORPORATE_SHIELD', title: 'Corporate Mask', desc: 'Stiff formality blocking genuine human and technical candor', targetCard: 'AT_VIE_COUNT' },
+        { id: 'MANUAL_GRIND', title: 'Manual Grind Friction', desc: 'Team burning manual hours on repetitive pipeline handoffs', targetCard: 'CZ_OVA_COUNT' }
+      ],
+
+      falseFriends: [
+        { cz: 'úžasný', ru_trap: 'ужасный (terrible)', de_calque: 'erstaunlich / großartig', meaning: 'Amazing / impressive praise' },
+        { cz: 'čerstvý', ru_trap: 'черствый (stale/callous)', de_calque: 'frisch / aktuell', meaning: 'Fresh / real-time (čerstvá data)' },
+        { cz: 'nápad', ru_trap: 'нападки (hostile attacks)', de_calque: 'Einfall (Ein-fall = ná-pad)', meaning: 'Idea / architecture concept' },
+        { cz: 'vyprodat', ru_trap: 'распродать (liquidate stock)', de_calque: 'ausverkaufen', meaning: 'Sell out (do NOT use for B2B closing)' },
+        { cz: 'pozor', ru_trap: 'позор (public shame)', de_calque: 'Achtung / Vorsicht', meaning: 'Attention / watch out (dávat pozor na)' },
+        { cz: 'hodina', ru_trap: 'година (historical epoch)', de_calque: 'Stunde', meaning: 'One hour (critical for SLAs)' },
+        { cz: 'zapomenout', ru_trap: 'запомнить (to remember!)', de_calque: 'vergessen', meaning: 'To forget (exact opposite trap)' },
+        { cz: 'přesný', ru_trap: 'пресный (bland/flavorless)', de_calque: 'präzise / genau', meaning: 'Exact / deterministic data' },
+        { cz: 'směšný', ru_trap: 'смешной (lighthearted funny)', de_calque: 'lächerlich', meaning: 'Ridiculous / absurd (heavy negative tone)' }
+      ],
+
+      weekndLyrics: [
+        {
+          lang: 'EN',
+          persona: 'Original Hook',
+          lyrics: 'Give me tough love, leave me with no breath / Lock me up, lock me down, make me feel like I’m one of the girls / Tell me I’m your muse, give me something I can never lose.',
+          rhythmNote: 'Sultry syncopated 87 BPM, accents landing on off-beat sixteenths'
+        },
+        {
+          lang: 'CZ_OVA',
+          persona: 'Ostravian Punch',
+          lyrics: 'Dej mi tvrdou lásku, ať nemůžu dýchat / Zavři mě, drž mě pevně, ať vím, že jsem jedna z nich / Žádné sraní, poctivá šichta pro duši, co nikdy neskončí.',
+          rhythmNote: 'Clipped vowels, sharp percussive consonants on "šichta"'
+        },
+        {
+          lang: 'AT_VIE',
+          persona: 'Wiener Schmäh',
+          lyrics: 'Gib mir die harte Liebe, bis mir der Atem stockt / Sperr mich ein, halt mich fest, wie eine von den Madln / Vernunft an der Garderobe abgeben, Schmäh ohne Ende.',
+          rhythmNote: 'Syncopated legato, stretched vowels on "Madln"'
+        },
+        {
+          lang: 'RU_ALA',
+          persona: 'Almaty Soul',
+          lyrics: 'Дай мне эту дикую страсть, чтоб перехватило дух / Запри меня, держи крепко, сделай меня одной из тех / Сделали по красоте, родной, этой ночью базару нет.',
+          rhythmNote: 'Deep chest resonance, smooth gliding delivery on "базару нет"'
+        },
+        {
+          lang: 'ES_SOT',
+          persona: 'Sotogrande Duende',
+          lyrics: 'Dame amor del duro, que me quede sin aliento / Enciérrame, átame bien, hazme sentir una de ellas / Con un duende que quema el puerto de Sotogrande al amanecer.',
+          rhythmNote: 'Melodic breath control, rolling cadences and pauses'
+        }
+      ]
+    };
+
+    // Edge Transitions Topology (Graph Relationships)
+    let GRAPH_EDGES = [
+      // CZ_OVA Intra-Flow
+      { id: 'E_OVA_1', source: 'CZ_OVA_COMP', target: 'CZ_OVA_CHAM', type: 'FLOWS_TO', weight: 0.94, daysAgo: 1, drills: 12, stability: 14.5 },
+      { id: 'E_OVA_2', source: 'CZ_OVA_CHAM', target: 'CZ_OVA_COUNT', type: 'FLOWS_TO', weight: 0.88, daysAgo: 2, drills: 9, stability: 11.2 },
+      { id: 'E_OVA_3', source: 'CZ_OVA_COUNT', target: 'CZ_OVA_CUR', type: 'FLOWS_TO', weight: 0.52, daysAgo: 9, drills: 3, stability: 3.8 },
+
+      // AT_VIE Intra-Flow
+      { id: 'E_VIE_1', source: 'AT_VIE_COMP', target: 'AT_VIE_CHAM', type: 'FLOWS_TO', weight: 0.91, daysAgo: 2, drills: 8, stability: 12.0 },
+      { id: 'E_VIE_2', source: 'AT_VIE_CHAM', target: 'AT_VIE_COUNT', type: 'FLOWS_TO', weight: 0.85, daysAgo: 3, drills: 7, stability: 9.5 },
+      { id: 'E_VIE_3', source: 'AT_VIE_COUNT', target: 'AT_VIE_CUR', type: 'FLOWS_TO', weight: 0.62, daysAgo: 6, drills: 4, stability: 5.4 },
+
+      // RU_ALA Intra-Flow
+      { id: 'E_ALA_1', source: 'RU_ALA_COMP', target: 'RU_ALA_CHAM', type: 'FLOWS_TO', weight: 0.89, daysAgo: 2, drills: 8, stability: 10.2 },
+      { id: 'E_ALA_2', source: 'RU_ALA_CHAM', target: 'RU_ALA_COUNT', type: 'FLOWS_TO', weight: 0.95, daysAgo: 1, drills: 15, stability: 18.0 },
+      { id: 'E_ALA_3', source: 'RU_ALA_COUNT', target: 'RU_ALA_CUR', type: 'FLOWS_TO', weight: 0.58, daysAgo: 8, drills: 4, stability: 4.2 },
+
+      // EN_YYC Intra-Flow
+      { id: 'E_YYC_1', source: 'EN_YYC_COMP', target: 'EN_YYC_CHAM', type: 'FLOWS_TO', weight: 0.93, daysAgo: 1, drills: 11, stability: 13.0 },
+      { id: 'E_YYC_2', source: 'EN_YYC_CHAM', target: 'EN_YYC_COUNT', type: 'FLOWS_TO', weight: 0.86, daysAgo: 3, drills: 6, stability: 8.8 },
+      { id: 'E_YYC_3', source: 'EN_YYC_COUNT', target: 'EN_YYC_CUR', type: 'FLOWS_TO', weight: 0.72, daysAgo: 4, drills: 5, stability: 6.5 },
+
+      // ES_SOT Intra-Flow
+      { id: 'E_SOT_1', source: 'ES_SOT_COMP', target: 'ES_SOT_CHAM', type: 'FLOWS_TO', weight: 0.90, daysAgo: 2, drills: 8, stability: 10.5 },
+      { id: 'E_SOT_2', source: 'ES_SOT_CHAM', target: 'ES_SOT_COUNT', type: 'FLOWS_TO', weight: 0.65, daysAgo: 5, drills: 5, stability: 6.0 },
+      { id: 'E_SOT_3', source: 'ES_SOT_COUNT', target: 'ES_SOT_CUR', type: 'FLOWS_TO', weight: 0.50, daysAgo: 10, drills: 2, stability: 2.8 },
+
+      // WEEKND Intra-Flow
+      { id: 'E_WKD_1', source: 'WEEKND_COMP', target: 'WEEKND_CHAM', type: 'FLOWS_TO', weight: 0.96, daysAgo: 1, drills: 14, stability: 16.0 },
+      { id: 'E_WKD_2', source: 'WEEKND_CHAM', target: 'WEEKND_COUNT', type: 'FLOWS_TO', weight: 0.82, daysAgo: 3, drills: 6, stability: 8.0 },
+      { id: 'E_WKD_3', source: 'WEEKND_COUNT', target: 'WEEKND_CUR', type: 'FLOWS_TO', weight: 0.78, daysAgo: 4, drills: 5, stability: 7.2 },
+
+      // Cross-Language Pivots (:PIVOTS_VIA)
+      { id: 'E_PIV_1', source: 'CZ_OVA_CHAM', target: 'AT_VIE_COUNT', type: 'PIVOTS_VIA', weight: 0.55, daysAgo: 8, drills: 3, stability: 3.5, bridge: 'BR_OVA_VIE' },
+      { id: 'E_PIV_2', source: 'AT_VIE_CHAM', target: 'RU_ALA_COUNT', type: 'PIVOTS_VIA', weight: 0.89, daysAgo: 2, drills: 8, stability: 11.0, bridge: 'BR_VIE_ALA' },
+      { id: 'E_PIV_3', source: 'RU_ALA_CHAM', target: 'EN_YYC_COUNT', type: 'PIVOTS_VIA', weight: 0.74, daysAgo: 4, drills: 5, stability: 7.0, bridge: 'BR_ALA_YYC' },
+      { id: 'E_PIV_4', source: 'EN_YYC_CHAM', target: 'ES_SOT_COUNT', type: 'PIVOTS_VIA', weight: 0.64, daysAgo: 5, drills: 4, stability: 5.2, bridge: 'BR_YYC_SOT' },
+      { id: 'E_PIV_5', source: 'ES_SOT_CHAM', target: 'WEEKND_COUNT', type: 'PIVOTS_VIA', weight: 0.88, daysAgo: 1, drills: 10, stability: 12.5, bridge: 'BR_SOT_WEEKND' },
+      { id: 'E_PIV_6', source: 'WEEKND_CHAM', target: 'CZ_OVA_COUNT', type: 'PIVOTS_VIA', weight: 0.48, daysAgo: 11, drills: 2, stability: 2.2, bridge: 'BR_WEEKND_OVA' },
+
+      // Cross-Linguistic Vibe Links (:SHARES_VIBE_WITH)
+      { id: 'E_VB_1', source: 'CZ_OVA_CHAM', target: 'RU_ALA_COMP', type: 'SHARES_VIBE_WITH', weight: 0.90, desc: 'fachat ↔ сделали по красоте' },
+      { id: 'E_VB_2', source: 'CZ_OVA_COUNT', target: 'AT_VIE_COUNT', type: 'SHARES_VIBE_WITH', weight: 0.85, desc: 'fajront ↔ an der Garderobe abgeben' },
+      { id: 'E_VB_3', source: 'RU_ALA_COUNT', target: 'EN_YYC_COUNT', type: 'SHARES_VIBE_WITH', weight: 0.80, desc: 'горный беркут ↔ 69 Mustang' },
+      { id: 'E_VB_4', source: 'AT_VIE_CHAM', target: 'CZ_OVA_CHAM', type: 'SHARES_VIBE_WITH', weight: 0.88, desc: 'G\'schichtldrucken ↔ prázdné kecy' }
+    ];
+
+    // ========================================================================
+    // 2. ACTIVE APPLICATION RUNTIME STATE
+    // ========================================================================
+    let APP_STATE = {
+      activePersonaId: 'CZ_OVA',
+      activeStageIndex: 0, // 0: COMPLIMENT, 1: CHAMELEON, 2: COUNTERACT, 3: CURIOSITY
+      selectedCardUid: 'CZ_OVA_COMP',
+      selectedEdgeId: 'E_OVA_1',
+      activeView: 'studio',
+      isAudioMasterOn: false,
+      isRhythmPlaying: false,
+      currentBpm: 130,
+      isMetronomeOn: false,
+      isProsodyMicOn: false,
+      masterVolumeDb: 0,
+      activeStepIndex: 0,
+      blitzState: {
+        active: false,
+        secondsLeft: 60,
+        streak: 0,
+        currentQuestion: null,
+        timerInterval: null
+      }
+    };
+
+    // ========================================================================
+    // 3. TONE.JS AUDIO SYNTHESIS & SEQUENCER ENGINE
+    // ========================================================================
+    let audioSynths = {
+      kick: null,
+      snare: null,
+      hihat: null,
+      bass: null,
+      polyChords: null,
+      leadSynth: null,
+      metroClick: null,
+      analyser: null
+    };
+
+    let stepRepeatEvent = null;
+    let micAudioContext = null;
+    let micAnalyser = null;
+    let micStream = null;
+    let pitchBaselineHz = null;
+
+    // Initialize Tone.js synthesizers
+    function initToneAudio() {
+      if (audioSynths.kick) return;
+
+      try {
+        // Kick Drum (Punchy 808 Membrane)
+        audioSynths.kick = new Tone.MembraneSynth({
+          pitchDecay: 0.05,
+          octaves: 8,
+          oscillator: { type: 'sine' },
+          envelope: { attack: 0.001, decay: 0.35, sustain: 0.01, release: 0.4 }
+        }).toDestination();
+        audioSynths.kick.volume.value = -3;
+
+        // Snare / Rimshot
+        audioSynths.snare = new Tone.NoiseSynth({
+          noise: { type: 'white' },
+          envelope: { attack: 0.001, decay: 0.18, sustain: 0.0 }
+        }).toDestination();
+        audioSynths.snare.volume.value = -8;
+
+        // Hi-Hat / Palmas
+        audioSynths.hihat = new Tone.MetalSynth({
+          frequency: 240,
+          envelope: { attack: 0.001, decay: 0.06, release: 0.05 },
+          harmonicity: 5.1,
+          modulationIndex: 32,
+          resonance: 4000,
+          octaves: 1.5
+        }).toDestination();
+        audioSynths.hihat.volume.value = -14;
+
+        // Bass Synth (Warm Analog / Reese Sub)
+        audioSynths.bass = new Tone.MonoSynth({
+          oscillator: { type: 'sawtooth' },
+          filter: { Q: 3, type: 'lowpass', rolloff: -24 },
+          envelope: { attack: 0.02, decay: 0.3, sustain: 0.5, release: 0.4 },
+          filterEnvelope: { attack: 0.01, decay: 0.2, sustain: 0.2, release: 0.4, baseFrequency: 65, octaves: 2.6 }
+        }).toDestination();
+        audioSynths.bass.volume.value = -4;
+
+        // Polyphonic Synth for Ambient Chords
+        audioSynths.polyChords = new Tone.PolySynth(Tone.Synth, {
+          oscillator: { type: 'triangle' },
+          envelope: { attack: 0.08, decay: 0.6, sustain: 0.6, release: 1.2 }
+        }).toDestination();
+        audioSynths.polyChords.volume.value = -10;
+
+        // Melodic Lead Synthesizer for Hook Riffs
+        audioSynths.leadSynth = new Tone.Synth({
+          oscillator: { type: 'sine' },
+          envelope: { attack: 0.05, decay: 0.2, sustain: 0.4, release: 0.8 }
+        }).toDestination();
+        audioSynths.leadSynth.volume.value = -6;
+
+        // Metronome Woodblock Click
+        audioSynths.metroClick = new Tone.MembraneSynth({
+          pitchDecay: 0.01,
+          octaves: 2,
+          oscillator: { type: 'square' },
+          envelope: { attack: 0.001, decay: 0.04, sustain: 0, release: 0.04 }
+        }).toDestination();
+        audioSynths.metroClick.volume.value = -6;
+
+        // Visualizer FFT / Waveform Analyser
+        audioSynths.analyser = new Tone.Analyser('waveform', 128);
+        Tone.getDestination().connect(audioSynths.analyser);
+
+        Tone.Transport.bpm.value = APP_STATE.currentBpm;
+        setupSequencerLoop();
+        requestAnimationFrame(renderAudioVisualizer);
+      } catch (err) {
+        console.warn('Tone.js audio setup notice:', err);
+      }
+    }
+
+    // Toggle Master Audio Engine
+    async function toggleMasterAudio() {
+      try {
+        if (!audioSynths.kick) initToneAudio();
+        await Tone.start();
+        APP_STATE.isAudioMasterOn = !APP_STATE.isAudioMasterOn;
+
+        const mobileBtn = document.getElementById('btn-audio-master-mobile');
+        const desktopBtn = document.getElementById('btn-audio-master-desktop');
+        const mobileLabel = document.getElementById('label-audio-mobile');
+        const desktopLabel = document.getElementById('label-audio-desktop');
+
+        if (APP_STATE.isAudioMasterOn) {
+          if (mobileLabel) mobileLabel.textContent = 'ENGINE ACTIVE';
+          if (desktopLabel) desktopLabel.textContent = 'ENGINE ACTIVE';
+          if (desktopBtn) desktopBtn.classList.add('active-glow');
+          // If rhythm not playing, start it
+          if (!APP_STATE.isRhythmPlaying) toggleRhythmPlay();
+        } else {
+          if (mobileLabel) mobileLabel.textContent = 'START AUDIO';
+          if (desktopLabel) desktopLabel.textContent = 'START ENGINE';
+          if (desktopBtn) desktopBtn.classList.remove('active-glow');
+          if (APP_STATE.isRhythmPlaying) toggleRhythmPlay();
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    // Toggle Rhythm Beat Playback
+    async function toggleRhythmPlay() {
+      if (!audioSynths.kick) {
+        await toggleMasterAudio();
+        return;
+      }
+
+      if (Tone.Transport.state === 'started') {
+        Tone.Transport.stop();
+        APP_STATE.isRhythmPlaying = false;
+        updatePlayButtonUI(false);
+      } else {
+        await Tone.start();
+        Tone.Transport.start();
+        APP_STATE.isRhythmPlaying = true;
+        updatePlayButtonUI(true);
+      }
+    }
+
+    function updatePlayButtonUI(isPlaying) {
+      const btn = document.getElementById('btn-rhythm-play');
+      const label = document.getElementById('label-rhythm-play');
+      const icon = document.getElementById('icon-rhythm-play');
+      if (!btn || !label) return;
+
+      if (isPlaying) {
+        btn.classList.add('active-glow');
+        label.textContent = 'PAUSE CADENCE';
+        if (icon) icon.setAttribute('data-lucide', 'pause');
+      } else {
+        btn.classList.remove('active-glow');
+        label.textContent = 'PLAY CADENCE BEAT';
+        if (icon) icon.setAttribute('data-lucide', 'play');
+      }
+      lucide.createIcons();
+    }
+
+    // 16-Step Sequencer Step Engine
+    function setupSequencerLoop() {
+      if (stepRepeatEvent !== null) {
+        Tone.Transport.clear(stepRepeatEvent);
+      }
+
+      let step = 0;
+      stepRepeatEvent = Tone.Transport.scheduleRepeat((time) => {
+        APP_STATE.activeStepIndex = step;
+        triggerStepAudio(step, time);
+        Tone.Draw.schedule(() => {
+          updateStepLedUI(step);
+        }, time);
+        step = (step + 1) % 16;
+      }, '16n');
+    }
+
+    // Step Audio Pattern Triggers per Persona
+    function triggerStepAudio(step, time) {
+      const persona = APP_DATA.personas[APP_STATE.activePersonaId] || APP_DATA.personas['CZ_OVA'];
+      const style = persona.grooveStyle || 'industrial';
+
+      // Metronome Click on 1/4 notes (0, 4, 8, 12)
+      if (APP_STATE.isMetronomeOn && step % 4 === 0) {
+        const pitch = step === 0 ? 'C5' : 'G4';
+        audioSynths.metroClick.triggerAttackRelease(pitch, '32n', time, 0.4);
+      }
+
+      // 1. OSTRAVIAN INDUSTRIAL (130 BPM, machine pulse)
+      if (style === 'industrial') {
+        if (step === 0 || step === 8 || step === 10) audioSynths.kick.triggerAttackRelease('C1', '16n', time);
+        if (step === 4 || step === 12) audioSynths.snare.triggerAttackRelease('16n', time);
+        if (step % 2 === 0) audioSynths.hihat.triggerAttackRelease('32n', time, step % 4 === 0 ? 0.3 : 0.15);
+        if (step === 0) audioSynths.bass.triggerAttackRelease('F1', '8n', time);
+        if (step === 8) audioSynths.bass.triggerAttackRelease('Eb1', '8n', time);
+      }
+
+      // 2. VIENNESE WALTZ (92 BPM, 3/4 feel mapped to 12/16)
+      else if (style === 'waltz') {
+        if (step === 0 || step === 6) audioSynths.kick.triggerAttackRelease('A1', '8n', time, 0.6);
+        if (step === 2 || step === 4 || step === 8 || step === 10) {
+          audioSynths.snare.triggerAttackRelease('32n', time, 0.25);
+          audioSynths.polyChords.triggerAttackRelease(['C4', 'E4', 'G4'], '16n', time, 0.2);
+        }
+        if (step === 0) audioSynths.bass.triggerAttackRelease('A1', '4n', time);
+        if (step === 6) audioSynths.bass.triggerAttackRelease('E2', '4n', time);
+      }
+
+      // 3. ALMATY CHILLHOP (88 BPM, lazy swing)
+      else if (style === 'chillhop') {
+        if (step === 0 || step === 7 || step === 10) audioSynths.kick.triggerAttackRelease('D1', '8n', time, 0.8);
+        if (step === 4 || step === 12) audioSynths.snare.triggerAttackRelease('16n', time, 0.6);
+        if (step % 2 === 0) audioSynths.hihat.triggerAttackRelease('32n', time, 0.18);
+        if (step === 0) audioSynths.polyChords.triggerAttackRelease(['D3', 'F3', 'A3', 'C4'], '2n', time, 0.25);
+        if (step === 8) audioSynths.polyChords.triggerAttackRelease(['G3', 'Bb3', 'D4', 'F4'], '2n', time, 0.25);
+      }
+
+      // 4. CALGARY ARENA ROCK (116 BPM, driving punch)
+      else if (style === 'rock') {
+        if (step === 0 || step === 6 || step === 8 || step === 14) audioSynths.kick.triggerAttackRelease('E1', '8n', time);
+        if (step === 4 || step === 12) audioSynths.snare.triggerAttackRelease('16n', time, 0.8);
+        audioSynths.hihat.triggerAttackRelease('32n', time, 0.2);
+        if (step === 0 || step === 2 || step === 8) audioSynths.bass.triggerAttackRelease('E1', '16n', time);
+      }
+
+      // 5. SOTOGRANDE DUENDE COMPÁS (104 BPM, flamenco palmas)
+      else if (style === 'flamenco') {
+        if (step === 0 || step === 3 || step === 6 || step === 8 || step === 10) {
+          audioSynths.hihat.triggerAttackRelease('32n', time, 0.4); // Palmas accents
+        }
+        if (step === 0 || step === 8) audioSynths.kick.triggerAttackRelease('G1', '16n', time, 0.5);
+        if (step === 4 || step === 12) audioSynths.snare.triggerAttackRelease('32n', time, 0.3);
+        if (step === 0) audioSynths.polyChords.triggerAttackRelease(['A3', 'C#4', 'E4'], '4n', time, 0.2);
+        if (step === 8) audioSynths.polyChords.triggerAttackRelease(['Bb3', 'D4', 'F4'], '4n', time, 0.2);
+      }
+
+      // 6. THE WEEKND - ONE OF THE GIRLS (87 BPM, Cm7 - Ebmaj7 - Bb - Abmaj7 glide)
+      else if (style === 'synthwave') {
+        // Hypnotic 808 sub kick
+        if (step === 0 || step === 9 || step === 10) audioSynths.kick.triggerAttackRelease('C1', '8n', time, 0.9);
+        // Snappy rim / snare on 4 and 12
+        if (step === 4 || step === 12) audioSynths.snare.triggerAttackRelease('16n', time, 0.5);
+        // Subtle hi-hat tick on 16ths
+        if (step % 2 === 0) audioSynths.hihat.triggerAttackRelease('32n', time, 0.12);
+
+        // Sub-bass glide & lush minor 7th pad chords
+        if (step === 0) {
+          audioSynths.bass.triggerAttackRelease('C1', '2n', time, 0.8);
+          audioSynths.polyChords.triggerAttackRelease(['C3', 'Eb3', 'G3', 'Bb3'], '2n', time, 0.3);
+        } else if (step === 8) {
+          audioSynths.bass.triggerAttackRelease('Ab0', '2n', time, 0.8);
+          audioSynths.polyChords.triggerAttackRelease(['Ab2', 'C3', 'Eb3', 'G3'], '2n', time, 0.3);
+        }
+      }
+    }
+
+    // Play Weeknd Iconic Hook Melody
+    function playWeekndHookAudio() {
+      if (!audioSynths.leadSynth) initToneAudio();
+      const now = Tone.now();
+      const notes = [
+        { note: 'Eb4', time: 0, dur: '8n' },
+        { note: 'D4', time: 0.3, dur: '8n' },
+        { note: 'C4', time: 0.6, dur: '4n' },
+        { note: 'Bb3', time: 1.1, dur: '8n' },
+        { note: 'C4', time: 1.4, dur: '4n' },
+        { note: 'G4', time: 2.0, dur: '4n' },
+        { note: 'F4', time: 2.6, dur: '8n' },
+        { note: 'Eb4', time: 2.9, dur: '4n' },
+        { note: 'C4', time: 3.5, dur: '2n' }
+      ];
+      notes.forEach(n => {
+        audioSynths.leadSynth.triggerAttackRelease(n.note, n.dur, now + n.time);
+      });
+    }
+
+    // Play 5-Language Syllable Chime Chain
+    function playFiveLanguageChainAudio() {
+      if (!audioSynths.leadSynth) initToneAudio();
+      const now = Tone.now();
+      const tones = ['C4', 'Eb4', 'G4', 'Bb4', 'C5'];
+      tones.forEach((tone, idx) => {
+        audioSynths.leadSynth.triggerAttackRelease(tone, '8n', now + idx * 0.45, 0.4);
+      });
+    }
+
+    // Canvas Audio Visualizer Animation Loop
+    function renderAudioVisualizer() {
+      const canvas = document.getElementById('visualizer-canvas');
+      if (canvas && audioSynths.analyser) {
+        const ctx = canvas.getContext('2d');
+        const values = audioSynths.analyser.getValue();
+        ctx.fillStyle = '#0a0a12';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.beginPath();
+        ctx.lineWidth = 1.5;
+        ctx.strokeStyle = APP_STATE.isRhythmPlaying ? '#00ffcc' : '#5a5068';
+
+        const sliceWidth = canvas.width / values.length;
+        let x = 0;
+        for (let i = 0; i < values.length; i++) {
+          const v = (values[i] + 1) / 2;
+          const y = v * canvas.height;
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+          x += sliceWidth;
+        }
+        ctx.stroke();
+      }
+      requestAnimationFrame(renderAudioVisualizer);
+    }
+
+    // Metronome Toggle
+    function toggleMetronome() {
+      APP_STATE.isMetronomeOn = !APP_STATE.isMetronomeOn;
+      const btn = document.getElementById('btn-metronome');
+      const label = document.getElementById('label-metro');
+      if (label) {
+        label.textContent = APP_STATE.isMetronomeOn ? 'METRO: ON' : 'METRO: OFF';
+      }
+      if (btn) {
+        if (APP_STATE.isMetronomeOn) btn.classList.add('border-[#00ffcc]', 'text-[#00ffcc]');
+        else btn.classList.remove('border-[#00ffcc]', 'text-[#00ffcc]');
+      }
+    }
+
+    // Update BPM
+    function updateBpm(val) {
+      APP_STATE.currentBpm = parseInt(val, 10);
+      if (Tone.Transport) Tone.Transport.bpm.value = APP_STATE.currentBpm;
+      const bpmDisp = document.getElementById('val-bpm');
+      const hudBpm = document.getElementById('hud-bpm-val');
+      if (bpmDisp) bpmDisp.textContent = APP_STATE.currentBpm;
+      if (hudBpm) hudBpm.textContent = `${APP_STATE.currentBpm} BPM`;
+    }
+
+    // Tap Tempo Calculator
+    let lastTapTime = 0;
+    let tapDiffs = [];
+    function tapTempo() {
+      const now = performance.now();
+      if (lastTapTime > 0) {
+        const diff = now - lastTapTime;
+        if (diff > 200 && diff < 2000) {
+          tapDiffs.push(diff);
+          if (tapDiffs.length > 4) tapDiffs.shift();
+          const avg = tapDiffs.reduce((a, b) => a + b) / tapDiffs.length;
+          const bpm = Math.round(60000 / avg);
+          const clamped = Math.max(60, Math.min(160, bpm));
+          const slider = document.getElementById('input-bpm');
+          if (slider) slider.value = clamped;
+          updateBpm(clamped);
+        }
+      }
+      lastTapTime = now;
+    }
+
+    // Master Volume Update
+    function updateMasterVolume(valDb) {
+      APP_STATE.masterVolumeDb = parseFloat(valDb);
+      Tone.getDestination().volume.value = APP_STATE.masterVolumeDb;
+    }
+
+    // Change Groove Track via dropdown
+    function changeGrooveTrack(personaId) {
+      loadPersona(personaId);
+    }
+
+    // 16 Step LED Indicators UI Builder & Updater
+    function initStepLeds() {
+      const rail = document.getElementById('step-led-rail');
+      if (!rail) return;
+      rail.innerHTML = '';
+      for (let i = 0; i < 16; i++) {
+        const d = document.createElement('div');
+        d.id = `step-led-${i}`;
+        d.className = `step-led ${i % 4 === 0 ? 'downbeat' : ''}`;
+        rail.appendChild(d);
+      }
+    }
+
+    function updateStepLedUI(step) {
+      for (let i = 0; i < 16; i++) {
+        const el = document.getElementById(`step-led-${i}`);
+        if (el) {
+          if (i === step) el.classList.add('current');
+          else el.classList.remove('current');
+        }
+      }
+    }
+
+    // ========================================================================
+    // 4. WEBAUDIO PROSODY & PITCH-DROP DETECTOR (Autocorrelation DSP)
+    // ========================================================================
+    async function toggleProsodyMicrophone() {
+      const box = document.getElementById('live-prosody-box');
+      const label = document.getElementById('label-mic');
+      const btn = document.getElementById('btn-prosody-mic');
+
+      if (APP_STATE.isProsodyMicOn) {
+        if (micStream) {
+          micStream.getTracks().forEach(t => t.stop());
+          micStream = null;
+        }
+        APP_STATE.isProsodyMicOn = false;
+        if (box) box.classList.add('hidden');
+        if (label) label.textContent = 'PITCH METER: OFF';
+        if (btn) btn.classList.remove('border-[#ff2d78]', 'text-[#ff2d78]');
+        return;
+      }
+
+      try {
+        micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        micAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const source = micAudioContext.createMediaStreamSource(micStream);
+        micAnalyser = micAudioContext.createAnalyser();
+        micAnalyser.fftSize = 2048;
+        source.connect(micAnalyser);
+
+        APP_STATE.isProsodyMicOn = true;
+        pitchBaselineHz = null;
+        if (box) box.classList.remove('hidden');
+        if (label) label.textContent = 'PITCH METER: ON';
+        if (btn) btn.classList.add('border-[#ff2d78]', 'text-[#ff2d78]');
+
+        sampleMicrophoneProsody();
+      } catch (err) {
+        alert('Microphone access denied or not available. Meter disabled.');
+      }
+    }
+
+    function sampleMicrophoneProsody() {
+      if (!APP_STATE.isProsodyMicOn || !micAnalyser) return;
+      const buf = new Float32Array(micAnalyser.fftSize);
+      micAnalyser.getFloatTimeDomainData(buf);
+
+      const hz = autoCorrelatePitch(buf, micAudioContext.sampleRate);
+      const pitchHzLabel = document.getElementById('prosody-pitch-hz');
+      const dropTag = document.getElementById('prosody-drop-tag');
+
+      if (hz > 65 && hz < 380) {
+        if (!pitchBaselineHz) pitchBaselineHz = hz;
+        const semitones = +(12 * Math.log2(hz / pitchBaselineHz)).toFixed(1);
+
+        if (pitchHzLabel) pitchHzLabel.textContent = `${Math.round(hz)} Hz`;
+        if (dropTag) {
+          if (semitones <= -4.0) {
+            dropTag.textContent = `ST: ${semitones} (DROP HIT!)`;
+            dropTag.className = 'px-1.5 py-0.2 rounded text-[10px] bg-[#34d399]/20 text-[#34d399] font-mono font-bold';
+          } else {
+            dropTag.textContent = `ST: ${semitones}`;
+            dropTag.className = 'px-1.5 py-0.2 rounded text-[10px] bg-[#302840] text-[#00ffcc] font-mono';
+          }
+        }
+      }
+      requestAnimationFrame(sampleMicrophoneProsody);
+    }
+
+    function autoCorrelatePitch(buf, sampleRate) {
+      let rms = 0;
+      for (let i = 0; i < buf.length; i++) rms += buf[i] * buf[i];
+      if (Math.sqrt(rms / buf.length) < 0.012) return -1;
+
+      let bestOffset = -1, bestCorr = 0;
+      const minPeriod = Math.floor(sampleRate / 380);
+      const maxPeriod = Math.floor(sampleRate / 65);
+      for (let offset = minPeriod; offset < maxPeriod; offset++) {
+        let corr = 0;
+        for (let i = 0; i < buf.length - offset; i++) corr += buf[i] * buf[i + offset];
+        if (corr > bestCorr) { bestCorr = corr; bestOffset = offset; }
+      }
+      return bestOffset > 0 ? sampleRate / bestOffset : -1;
+    }
+
+    // ========================================================================
+    // 5. VIEW NAVIGATION & PERSONA SWITCHING
+    // ========================================================================
+    function switchView(viewName) {
+      APP_STATE.activeView = viewName;
+      const views = ['studio', 'weeknd', 'roulette', 'graph', 'shield', 'builder'];
+      views.forEach(v => {
+        const sec = document.getElementById(`view-${v}`);
+        const tab = document.getElementById(`tab-nav-${v}`);
+        if (sec) {
+          if (v === viewName) sec.classList.remove('hidden');
+          else sec.classList.add('hidden');
+        }
+        if (tab) {
+          if (v === viewName) {
+            tab.classList.add('text-[#ff2d78]', 'bg-[#1e1e30]');
+            tab.classList.remove('text-[#a098b0]');
+          } else {
+            tab.classList.remove('text-[#ff2d78]', 'bg-[#1e1e30]');
+            tab.classList.add('text-[#a098b0]');
+          }
+        }
+      });
+
+      if (viewName === 'graph') {
+        setTimeout(initForceGraphSimulation, 80);
+      }
+    }
+
+    function loadPersona(personaId) {
+      if (!APP_DATA.personas[personaId]) return;
+      APP_STATE.activePersonaId = personaId;
+      const p = APP_DATA.personas[personaId];
+
+      // Update HUD
+      const hudName = document.getElementById('hud-persona-name');
+      if (hudName) hudName.textContent = `${p.flag} ${p.name}`;
+
+      // Update groove selector
+      const sel = document.getElementById('select-groove-track');
+      if (sel) sel.value = personaId;
+
+      // Update BPM if user has not heavily customized
+      const slider = document.getElementById('input-bpm');
+      if (slider) slider.value = p.bpm;
+      updateBpm(p.bpm);
+
+      // Re-render UI modules
+      renderPersonaQuickTabs();
+      renderPersonaBanner();
+      renderStudioCards();
+      renderFrictionHotkeys();
+      updateActiveEdgeBadge();
+      updateRustyQueue();
+
+      // Persist state
+      saveNotebookState();
+    }
+
+    // Render Persona Navigation Quick Tabs
+    function renderPersonaQuickTabs() {
+      const container = document.getElementById('persona-quick-tabs');
+      if (!container) return;
+      container.innerHTML = '';
+
+      Object.values(APP_DATA.personas).forEach(p => {
+        const btn = document.createElement('button');
+        const isActive = p.id === APP_STATE.activePersonaId;
+        btn.onclick = () => loadPersona(p.id);
+        btn.className = `px-2.5 py-1 rounded text-xs hud-label transition flex items-center gap-1.5 ${
+          isActive
+            ? 'bg-[#ff2d78]/20 border border-[#ff2d78] text-white shadow-[0_0_8px_rgba(255,45,120,0.3)]'
+            : 'bg-[#141422] border border-[#302840] text-[#a098b0] hover:text-[#e8e0f0]'
+        }`;
+        btn.innerHTML = `<span>${p.flag}</span> <span class="font-bold">${p.name}</span>`;
+        container.appendChild(btn);
+      });
+    }
+
+    // Render Persona Profile Banner
+    function renderPersonaBanner() {
+      const banner = document.getElementById('persona-profile-banner');
+      if (!banner) return;
+      const p = APP_DATA.personas[APP_STATE.activePersonaId] || APP_DATA.personas['CZ_OVA'];
+
+      banner.innerHTML = `
+        <div class="space-y-1">
+          <span class="hud-label text-[10px] text-[#00ffcc] uppercase">Register &amp; Dialect</span>
+          <div class="text-sm font-bold text-white">${p.flag} ${p.name}</div>
+          <div class="text-[#a098b0]">${p.register}</div>
+        </div>
+        <div class="space-y-1">
+          <span class="hud-label text-[10px] text-[#ff2d78] uppercase">Linguistic Family</span>
+          <div class="text-sm font-bold text-white">${p.family}</div>
+          <div class="text-[#a098b0]">Meter: ${p.meter}</div>
+        </div>
+        <div class="space-y-1">
+          <span class="hud-label text-[10px] text-[#ffe04a] uppercase">Rhythm &amp; Phonetic Cue</span>
+          <div class="text-[#e8e0f0]">${p.rhythmCue}</div>
+        </div>
+        <div class="space-y-1">
+          <span class="hud-label text-[10px] text-[#b388ff] uppercase">Vocal Resonance &amp; Posture</span>
+          <div class="text-[#e8e0f0]">${p.postureCue}</div>
+        </div>
+      `;
+    }
+
+    // ========================================================================
+    // 6. 4-C STUDIO CARDS & SRS INTERACTION
+    // ========================================================================
+    function renderStudioCards() {
+      const container = document.getElementById('cards-container');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const personaCards = APP_DATA.cards.filter(c => c.lang === APP_STATE.activePersonaId);
+      const stageStyles = {
+        COMPLIMENT: { border: 'border-[#ff2d78]', text: 'text-[#ff2d78]', name: '1. COMPLIMENT', num: '01' },
+        CHAMELEON: { border: 'border-[#00ffcc]', text: 'text-[#00ffcc]', name: '2. CHAMELEON', num: '02' },
+        COUNTERACT: { border: 'border-[#b388ff]', text: 'text-[#b388ff]', name: '3. COUNTERACT', num: '03' },
+        CURIOSITY: { border: 'border-[#ffe04a]', text: 'text-[#ffe04a]', name: '4. CURIOSITY', num: '04' }
+      };
+
+      personaCards.forEach(card => {
+        const style = stageStyles[card.stage] || stageStyles.COMPLIMENT;
+        const isSelected = card.uid === APP_STATE.selectedCardUid;
+
+        const cardEl = document.createElement('div');
+        cardEl.className = `neon-panel p-5 flex flex-col justify-between space-y-4 cursor-pointer transition ${
+          isSelected ? `${style.border} shadow-[0_0_16px_rgba(255,45,120,0.2)] bg-[#1e1e30]` : 'hover:border-[#5a5068]'
+        }`;
+        cardEl.onclick = () => selectCard(card.uid);
+
+        // Highlight idiom in text
+        let displayText = card.text;
+        if (card.idiom && displayText.includes(card.idiom)) {
+          displayText = displayText.replace(
+            card.idiom,
+            `<span class="idiom-token font-bold" onclick="event.stopPropagation(); spotlightIdiom('${card.idiom}')">${card.idiom}</span>`
+          );
+        }
+
+        cardEl.innerHTML = `
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="hud-label text-[10px] font-bold ${style.text} tracking-wider">${style.name}</span>
+              <span class="hud-label text-[10px] text-[#a098b0]">${style.num}</span>
+            </div>
+            <p class="text-xs sm:text-sm text-[#e8e0f0] leading-relaxed font-medium">
+              ${displayText}
+            </p>
+          </div>
+          <div class="pt-3 border-t border-[#302840] flex items-center justify-between text-[11px] hud-label">
+            <span class="text-[#a098b0] italic truncate mr-2">${card.cue}</span>
+            <button onclick="event.stopPropagation(); openTeleprompterAtCard('${card.uid}')" class="text-[#00ffcc] hover:underline flex items-center gap-1 shrink-0">
+              <i data-lucide="eye" class="w-3 h-3"></i>
+              <span>Focus</span>
+            </button>
+          </div>
+        `;
+        container.appendChild(cardEl);
+      });
+      lucide.createIcons();
+    }
+
+    function selectCard(uid) {
+      APP_STATE.selectedCardUid = uid;
+      renderStudioCards();
+
+      // Find outbound edge for this card to grade
+      const edge = GRAPH_EDGES.find(e => e.source === uid);
+      if (edge) {
+        APP_STATE.selectedEdgeId = edge.id;
+      }
+      updateActiveEdgeBadge();
+
+      // Update acoustic cue in sidebar
+      const card = APP_DATA.cards.find(c => c.uid === uid);
+      const cueBox = document.getElementById('prosody-cue-text');
+      if (card && cueBox) {
+        cueBox.innerHTML = `<strong>${card.stage} Delivery:</strong> ${card.cue}`;
+      }
+    }
+
+    function updateActiveEdgeBadge() {
+      const edge = GRAPH_EDGES.find(e => e.id === APP_STATE.selectedEdgeId);
+      const label = document.getElementById('active-edge-label');
+      const weightDisp = document.getElementById('active-edge-weight');
+      const fsrsDisp = document.getElementById('active-edge-fsrs');
+
+      if (!edge) return;
+      const srcCard = APP_DATA.cards.find(c => c.uid === edge.source);
+      const tgtCard = APP_DATA.cards.find(c => c.uid === edge.target);
+
+      if (label && srcCard && tgtCard) {
+        const bridgeTxt = edge.type === 'PIVOTS_VIA' ? ' ⚡ PIVOT' : '';
+        label.textContent = `${srcCard.stage.slice(0, 4)} → ${tgtCard.stage.slice(0, 4)}${bridgeTxt}`;
+      }
+      if (weightDisp) weightDisp.textContent = edge.weight.toFixed(2);
+
+      const R = computeRetrievability(edge);
+      if (fsrsDisp) {
+        fsrsDisp.textContent = `R: ${Math.round(R * 100)}% • S: ${(edge.stability || 4).toFixed(1)}d`;
+      }
+    }
+
+    // FSRS Memory Decay Formula: R(t) = (1 + t / (9 * S))^-1
+    function computeRetrievability(edge) {
+      const stability = edge.stability || (edge.drills || 1) * 3.5;
+      const days = edge.daysAgo || 0;
+      return +(Math.pow(1 + days / (9 * stability), -1)).toFixed(2);
+    }
+
+    // SRS Mastery Grader (1 = Rusty, 3 = Solid, 5 = Nailed It)
+    function gradeActiveTransition(score) {
+      const edge = GRAPH_EDGES.find(e => e.id === APP_STATE.selectedEdgeId);
+      if (!edge) return;
+
+      const prevStability = edge.stability || 4.0;
+      if (score === 1) {
+        edge.stability = Math.max(1.5, +(prevStability * 0.45).toFixed(2));
+        edge.weight = Math.max(0.15, +(edge.weight - 0.14).toFixed(2));
+      } else {
+        const mult = score === 5 ? 1.85 : 1.25;
+        edge.stability = +(prevStability * mult).toFixed(2);
+        edge.weight = Math.min(0.99, +(edge.weight + (score - 3) * 0.07 + 0.02).toFixed(2));
+        edge.daysAgo = 0;
+      }
+      edge.drills = (edge.drills || 1) + 1;
+
+      // Show user feedback
+      const fb = document.getElementById('srs-grade-feedback');
+      if (fb) {
+        const status = edge.weight >= 0.85 ? 'MASTERED (Emerald)' : edge.weight < 0.60 ? 'RUSTY (Amber)' : 'ACTIVE (Cyan)';
+        fb.innerHTML = `✓ Graded <strong>${score}/5</strong>! New weight: <span class="text-[#00ffcc] font-mono">${edge.weight.toFixed(2)}</span> • State: <span class="font-bold">${status}</span>`;
+      }
+
+      if (window.PolyglotMobile) window.PolyglotMobile.haptic(15);
+      if (window.PolyglotAPI) {
+        window.PolyglotAPI.gradeTransition(edge.id, score, edge.source, edge.target).then(res => {
+          if (res && res.new_stability) {
+            edge.stability = Number(res.new_stability);
+            updateActiveEdgeBadge();
+          }
+          if (fb && res && res.queued_offline) {
+            fb.innerHTML += ` <span class="text-[#ffe04a] font-mono">[Queued Offline (${res.outbox_count})]</span>`;
+          }
+        }).catch(() => {});
+      }
+
+      updateActiveEdgeBadge();
+      updateRustyQueue();
+      saveNotebookState();
+    }
+
+    // Spotlight regional idiom
+    function spotlightIdiom(term) {
+      const idmData = APP_DATA.idioms[term] || {
+        term,
+        lang: APP_STATE.activePersonaId,
+        origin: 'Regional colloquial',
+        meaning: 'Idiomatic expression',
+        cousin: '---'
+      };
+
+      const box = document.getElementById('idiom-spotlight-box');
+      if (!box) return;
+
+      box.innerHTML = `
+        <div class="bg-[#0a0a12] p-3 rounded border border-[#00ffcc]/40 space-y-1.5">
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-bold text-white font-mono">${idmData.term}</span>
+            <span class="text-[10px] hud-label text-[#00ffcc]">${idmData.lang}</span>
+          </div>
+          <div class="text-[11px] text-[#a098b0]"><strong class="text-[#e8e0f0]">Origin:</strong> ${idmData.origin}</div>
+          <div class="text-[11px] text-[#e8e0f0]"><strong class="text-[#a098b0]">Meaning:</strong> ${idmData.meaning}</div>
+          <div class="text-[11px] text-[#ffe04a] pt-1 border-t border-[#302840]">
+            <strong class="text-[#a098b0]">Cross-Lingual Cousin:</strong> <code>${idmData.cousin}</code>
+          </div>
+        </div>
+      `;
+    }
+
+    // ========================================================================
+    // 7. ROOM-FRICTION OBJECTION RESOLVER (:COUNTERS_STATE)
+    // ========================================================================
+    function renderFrictionHotkeys() {
+      const container = document.getElementById('friction-hotkeys');
+      if (!container) return;
+      container.innerHTML = '';
+
+      APP_DATA.objectionStates.forEach(st => {
+        const btn = document.createElement('button');
+        btn.onclick = () => resolveRoomFriction(st.id);
+        btn.className = 'px-2.5 py-1 rounded bg-[#111118] hover:bg-[#ff2d78]/20 border border-[#ff2d78]/30 hover:border-[#ff2d78] text-[#ffe0ec] text-xs hud-label transition';
+        btn.textContent = st.title;
+        container.appendChild(btn);
+      });
+    }
+
+    function resolveRoomFriction(stateId) {
+      const stateObj = APP_DATA.objectionStates.find(s => s.id === stateId);
+      if (!stateObj) return;
+
+      const targetCard = APP_DATA.cards.find(c => c.uid === stateObj.targetCard);
+      const banner = document.getElementById('friction-resolution-banner');
+      const textDiv = document.getElementById('friction-resolution-text');
+
+      if (banner && textDiv && targetCard) {
+        banner.classList.remove('hidden');
+        textDiv.innerHTML = `
+          <div><strong class="text-[#ff2d78] uppercase hud-label">OBJECTION ROUTED [${stateObj.title}]:</strong> ${stateObj.desc}</div>
+          <div class="text-white font-medium text-xs mt-1">
+            → Cue Pattern Interrupt (<strong>${targetCard.lang}</strong>): <span class="italic">"${targetCard.text}"</span>
+          </div>
+          <div class="text-[11px] text-[#00ffcc] hud-label mt-0.5">Vocal Delivery: ${targetCard.cue}</div>
+        `;
+      }
+      selectCard(targetCard.uid);
+    }
+
+    function dismissFrictionBanner() {
+      const b = document.getElementById('friction-resolution-banner');
+      if (b) b.classList.add('hidden');
+    }
+
+    // ========================================================================
+    // 8. THE WEEKND "ONE OF THE GIRLS" LYRICS ENGINE
+    // ========================================================================
+    function renderWeekndLyrics() {
+      const grid = document.getElementById('weeknd-lyrics-grid');
+      if (!grid) return;
+      grid.innerHTML = '';
+
+      APP_DATA.weekndLyrics.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'neon-panel p-4 space-y-3 flex flex-col justify-between';
+
+        card.innerHTML = `
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="hud-label text-xs font-bold text-[#ff2d78]">[${item.lang}] ${item.persona}</span>
+              <span class="hud-label text-[10px] text-[#00ffcc]">87 BPM</span>
+            </div>
+            <p class="text-xs text-[#e8e0f0] leading-relaxed font-medium">
+              "${item.lyrics}"
+            </p>
+          </div>
+          <div class="pt-2 border-t border-[#302840] text-[11px] hud-label text-[#a098b0]">
+            <i data-lucide="music-2" class="w-3 h-3 inline mr-1 text-[#00ffcc]"></i>
+            <span>${item.rhythmNote}</span>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+      lucide.createIcons();
+    }
+
+    function filterLyricLang(lang) {
+      renderWeekndLyrics();
+    }
+
+    // ========================================================================
+    // 9. CHAMELEON ROULETTE & PIVOT GENERATOR
+    // ========================================================================
+    function spinChameleonRoulette() {
+      const langs = ['CZ_OVA', 'AT_VIE', 'RU_ALA', 'EN_YYC', 'ES_SOT', 'WEEKND'];
+      const stages = ['COMPLIMENT', 'CHAMELEON', 'COUNTERACT', 'CURIOSITY'];
+
+      const chosenChain = stages.map((stage, idx) => {
+        const lockSel = document.getElementById(`lock-stage-${idx + 1}`);
+        const lockedVal = lockSel ? lockSel.value : 'RANDOM';
+        const lang = lockedVal === 'RANDOM' ? langs[Math.floor(Math.random() * langs.length)] : lockedVal;
+        const card = APP_DATA.cards.find(c => c.lang === lang && c.stage === stage);
+        return { stage, lang, card };
+      });
+
+      const display = document.getElementById('roulette-flow-display');
+      if (!display) return;
+      display.innerHTML = '';
+
+      chosenChain.forEach((item, idx) => {
+        const row = document.createElement('div');
+        row.className = 'neon-panel p-4 space-y-2';
+
+        const p = APP_DATA.personas[item.lang] || APP_DATA.personas['CZ_OVA'];
+        row.innerHTML = `
+          <div class="flex items-center justify-between text-xs hud-label">
+            <span class="text-[#ff2d78] font-bold">STAGE ${idx + 1}: ${item.stage}</span>
+            <span class="text-[#00ffcc]">${p.flag} ${p.name} • ${p.bpm} BPM</span>
+          </div>
+          <p class="text-xs sm:text-sm text-[#e8e0f0] font-medium">
+            "${item.card ? item.card.text : 'Monologue phrase'}"
+          </p>
+          <div class="text-[11px] hud-label text-[#a098b0]">
+            Acoustic Pivot: ${item.card ? item.card.cue : ''}
+          </div>
+        `;
+        display.appendChild(row);
+
+        // Insert code-switching bridge if not last stage
+        if (idx < 3) {
+          const bridgeDiv = document.createElement('div');
+          bridgeDiv.className = 'px-4 py-1.5 rounded bg-[#111118] border border-dashed border-[#00ffcc]/40 text-xs font-mono text-[#00ffcc] flex items-center justify-between';
+          bridgeDiv.innerHTML = `
+            <span>⚡ CODE-SWITCH BRIDGE (${item.lang} → ${chosenChain[idx + 1].lang}):</span>
+            <span class="italic text-[#e8e0f0]">"${getBridgePhrase(item.lang, chosenChain[idx + 1].lang)}"</span>
+          `;
+          display.appendChild(bridgeDiv);
+        }
+      });
+    }
+
+    function getBridgePhrase(fromLang, toLang) {
+      const bridge = APP_DATA.bridges.find(b => b.from === fromLang && b.to === toLang);
+      if (bridge) return bridge.text;
+      return `And as we say when the room temperature changes—`;
+    }
+
+    // ========================================================================
+    // 10. D3.JS FORCE-DIRECTED GRAPH & HEATMAP VISUALIZER
+    // ========================================================================
+    let graphSimulation = null;
+    let graphSvg = null;
+
+    function initForceGraphSimulation() {
+      const container = document.getElementById('d3-graph-wrapper');
+      const svgEl = document.getElementById('svg-force-graph');
+      if (!container || !svgEl) return;
+
+      const width = container.clientWidth || 800;
+      const height = container.clientHeight || 560;
+
+      d3.select('#svg-force-graph').selectAll('*').remove();
+      graphSvg = d3.select('#svg-force-graph')
+        .attr('viewBox', [0, 0, width, height]);
+
+      // Zoom container
+      const g = graphSvg.append('g');
+      const zoom = d3.zoom()
+        .scaleExtent([0.4, 3])
+        .on('zoom', (event) => g.attr('transform', event.transform));
+      graphSvg.call(zoom);
+
+      // Prepare nodes & links
+      const nodesMap = new Map();
+
+      // Persona Nodes
+      Object.values(APP_DATA.personas).forEach(p => {
+        nodesMap.set(p.id, { id: p.id, label: p.name, type: 'Persona', color: '#00ffcc', size: 16 });
+      });
+
+      // Card Nodes
+      APP_DATA.cards.forEach(c => {
+        const stageColors = { COMPLIMENT: '#ff2d78', CHAMELEON: '#00ffcc', COUNTERACT: '#b388ff', CURIOSITY: '#ffe04a' };
+        nodesMap.set(c.uid, { id: c.uid, label: `${c.lang} ${c.stage}`, type: 'Card', color: stageColors[c.stage] || '#fff', size: 10, cardData: c });
+      });
+
+      // Objection State Nodes
+      APP_DATA.objectionStates.forEach(s => {
+        nodesMap.set(s.id, { id: s.id, label: s.title, type: 'State', color: '#ff4444', size: 12 });
+      });
+
+      const nodes = Array.from(nodesMap.values());
+      const links = GRAPH_EDGES.map(e => ({
+        id: e.id,
+        source: e.source,
+        target: e.target,
+        type: e.type,
+        weight: e.weight,
+        daysAgo: e.daysAgo,
+        drills: e.drills
+      })).filter(l => nodesMap.has(l.source) && nodesMap.has(l.target));
+
+      // Edges (Links)
+      const link = g.append('g')
+        .selectAll('line')
+        .data(links)
+        .enter()
+        .append('line')
+        .attr('stroke', d => {
+          if (d.type === 'SHARES_VIBE_WITH') return '#ff2d78';
+          if (d.weight >= 0.85 && d.daysAgo < 7) return '#34d399'; // Mastered
+          if (d.weight < 0.60 || d.daysAgo >= 7) return '#ffe04a'; // Rusty
+          return '#00ffcc'; // Active
+        })
+        .attr('stroke-width', d => Math.max(1.5, d.weight * 5))
+        .attr('stroke-dasharray', d => (d.daysAgo >= 7 || d.weight < 0.60) ? '4,4' : 'none')
+        .attr('opacity', 0.85)
+        .attr('cursor', 'pointer')
+        .on('click', (event, d) => inspectGraphEdge(d));
+
+      // Nodes
+      const node = g.append('g')
+        .selectAll('g')
+        .data(nodes)
+        .enter()
+        .append('g')
+        .attr('cursor', 'pointer')
+        .call(d3.drag()
+          .on('start', dragstarted)
+          .on('drag', dragged)
+          .on('end', dragended)
+        )
+        .on('click', (event, d) => inspectGraphNode(d));
+
+      // Node Circles / Diamonds
+      node.each(function(d) {
+        const sel = d3.select(this);
+        if (d.type === 'State') {
+          sel.append('rect')
+            .attr('width', d.size * 1.8)
+            .attr('height', d.size * 1.8)
+            .attr('x', -d.size * 0.9)
+            .attr('y', -d.size * 0.9)
+            .attr('transform', 'rotate(45)')
+            .attr('fill', d.color)
+            .attr('stroke', '#fff')
+            .attr('stroke-width', 1.5);
+        } else {
+          sel.append('circle')
+            .attr('r', d.size)
+            .attr('fill', d.color)
+            .attr('stroke', '#0a0a12')
+            .attr('stroke-width', 2);
+        }
+      });
+
+      // Node Labels
+      node.append('text')
+        .text(d => d.label)
+        .attr('x', d => d.size + 4)
+        .attr('y', 4)
+        .attr('font-size', '9px')
+        .attr('font-family', 'Space Mono, monospace')
+        .attr('fill', '#e8e0f0')
+        .attr('pointer-events', 'none');
+
+      // Simulation
+      graphSimulation = d3.forceSimulation(nodes)
+        .force('link', d3.forceLink(links).id(d => d.id).distance(65))
+        .force('charge', d3.forceManyBody().strength(-140))
+        .force('center', d3.forceCenter(width / 2, height / 2))
+        .force('collision', d3.forceCollide().radius(d => d.size + 15))
+        .on('tick', () => {
+          link
+            .attr('x1', d => d.source.x)
+            .attr('y1', d => d.source.y)
+            .attr('x2', d => d.target.x)
+            .attr('y2', d => d.target.y);
+
+          node.attr('transform', d => `translate(${d.x},${d.y})`);
+        });
+
+      function dragstarted(event, d) {
+        if (!event.active) graphSimulation.alphaTarget(0.3).restart();
+        d.fx = d.x;
+        d.fy = d.y;
+      }
+      function dragged(event, d) {
+        d.fx = event.x;
+        d.fy = event.y;
+      }
+      function dragended(event, d) {
+        if (!event.active) graphSimulation.alphaTarget(0);
+        d.fx = null;
+        d.fy = null;
+      }
+    }
+
+    function inspectGraphNode(d) {
+      const pane = document.getElementById('graph-inspector-pane');
+      if (!pane) return;
+
+      if (d.type === 'Card' && d.cardData) {
+        pane.innerHTML = `
+          <div class="hud-label text-xs font-bold text-[#ff2d78] uppercase">:Card Node Inspection</div>
+          <div class="bg-[#0a0a12] p-3 rounded border border-[#302840] space-y-2 text-xs">
+            <div><strong class="text-[#00ffcc]">UID:</strong> ${d.cardData.uid}</div>
+            <div><strong class="text-[#00ffcc]">Lang:</strong> ${d.cardData.lang} • <strong class="text-[#ff2d78]">${d.cardData.stage}</strong></div>
+            <div><strong class="text-[#a098b0]">Text:</strong> "${d.cardData.text}"</div>
+            <div><strong class="text-[#ffe04a]">Slang:</strong> ${d.cardData.idiom || 'None'}</div>
+            <div><strong class="text-[#b388ff]">Cue:</strong> ${d.cardData.cue}</div>
+          </div>
+          <button onclick="selectCard('${d.cardData.uid}'); switchView('studio');" class="btn-neon-pink w-full py-2 text-xs">
+            Open in 4-C Studio →
+          </button>
+        `;
+      } else if (d.type === 'Persona') {
+        const p = APP_DATA.personas[d.id];
+        pane.innerHTML = `
+          <div class="hud-label text-xs font-bold text-[#00ffcc] uppercase">:Persona Node Inspection</div>
+          <div class="bg-[#0a0a12] p-3 rounded border border-[#302840] space-y-1.5 text-xs">
+            <div><strong class="text-white">${p.flag} ${p.name}</strong> (${p.id})</div>
+            <div><strong class="text-[#a098b0]">Family:</strong> ${p.family}</div>
+            <div><strong class="text-[#a098b0]">BPM:</strong> ${p.bpm} (${p.meter})</div>
+            <div><strong class="text-[#ffe04a]">Rhythm:</strong> ${p.rhythmCue}</div>
+          </div>
+          <button onclick="loadPersona('${d.id}'); switchView('studio');" class="btn-neon-cyan w-full py-2 text-xs">
+            Switch to Persona →
+          </button>
+        `;
+      } else if (d.type === 'State') {
+        pane.innerHTML = `
+          <div class="hud-label text-xs font-bold text-[#ff4444] uppercase">:State Objection Node</div>
+          <div class="bg-[#0a0a12] p-3 rounded border border-[#302840] text-xs">
+            <div><strong>ID:</strong> ${d.id}</div>
+            <p class="text-[#a098b0] mt-1">${d.label}</p>
+          </div>
+          <button onclick="resolveRoomFriction('${d.id}'); switchView('studio');" class="btn-neon-pink w-full py-2 text-xs">
+            Trigger Pattern Interrupt →
+          </button>
+        `;
+      }
+    }
+
+    function inspectGraphEdge(d) {
+      const pane = document.getElementById('graph-inspector-pane');
+      if (!pane) return;
+
+      const edge = GRAPH_EDGES.find(e => e.id === d.id);
+      if (!edge) return;
+      APP_STATE.selectedEdgeId = edge.id;
+
+      pane.innerHTML = `
+        <div class="hud-label text-xs font-bold text-[#34d399] uppercase">Relationship Edge Inspection</div>
+        <div class="bg-[#0a0a12] p-3 rounded border border-[#302840] space-y-1.5 text-xs font-mono">
+          <div><strong class="text-[#00ffcc]">ID:</strong> ${edge.id}</div>
+          <div><strong class="text-[#00ffcc]">Type:</strong> [:${edge.type}]</div>
+          <div><strong class="text-[#ff2d78]">Weight:</strong> ${edge.weight.toFixed(2)}</div>
+          <div><strong class="text-[#ffe04a]">Last Drilled:</strong> ${edge.daysAgo} days ago (${edge.drills} drills)</div>
+          <div><strong class="text-[#34d399]">Stability (S):</strong> ${(edge.stability || 4).toFixed(1)} days</div>
+        </div>
+        <div class="space-y-2 pt-2">
+          <span class="hud-label text-[10px] text-[#a098b0]">QUICK DRILL GRADE:</span>
+          <div class="grid grid-cols-3 gap-1.5">
+            <button onclick="gradeActiveTransition(1); initForceGraphSimulation();" class="py-1.5 bg-[#141422] border border-[#ff4444] text-[#ff4444] text-xs rounded">1 • Rusty</button>
+            <button onclick="gradeActiveTransition(3); initForceGraphSimulation();" class="py-1.5 bg-[#141422] border border-[#00ffcc] text-[#00ffcc] text-xs rounded">3 • Solid</button>
+            <button onclick="gradeActiveTransition(5); initForceGraphSimulation();" class="py-1.5 bg-[#141422] border border-[#34d399] text-[#34d399] text-xs rounded">5 • Nailed</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function resetGraphSimulation() {
+      if (graphSimulation) {
+        graphSimulation.alpha(1).restart();
+      }
+    }
+
+    function filterGraphView(type) {
+      initForceGraphSimulation();
+    }
+
+    function filterGraphRustyOnly() {
+      initForceGraphSimulation();
+    }
+
+    function updateRustyQueue() {
+      const container = document.getElementById('rusty-queue-items');
+      const badge = document.getElementById('badge-rusty-count');
+      if (!container) return;
+
+      const rustyList = GRAPH_EDGES.filter(e => e.weight < 0.60 || e.daysAgo >= 7);
+      if (badge) badge.textContent = `${rustyList.length} Rusty`;
+
+      container.innerHTML = '';
+      if (rustyList.length === 0) {
+        container.innerHTML = `<div class="text-[11px] text-[#34d399] italic">All transition edges currently stable!</div>`;
+        return;
+      }
+
+      rustyList.forEach(e => {
+        const item = document.createElement('div');
+        item.className = 'bg-[#141422] p-2 rounded border border-[#ffe04a]/30 flex items-center justify-between cursor-pointer hover:border-[#ffe04a]';
+        item.onclick = () => {
+          APP_STATE.selectedEdgeId = e.id;
+          updateActiveEdgeBadge();
+          switchView('studio');
+        };
+        item.innerHTML = `
+          <div>
+            <div class="font-bold text-white text-[10px]">${e.source} → ${e.target}</div>
+            <div class="text-[9px] text-[#ffe04a]">${e.daysAgo}d ago • w=${e.weight.toFixed(2)}</div>
+          </div>
+          <button class="px-2 py-0.5 rounded bg-[#ffe04a]/20 text-[#ffe04a] text-[10px]">Drill</button>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    // ========================================================================
+    // 11. TRILINGUAL INTERFERENCE SHIELD & 60s BLITZ DRILL
+    // ========================================================================
+    function renderFalseFriendsTable() {
+      const tbody = document.getElementById('table-false-friends');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      APP_DATA.falseFriends.forEach(ff => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-[#141422]/60';
+        tr.innerHTML = `
+          <td class="py-2 px-3 font-bold text-white font-mono">${ff.cz}</td>
+          <td class="py-2 px-3 text-[#ff4444] font-mono">${ff.ru_trap}</td>
+          <td class="py-2 px-3 text-[#00ffcc] font-mono">${ff.de_calque}</td>
+          <td class="py-2 px-3 text-[#e8e0f0]">${ff.meaning}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function startOrResetBlitz() {
+      const b = APP_STATE.blitzState;
+      if (b.active) {
+        clearInterval(b.timerInterval);
+        b.active = false;
+        b.secondsLeft = 60;
+        document.getElementById('btn-start-blitz').textContent = 'START 60s BLITZ DRILL';
+        return;
+      }
+
+      b.active = true;
+      b.secondsLeft = 60;
+      b.streak = 0;
+      updateBlitzScoreUI();
+      document.getElementById('btn-start-blitz').textContent = 'RESET DRILL';
+
+      nextBlitzQuestion();
+      b.timerInterval = setInterval(() => {
+        b.secondsLeft--;
+        const timerEl = document.getElementById('blitz-timer');
+        if (timerEl) timerEl.textContent = `${b.secondsLeft}s`;
+        if (b.secondsLeft <= 0) {
+          clearInterval(b.timerInterval);
+          b.active = false;
+          alert(`⚡ Time's up! You scored a streak of ${b.streak} verified pitch traps!`);
+          document.getElementById('btn-start-blitz').textContent = 'START 60s BLITZ DRILL';
+        }
+      }, 1000);
+    }
+
+    function nextBlitzQuestion() {
+      const cardBox = document.getElementById('blitz-sparring-card');
+      if (!cardBox) return;
+
+      const ff = APP_DATA.falseFriends[Math.floor(Math.random() * APP_DATA.falseFriends.length)];
+      APP_STATE.blitzState.currentQuestion = ff;
+
+      // Randomize whether question asks for authentic meaning or Russian trap
+      const isTrapQuestion = Math.random() > 0.5;
+
+      cardBox.innerHTML = `
+        <div class="space-y-1">
+          <span class="hud-label text-[10px] text-[#ffe04a] uppercase">Sparring Prompt:</span>
+          <div class="text-base font-bold text-white font-mono">Czech Term: "${ff.cz}"</div>
+          <p class="text-xs text-[#a098b0]">
+            ${isTrapQuestion ? 'What is the dangerous Russian false-friend trap?' : 'What is the true Czech B2B meaning?'}
+          </p>
+        </div>
+        <div class="space-y-1.5 pt-2">
+          <button onclick="answerBlitz(true)" class="w-full py-2 px-3 text-left rounded bg-[#141422] hover:bg-[#302840] text-xs text-[#e8e0f0] border border-[#302840]">
+            A: ${isTrapQuestion ? ff.ru_trap : ff.meaning}
+          </button>
+          <button onclick="answerBlitz(false)" class="w-full py-2 px-3 text-left rounded bg-[#141422] hover:bg-[#302840] text-xs text-[#e8e0f0] border border-[#302840]">
+            B: ${isTrapQuestion ? 'Means ordinary routine without emotion' : 'Means total structural failure'}
+          </button>
+        </div>
+      `;
+    }
+
+    function answerBlitz(isCorrect) {
+      if (!APP_STATE.blitzState.active) return;
+      if (isCorrect) {
+        APP_STATE.blitzState.streak++;
+        updateBlitzScoreUI();
+        nextBlitzQuestion();
+      } else {
+        APP_STATE.blitzState.streak = 0;
+        updateBlitzScoreUI();
+        alert('Trap triggered! Streak reset. Keep eyes on the German calques.');
+        nextBlitzQuestion();
+      }
+    }
+
+    function updateBlitzScoreUI() {
+      const streakEl = document.getElementById('blitz-streak-val');
+      if (streakEl) streakEl.textContent = APP_STATE.blitzState.streak;
+    }
+
+    // ========================================================================
+    // 12. FULLSCREEN TELEPROMPTER ENGINE
+    // ========================================================================
+    function openFullTeleprompter() {
+      const modal = document.getElementById('teleprompter-modal');
+      if (modal) modal.classList.remove('hidden');
+      updateTeleprompterDisplay();
+    }
+
+    function openTeleprompterAtCard(uid) {
+      selectCard(uid);
+      openFullTeleprompter();
+    }
+
+    function closeFullTeleprompter() {
+      const modal = document.getElementById('teleprompter-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function updateTeleprompterDisplay() {
+      const card = APP_DATA.cards.find(c => c.uid === APP_STATE.selectedCardUid) || APP_DATA.cards[0];
+      const p = APP_DATA.personas[card.lang] || APP_DATA.personas['CZ_OVA'];
+
+      const stageBadge = document.getElementById('tp-stage-badge');
+      const personaBadge = document.getElementById('tp-persona-badge');
+      const cueBadge = document.getElementById('tp-cue-badge');
+      const giantText = document.getElementById('tp-giant-text');
+
+      if (stageBadge) stageBadge.textContent = card.stage;
+      if (personaBadge) personaBadge.textContent = `${p.flag} ${p.name}`;
+      if (cueBadge) cueBadge.textContent = `ACOUSTIC CUE: ${card.cue}`;
+      if (giantText) giantText.textContent = `"${card.text}"`;
+    }
+
+    function nextTeleprompterCard() {
+      const personaCards = APP_DATA.cards.filter(c => c.lang === APP_STATE.activePersonaId);
+      const currentIdx = personaCards.findIndex(c => c.uid === APP_STATE.selectedCardUid);
+      const nextIdx = (currentIdx + 1) % personaCards.length;
+      selectCard(personaCards[nextIdx].uid);
+      updateTeleprompterDisplay();
+    }
+
+    function prevTeleprompterCard() {
+      const personaCards = APP_DATA.cards.filter(c => c.lang === APP_STATE.activePersonaId);
+      const currentIdx = personaCards.findIndex(c => c.uid === APP_STATE.selectedCardUid);
+      const prevIdx = (currentIdx - 1 + personaCards.length) % personaCards.length;
+      selectCard(personaCards[prevIdx].uid);
+      updateTeleprompterDisplay();
+    }
+
+    // Keyboard navigation in teleprompter
+    window.addEventListener('keydown', (e) => {
+      const modal = document.getElementById('teleprompter-modal');
+      if (!modal || modal.classList.contains('hidden')) return;
+
+      if (e.key === 'Escape') closeFullTeleprompter();
+      if (e.key === 'ArrowRight') nextTeleprompterCard();
+      if (e.key === 'ArrowLeft') prevTeleprompterCard();
+      if (e.key === ' ') {
+        e.preventDefault();
+        toggleRhythmPlay();
+      }
+    });
+
+    // ========================================================================
+    // 13. WORKBENCH & CYPHER EXPORT ENGINE
+    // ========================================================================
+    function injectCustomCard() {
+      const lang = document.getElementById('new-card-lang').value;
+      const stage = document.getElementById('new-card-stage').value;
+      const text = document.getElementById('new-card-text').value.trim();
+      const idiom = document.getElementById('new-card-idiom').value.trim();
+      const cue = document.getElementById('new-card-cue').value.trim();
+
+      if (!text) {
+        alert('Please enter monologue script text.');
+        return;
+      }
+
+      const uid = `${lang}_${stage}_${Date.now().toString().slice(-4)}`;
+      const newCard = { uid, lang, stage, text, idiom, cue: cue || 'Standard vocal delivery' };
+      APP_DATA.cards.push(newCard);
+
+      // Create sequential edge to previous card if available
+      const lastSameLang = APP_DATA.cards.filter(c => c.lang === lang && c.uid !== uid).pop();
+      if (lastSameLang) {
+        GRAPH_EDGES.push({
+          id: `E_CUST_${Date.now()}`,
+          source: lastSameLang.uid,
+          target: uid,
+          type: 'FLOWS_TO',
+          weight: 0.70,
+          daysAgo: 0,
+          drills: 1,
+          stability: 4.0
+        });
+      }
+
+      if (window.PolyglotAPI && lang !== 'WEEKND') {
+        window.PolyglotAPI.commitNode({
+          uid,
+          register_id: lang,
+          stage,
+          arena: 'terrace',
+          text,
+          idiom_term: idiom || null,
+          delivery_cue: cue || 'Standard vocal delivery',
+          connect_from_uid: lastSameLang ? lastSameLang.uid : null
+        }).catch(() => {});
+      }
+
+      alert(`✓ Card [${uid}] successfully committed to live property graph!`);
+      document.getElementById('new-card-text').value = '';
+      renderStudioCards();
+      renderCypherPreview();
+      saveNotebookState();
+    }
+
+    function generateCypherMigrationScript() {
+      let cypher = `// ========================================================\n`;
+      cypher += `// NEO4J SRS GRAPH MIGRATION: POLYGLOT RIFF STUDIO v4.5\n`;
+      cypher += `// Generated: ${new Date().toISOString()}\n`;
+      cypher += `// ========================================================\n\n`;
+
+      cypher += `CREATE CONSTRAINT card_uid IF NOT EXISTS FOR (c:Card) REQUIRE c.uid IS UNIQUE;\n`;
+      cypher += `CREATE CONSTRAINT persona_id IF NOT EXISTS FOR (p:Persona) REQUIRE p.id IS UNIQUE;\n\n`;
+
+      // Seed Personas
+      cypher += `// 1. Seed Personas\n`;
+      Object.values(APP_DATA.personas).forEach(p => {
+        cypher += `MERGE (p:Persona {id: '${p.id}'}) SET p.name = '${p.name}', p.family = '${p.family}', p.bpm = ${p.bpm};\n`;
+      });
+
+      // Seed Cards
+      cypher += `\n// 2. Seed 4-C Cards\n`;
+      APP_DATA.cards.forEach(c => {
+        const cleanText = c.text.replace(/'/g, "\\'");
+        cypher += `MERGE (c:Card {uid: '${c.uid}'}) SET c.lang = '${c.lang}', c.stage = '${c.stage}', c.text = '${cleanText}';\n`;
+      });
+
+      // Seed Edges
+      cypher += `\n// 3. Seed Weighted SRS Edges\n`;
+      GRAPH_EDGES.forEach(e => {
+        cypher += `MATCH (a:Card {uid: '${e.source}'}), (b:Card {uid: '${e.target}'}) MERGE (a)-[r:${e.type}]->(b) SET r.weight = ${e.weight}, r.days_ago = ${e.daysAgo}, r.drills = ${e.drills};\n`;
+      });
+
+      return cypher;
+    }
+
+    function renderCypherPreview() {
+      const box = document.getElementById('cypher-preview-box');
+      if (box) {
+        box.textContent = generateCypherMigrationScript();
+      }
+    }
+
+    function exportCypherMigration() {
+      const script = generateCypherMigrationScript();
+      if (window.notebookAppApi && window.notebookAppApi.triggerFileDownload) {
+        window.notebookAppApi.triggerFileDownload({
+          content: script,
+          contentType: 'text/plain',
+          encoding: 'UTF-8',
+          filename: 'polyglot_riff_graph_migration.cypher'
+        });
+      } else {
+        const blob = new Blob([script], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'polyglot_riff_graph_migration.cypher';
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+    }
+
+    function exportJsonGraphState() {
+      const payload = JSON.stringify({
+        personas: APP_DATA.personas,
+        cards: APP_DATA.cards,
+        edges: GRAPH_EDGES,
+        savedAt: new Date().toISOString()
+      }, null, 2);
+
+      if (window.notebookAppApi && window.notebookAppApi.triggerFileDownload) {
+        window.notebookAppApi.triggerFileDownload({
+          content: payload,
+          contentType: 'text/plain',
+          encoding: 'UTF-8',
+          filename: 'polyglot_graph_state.json'
+        });
+      } else {
+        const blob = new Blob([payload], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'polyglot_graph_state.json';
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+    }
+
+    // ========================================================================
+    // 14. NOTEBOOK SHIM API PERSISTENCE (getAppState / setAppState)
+    // ========================================================================
+    async function initNotebookPersistence() {
+      try {
+        if (window.notebookAppApi && window.notebookAppApi.getAppState) {
+          const saved = await window.notebookAppApi.getAppState();
+          if (saved && saved.edges) {
+            GRAPH_EDGES = saved.edges;
+            if (saved.customCards && saved.customCards.length > 0) {
+              saved.customCards.forEach(c => {
+                if (!APP_DATA.cards.some(ex => ex.uid === c.uid)) {
+                  APP_DATA.cards.push(c);
+                }
+              });
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('Notebook persistence restore note:', err);
+      }
+    }
+
+    async function saveNotebookState() {
+      try {
+        if (window.notebookAppApi && window.notebookAppApi.setAppState) {
+          await window.notebookAppApi.setAppState({
+            edges: GRAPH_EDGES,
+            activePersonaId: APP_STATE.activePersonaId,
+            currentBpm: APP_STATE.currentBpm,
+            timestamp: Date.now()
+          });
+        }
+      } catch (err) {
+        console.warn('Notebook persistence save note:', err);
+      }
+    }
+
+    // ========================================================================
+    // 15. 6-ANTHEM LIVE HYDRATION & MOBILE TOUCH SWIPE
+    // ========================================================================
+    let V45_ANTHEMS = [
+      {
+        uid: 'SONG_CZ_OVA_NOHAVICA',
+        register_id: 'CZ_OVA',
+        title: 'Ostrava',
+        artist: 'Jaromír Nohavica',
+        city_region: '🇨🇿 Ostrava',
+        bpm: 130,
+        original_lyric: '„Ostrava, Ostrava, město mezi městy, kaj ľudzie fchytaju šichtu a po robotě maju čistý fajront, bo ten motor pojede sám.“',
+        pivot_line: '„Sleduji vaše projekty a má to rozbor... ale upřímně, držet to teď při zemi je zbytečná šichta navíc. Když ten strach pustíš, máš čistý fajront, bo ten motor pojede sám.“',
+        translations: {
+          ES: '"Ostrava, Ostrava, ciudad entre ciudades, donde la gente agarra el turno de trabajo y tras la labor tiene el fajront limpio, porque el motor funcionará solo."',
+          EN: '"Ostrava, Ostrava, city among cities, where people catch their shift and after work enjoy clean quitting time, because the engine will run by itself."',
+          DE: '"Ostrava, Ostrava, Stadt unter Städten, wo die Leute ihre Schicht anpacken und nach der Arbeit sauberen Feierabend haben, weil der Motor von alleine läuft."',
+          RU: '«Острава, Острава, город среди городов, где люди берутся за смену, а после работы у них чистый файронт, потому что этот мотор пойдёт сам.»'
+        }
+      },
+      {
+        uid: 'SONG_AT_VIE_FALCO',
+        register_id: 'AT_VIE',
+        title: 'Vienna Calling',
+        artist: 'Falco',
+        city_region: '🇦🇹 Vienna',
+        bpm: 92,
+        original_lyric: '„Vienna Calling! Oida, die Zeit rennt davon. Kein Stress, der Schmäh rennt eh von allein, musst nur die Vorsicht an der Garderobe abgeben.“',
+        pivot_line: '„Ich sehe, wie professionell Sie das aufgestellt haben... aber geh bitte: jetzt auf Nummer sicher gehen? Da musst du die übertriebene Vorsicht mal an der Garderobe abgeben, Oida!“',
+        translations: {
+          ES: '"¡Llamada desde Viena! Oida, el tiempo se nos va. Cero estrés, el encanto vienés fluye solo de todos modos, solo debes dejar la cautela en el ropero."',
+          EN: '"Vienna Calling! Oida, time is running out. No stress, the Schmäh runs by itself anyway, you just have to check your caution at the coat rack."',
+          CZ: '„Vídeň volá! Oida, čas utíká. Žádný stres, ten Schmäh stejně běží sám od sebe, jen musíš nechat opatrnost v šatně.“',
+          RU: '«Вена вызывает! Oida, время уходит. Никакого стресса, шме и так работает само по себе, надо только сдать осторожность в гардероб.»'
+        }
+      },
+      {
+        uid: 'SONG_RU_ALA_ASTUDIO',
+        register_id: 'RU_ALA',
+        title: 'Джулия (Julia)',
+        artist: 'A-Studio',
+        city_region: '🇰🇿 Almaty',
+        bpm: 88,
+        original_lyric: '«Девочка моя Джулия, под тёплыми звёздами Алматы мы всё сделаем по красоте, базару нет, как за широким дастарханом.»',
+        pivot_line: '«Слушай, родной, скажу как есть: то, что ты собрал — сделали по красоте. Базару нет, мы с тобой одной крови, давай поговорим по душам, как за широким дастарханом.»',
+        translations: {
+          ES: '"Mi chica Julia, bajo las cálidas estrellas de Almaty lo haremos todo con pura belleza, sin duda alguna, como en un gran dastarhan."',
+          EN: '"My girl Julia, under the warm stars of Almaty we will do everything with absolute beauty, zero doubt, like at a wide dastarhan."',
+          CZ: '„Moje holka Julie, pod teplými hvězdami Almaty všechno uděláme po kráse, žádné pochyby, jako u širokého dastarhanu.“',
+          DE: '„Mein Mädchen Julia, unter den warmen Sternen von Almaty machen wir alles in vollendeter Schönheit, ohne Zweifel, wie an einem großen Dastarhan.“'
+        }
+      },
+      {
+        uid: 'SONG_EN_YYC_LOVERBOY',
+        register_id: 'EN_YYC',
+        title: 'Working for the Weekend',
+        artist: 'Loverboy',
+        city_region: '🇨🇦 Calgary',
+        bpm: 116,
+        original_lyric: '"Everybody is working for the weekend, bud! Stop being all hat and no cattle, kick the garage door open and just give ’er!"',
+        pivot_line: '"Hold on a second, bud—what you’ve got going here is the real deal. In a room full of people who are all hat and no cattle, if we kick the garage doors open tonight and just give ’er, where are we taking this thing first?"',
+        translations: {
+          ES: '"¡Todo el mundo trabaja para el fin de semana, viejo! Déjate de postureo sin sustancia, abre la puerta del garaje y ¡dale a todo trapo!"',
+          CZ: '„Všichni makají na víkend, kámo! Přestaň dělat ramena bez výsledků, otevři vrata garáže a prostě to roztaj na plný plyn!“',
+          DE: '„Alle arbeiten fürs Wochenende, Kumpel! Hör auf mit der großen Klappe ohne Substanz, mach das Garagentor auf und gib einfach Vollgas!“',
+          RU: '«Все пашут ради выходных, старина! Хватит понтоваться без дела, выбивай ворота гаража и жми на всю катушку!»'
+        }
+      },
+      {
+        uid: 'SONG_ES_SOT_CAMARON',
+        register_id: 'ES_SOT',
+        title: 'Volando Voy',
+        artist: 'Camarón de la Isla',
+        city_region: '🇪🇸 Sotogrande',
+        bpm: 104,
+        original_lyric: '"Volando voy, volando vengo, por el camino yo me entretengo. Enamorao de la vida, porque esto tiene duende y no hay que mirar los toros desde la barrera."',
+        pivot_line: '«Oye, para el carro un segundo, tío: lo que transmites tiene duende. Eso no se fabrica ni se compra... ¡y ni de coña me digas que vas a mirar los toros desde la barrera!»',
+        translations: {
+          EN: '"Flying I go, flying I come, along the way I enjoy myself. In love with life, because this has true duende and you shouldn\'t watch the bulls from the sidelines."',
+          CZ: '„Létám sem a tam, cestou se bavím. Zamilovaný do života, bo to má skutočný duende a nemá smysl koukat na býky jen z bariéry.“',
+          DE: '"Fliegend komme ich, fliegend gehe ich, unterwegs genieße ich das Leben. Verliebt ins Leben, weil das echten Duende hat und man die Stiere nicht von der Tribüne aus beobachten sollte."',
+          RU: '«Лечу туда, лечу обратно, по дороге наслаждаюсь жизнью. Влюблённый в жизнь, потому что в этом есть настоящий дуэнде, и нечего смотреть на быков с трибуны.»'
+        }
+      },
+      {
+        uid: 'SONG_WEEKND_OOTG',
+        register_id: 'WEEKND',
+        title: 'One of the Girls',
+        artist: 'The Weeknd ft. JENNIE & Lily-Rose Depp',
+        city_region: '✨ Global Synthwave',
+        bpm: 87,
+        original_lyric: '"Give me tough love, leave me with no breath... Push me down on my knees, tell me I belong to the world."',
+        pivot_line: '"Zero corporate polish... give me tough love and tell me I belong to the world. We’re both cut from that same late-night frequency: addicted to the rush, zero patience for the ordinary."',
+        translations: {
+          ES: '"Dame amor duro, déjame sin aliento... Empújame de rodillas, dime que pertenezco al mundo."',
+          CZ: '„Dej mi tvrdou lásku, nech mě bez dechu... Sraz mě na kolena, řekni mi, že patřím světu.“',
+          DE: '"Gib mir harte Liebe, lass mich atemlos... Drück mich auf die Knie, sag mir, dass ich der Welt gehöre."',
+          RU: '«Дай мне суровую любовь, оставь меня без дыхания... Поставь меня на колени, скажи, что я принадлежу миру.»'
+        }
+      }
+    ];
+    let selectedV45AnthemIdx = 0;
+
+    function selectV45Anthem(idx) {
+      selectedV45AnthemIdx = idx;
+      const s = V45_ANTHEMS[idx] || V45_ANTHEMS[0];
+      if (s && s.register_id && APP_DATA.personas[s.register_id]) {
+        loadPersona(s.register_id);
+      }
+      renderV45Anthems();
+    }
+
+    function renderV45Anthems() {
+      const tabsEl = document.getElementById('v45-anthem-tabs');
+      const boxEl = document.getElementById('v45-selected-anthem-box');
+      if (!tabsEl || !boxEl) return;
+
+      tabsEl.innerHTML = V45_ANTHEMS.map((s, i) => `
+        <button onclick="selectV45Anthem(${i})" class="px-3 py-1.5 rounded text-xs hud-label whitespace-nowrap transition ${
+          i === selectedV45AnthemIdx
+            ? 'bg-[#ff2d78] text-white font-bold shadow-[0_0_12px_rgba(255,45,120,0.4)]'
+            : 'bg-[#141422] hover:bg-[#1e1e30] text-[#a098b0] border border-[#302840]'
+        }">
+          ${s.city_region || s.register_id} • ${s.title} (${s.bpm} BPM)
+        </button>
+      `).join('');
+
+      const cur = V45_ANTHEMS[selectedV45AnthemIdx] || V45_ANTHEMS[0];
+      const transEntries = Object.entries(cur.translations || {}).filter(([, v]) => v);
+      boxEl.innerHTML = `
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-[#302840] pb-2">
+          <div>
+            <span class="text-sm font-bold text-white">${cur.artist} — "${cur.title}"</span>
+            <span class="ml-2 text-[11px] hud-label text-[#00ffcc]">${cur.bpm} BPM • ${cur.uid}</span>
+          </div>
+          <button onclick="loadPersona('${cur.register_id || 'CZ_OVA'}'); switchView('studio');" class="btn-neon-cyan px-2.5 py-1 text-[11px]">
+            Open ${cur.register_id} 4-C Deck →
+          </button>
+        </div>
+        <div class="text-sm text-[#ffe04a] italic font-medium pt-1">${cur.original_lyric}</div>
+        <div class="bg-[#141422] p-3 rounded border border-[#ff2d78]/30 space-y-1">
+          <div class="hud-label text-[10px] text-[#ff2d78] font-bold uppercase">4-C Code-Switching Pivot Line:</div>
+          <div class="text-[#e8e0f0]">${cur.pivot_line}</div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+          ${transEntries.map(([k, v]) => `
+            <div class="bg-[#111118] p-2 rounded border border-[#302840]">
+              <span class="hud-label text-[10px] text-[#00ffcc] font-bold">${k}:</span>
+              <span class="text-[#a098b0] ml-1">${v}</span>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    async function hydrateV45FromBackend() {
+      if (!window.PolyglotAPI) return;
+      try {
+        const songRes = await window.PolyglotAPI.fetchSongs();
+        if (songRes && Array.isArray(songRes.songs) && songRes.songs.length >= 6) {
+          V45_ANTHEMS = songRes.songs;
+          const badge = document.getElementById('anthem-sync-badge');
+          if (badge) {
+            badge.textContent = songRes.offlineShardMode ? 'Offline .db.json (6 Songs)' : 'Live PG+Neo4j (6 Songs)';
+          }
+          renderV45Anthems();
+        }
+        const st = await window.PolyglotAPI.fetchFullState(false);
+        if (st && Array.isArray(st.edges) && st.edges.length > 0) {
+          st.edges.forEach(liveEdge => {
+            const localEdge = GRAPH_EDGES.find(e => e.id === liveEdge.id);
+            if (localEdge) {
+              localEdge.weight = Number(liveEdge.weight || localEdge.weight);
+              localEdge.stability = Number(liveEdge.stability || localEdge.stability);
+              localEdge.drills = Number(liveEdge.drills || localEdge.drills);
+              localEdge.daysAgo = Number(liveEdge.daysAgo || 0);
+            }
+          });
+          updateActiveEdgeBadge();
+          updateRustyQueue();
+        }
+      } catch (_) {}
+    }
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      initStepLeds();
+      await initNotebookPersistence();
+      renderPersonaQuickTabs();
+      renderPersonaBanner();
+      renderStudioCards();
+      renderFrictionHotkeys();
+      renderV45Anthems();
+      renderWeekndLyrics();
+      renderFalseFriendsTable();
+      renderCypherPreview();
+      updateRustyQueue();
+      lucide.createIcons();
+      hydrateV45FromBackend();
+
+      if (window.PolyglotMobile) {
+        window.PolyglotMobile.attachSwipe(document.getElementById('teleprompter-modal'), {
+          onSwipeLeft: () => nextTeleprompterCard(),
+          onSwipeRight: () => prevTeleprompterCard()
+        });
+      }
+
+      // Notify App Ready to host environment
+      if (window.notebookAppApi && window.notebookAppApi.notifyAppReady) {
+        window.notebookAppApi.notifyAppReady();
+      }
+    });
+  </script>
+</body>
+</html>

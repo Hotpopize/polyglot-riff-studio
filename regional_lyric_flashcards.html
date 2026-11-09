@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Polyglot Audio-Rhythm Anthem Studio & Flashcard Deck</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tone@14.9.17/build/Tone.js"></script>
+  <script src="polyglot_api_client.js"></script>
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #080911; color: #f1f5f9; -webkit-tap-highlight-color: transparent; }
+    button { touch-action: manipulation; }
+    h1, h2, h3, .font-headline { font-family: 'Sora', sans-serif; }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+    .neon-panel {
+      background: radial-gradient(ellipse at 50% 50%, rgba(26, 32, 53, 0.95) 0%, rgba(10, 12, 22, 0.98) 90%);
+      border: 1px solid rgba(245, 158, 11, 0.25);
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.7);
+    }
+    .neon-panel-subtle {
+      background: rgba(15, 19, 32, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .perspective-card { perspective: 1000px; }
+    .card-inner {
+      transition: transform 0.6s cubic-bezier(0.2, 0.85, 0.4, 1.2);
+      transform-style: preserve-3d;
+    }
+    .card-inner.is-flipped { transform: rotateY(180deg); }
+    .card-face {
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+    .card-back { transform: rotateY(180deg); }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-amber-500 selection:text-black">
+
+  <!-- TOP HEADER -->
+  <header class="border-b border-slate-800/80 bg-slate-950/90 backdrop-blur sticky top-0 z-30 px-4 py-3">
+    <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-500 via-rose-500 to-purple-600 flex items-center justify-center font-bold text-white shadow-lg shadow-amber-500/20">
+          <i data-lucide="music-2" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-sm sm:text-base font-bold text-white tracking-tight">REGIONAL ANTHEMS & 4-C PIVOT STUDIO</h1>
+            <span class="text-[10px] mono px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30 font-semibold uppercase">6 Anthems Loaded</span>
+          </div>
+          <p class="text-[11px] text-slate-400">Jaromír Nohavica • Falco • A-Studio • Loverboy • Camarón de la Isla • The Weeknd</p>
+        </div>
+      </div>
+
+      <!-- Audio Rhythm Player Trigger -->
+      <div class="flex items-center gap-2">
+        <button id="masterAudioBtn" onclick="toggleAudio()" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-amber-500 hover:bg-amber-400 text-slate-950 transition flex items-center gap-1.5 shadow-md">
+          <i data-lucide="play" id="audioIcon" class="w-3.5 h-3.5 fill-current"></i>
+          <span id="audioLabel">Play Cadence Beat</span>
+        </button>
+        <span id="bpmBadge" class="text-xs mono px-2 py-1 rounded bg-slate-900 border border-slate-800 text-amber-300 font-semibold">130 BPM</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN INTERFACE -->
+  <main class="max-w-6xl w-full mx-auto p-4 sm:p-6 space-y-6 flex-1">
+
+    <!-- TRACK SELECTOR TABS -->
+    <div class="flex items-center gap-1.5 overflow-x-auto pb-1" id="trackTabs"></div>
+
+    <!-- MAIN SPOTLIGHT: ANTHEM & FLASHCARD GRID -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- LEFT: INTERACTIVE 3D LYRIC FLASHCARD (7 COLS) -->
+      <div class="lg:col-span-7 space-y-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">
+            <i data-lucide="layers" class="w-4 h-4 text-amber-400"></i>
+            <span>Interactive 3D Cadence Flashcard</span>
+          </div>
+          <span class="text-[11px] text-slate-400 italic">Tap/Space to flip • Swipe ⇄ to switch</span>
+        </div>
+
+        <div id="flashcardTouchZone" class="perspective-card min-h-[380px] sm:min-h-[400px] cursor-pointer select-none" onclick="flipCard()">
+          <div id="flashcardInner" class="card-inner relative w-full h-full min-h-[380px] sm:min-h-[400px] rounded-2xl neon-panel p-5 sm:p-8 flex flex-col justify-between">
+            
+            <!-- FRONT: ORIGINAL DIALECT & REGIONAL ANTHEM -->
+            <div class="card-face w-full h-full flex flex-col justify-between space-y-6">
+              <div>
+                <div class="flex items-center justify-between text-xs mono mb-3">
+                  <span id="cardBadge" class="px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold">🇨🇿 OSTRAVA</span>
+                  <span id="cardGenre" class="text-slate-400">Industrial Miner Grit</span>
+                </div>
+                <h2 id="cardTitle" class="text-2xl font-bold text-white tracking-tight">Ostrava</h2>
+                <div id="cardArtist" class="text-sm font-semibold text-amber-400 mb-4">Jaromír Nohavica</div>
+                <p id="cardLyric" class="text-lg sm:text-xl font-medium text-slate-100 leading-relaxed italic bg-slate-950/60 p-4 rounded-xl border border-slate-800/80">
+                  „Ostrava, Ostrava, město mezi městy, kaj ľudzie fchytaju šichtu a po robotě maju čistý fajront, bo ten motor pojede sám.“
+                </p>
+              </div>
+
+              <div class="pt-4 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
+                <span id="cardSlang" class="mono text-amber-300 font-semibold">Anchors: šichta • fajront • bo</span>
+                <span class="flex items-center gap-1 text-slate-300 hover:text-white">
+                  <span>See 5-Language Translations</span>
+                  <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                </span>
+              </div>
+            </div>
+
+            <!-- BACK: MULTI-LANGUAGE TRANSLATIONS -->
+            <div class="card-face card-back absolute inset-0 w-full h-full p-6 sm:p-8 flex flex-col justify-between bg-slate-950 rounded-2xl border border-amber-500/30">
+              <div class="space-y-3">
+                <div class="flex items-center justify-between text-xs mono border-b border-slate-800 pb-2">
+                  <span class="text-amber-300 font-bold uppercase">Cross-Lingual Idiom Mapping</span>
+                  <span class="text-slate-400">Flip back [↺]</span>
+                </div>
+                <div id="translationsBox" class="space-y-2 text-xs leading-relaxed max-h-[260px] overflow-y-auto pr-1"></div>
+              </div>
+              <div class="text-[11px] text-slate-400 italic pt-2 border-t border-slate-800">
+                Syllabic rhythm preserved for natural code-switching practice.
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- FLIP & CADENCE CONTROLS -->
+        <div class="flex items-center justify-between gap-3 pt-1">
+          <button onclick="flipCard()" class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs font-semibold text-slate-300 hover:text-white transition flex items-center gap-1.5">
+            <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i>
+            <span>Flip Flashcard</span>
+          </button>
+          <div class="flex items-center gap-2">
+            <button onclick="prevTrack()" class="w-9 h-9 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 flex items-center justify-center transition">
+              <i data-lucide="chevron-left" class="w-4 h-4"></i>
+            </button>
+            <button onclick="nextTrack()" class="w-9 h-9 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 flex items-center justify-center transition">
+              <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: 4-C CODE-SWITCHING PIVOT & VOCAL DRILL (5 COLS) -->
+      <div class="lg:col-span-5 space-y-4">
+        <div class="flex items-center gap-2 text-xs font-semibold text-amber-400 uppercase tracking-wider">
+          <i data-lucide="zap" class="w-4 h-4"></i>
+          <span>4-C Code-Switching Riff</span>
+        </div>
+
+        <div class="neon-panel-subtle rounded-2xl p-6 space-y-4 border border-amber-500/25">
+          <div class="flex items-center justify-between">
+            <span id="pivotStageBadge" class="text-xs mono font-bold px-2.5 py-1 rounded-md bg-rose-500/20 text-rose-300 border border-rose-500/30">
+              COUNTERACT • PATTERN INTERRUPT
+            </span>
+            <span id="pivotDropBadge" class="text-xs mono text-amber-300">-5 ST Pitch Drop</span>
+          </div>
+
+          <div class="space-y-1.5">
+            <label class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">Executive-to-Regional Transition:</label>
+            <p id="pivotText" class="text-sm font-medium text-white leading-relaxed bg-slate-950/80 p-4 rounded-xl border border-slate-800">
+              „Sleduji vaše projekty a má to rozbor... ale upřímně, držet to teď při zemi je zbytečná šichta navíc. Když ten strach pustíš, máš čistý fajront, bo ten motor pojede sám.“
+            </p>
+          </div>
+
+          <div class="space-y-2 text-xs text-slate-300 bg-slate-900/60 p-3.5 rounded-xl border border-slate-800/80">
+            <div class="font-semibold text-amber-300 flex items-center gap-1.5">
+              <i data-lucide="mic" class="w-3.5 h-3.5"></i>
+              <span>Vocal & Cadence Delivery Rule:</span>
+            </div>
+            <p id="deliveryRule" class="text-slate-300 leading-relaxed text-[11px]">
+              Start formal with precise consonant enunciations, then drop vocal pitch by 5 semitones on "ale upřímně" and clip short vowels on "šichta" and "bo".
+            </p>
+          </div>
+
+          <button onclick="speakCadenceGuide()" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-500/20 to-rose-500/20 hover:from-amber-500/30 hover:to-rose-500/30 border border-amber-500/30 text-amber-300 text-xs font-semibold transition flex items-center justify-center gap-2">
+            <i data-lucide="volume-2" class="w-4 h-4"></i>
+            <span>Play Metronome Chime for Drill</span>
+          </button>
+
+          <!-- LIVE FSRS 1-5 CADENCE GRADING BAR -->
+          <div class="pt-3 border-t border-slate-800/90 space-y-2">
+            <div class="flex items-center justify-between text-[11px] mono">
+              <span class="text-slate-400 font-semibold uppercase">FSRS 4-C Pivot Drill Grade</span>
+              <span id="fsrsTelemetryPill" class="px-2 py-0.5 rounded bg-emerald-950/70 border border-emerald-500/30 text-emerald-300">
+                R(t)=94% • S=6.5d • Edge: E_CZ_3
+              </span>
+            </div>
+            <div class="grid grid-cols-5 gap-1.5">
+              <button onclick="gradeAnthemPivot(1)" class="py-2 rounded-lg bg-rose-950/60 hover:bg-rose-900/80 border border-rose-500/30 text-rose-300 text-[11px] font-bold mono transition">
+                1 Freeze
+              </button>
+              <button onclick="gradeAnthemPivot(2)" class="py-2 rounded-lg bg-orange-950/60 hover:bg-orange-900/80 border border-orange-500/30 text-orange-300 text-[11px] font-bold mono transition">
+                2 Stiff
+              </button>
+              <button onclick="gradeAnthemPivot(3)" class="py-2 rounded-lg bg-amber-950/60 hover:bg-amber-900/80 border border-amber-500/30 text-amber-300 text-[11px] font-bold mono transition">
+                3 Pass
+              </button>
+              <button onclick="gradeAnthemPivot(4)" class="py-2 rounded-lg bg-teal-950/60 hover:bg-teal-900/80 border border-teal-500/30 text-teal-300 text-[11px] font-bold mono transition">
+                4 Smooth
+              </button>
+              <button onclick="gradeAnthemPivot(5)" class="py-2 rounded-lg bg-emerald-950/70 hover:bg-emerald-900/90 border border-emerald-500/40 text-emerald-300 text-[11px] font-bold mono transition">
+                5 Groove
+              </button>
+            </div>
+            <div id="fsrsFeedbackMsg" class="text-[11px] mono text-slate-400 text-center min-h-[16px]"></div>
+          </div>
+        </div>
+
+        <!-- QUICK CYPHER MIGRATION REFERENCE -->
+        <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs space-y-1.5">
+          <div class="flex items-center justify-between text-slate-400 mono text-[10px]">
+            <span>CYPHER NODE UID</span>
+            <span class="text-emerald-400">NEO4J v3.3</span>
+          </div>
+          <div id="cypherUidTag" class="mono text-indigo-300 font-semibold truncate">
+            (:Song {uid: 'SONG_CZ_OVA_NOHAVICA'})
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <script>
+    const ANTHEMS = [
+      {
+        id: 'CZ_OVA',
+        flag: '🇨🇿',
+        city: 'Ostrava',
+        title: 'Ostrava',
+        artist: 'Jaromír Nohavica',
+        genre: 'Industrial Miner Grit • Ostravština',
+        bpm: 130,
+        lyric: '„Ostrava, Ostrava, město mezi městy, kaj ľudzie fchytaju šichtu a po robotě maju čistý fajront, bo ten motor pojede sám.“',
+        slang: 'šichta • fajront • bo',
+        cypherUid: '(:Song {uid: \'SONG_CZ_OVA_NOHAVICA\'})-[:REINFORCES_CARD_VIBE]->(CZ_OVA_COUNT)',
+        translations: [
+          { lang: '🇪🇸 Spanish', text: '"Ostrava, Ostrava, ciudad entre ciudades, donde la gente agarra el turno de trabajo y tras la labor tiene el fajront limpio, porque el motor funcionará solo."' },
+          { lang: '🇬🇧 English', text: '"Ostrava, Ostrava, city among cities, where people catch their shift and after work enjoy clean quitting time, because the engine will run by itself."' },
+          { lang: '🇩🇪 German', text: '"Ostrava, Ostrava, Stadt unter Städten, wo die Leute ihre Schicht anpacken und nach der Arbeit sauberen Feierabend haben, weil der Motor von alleine läuft."' },
+          { lang: '🇷🇺 Russian', text: '«Острава, Острава, город среди городов, где люди берутся за смену, а после работы у них чистый файронт, потому что этот мотор пойдёт сам.»' }
+        ],
+        pivotStage: 'COUNTERACT • PATTERN INTERRUPT',
+        pivotDrop: '-5 ST Pitch Drop',
+        pivotText: '„Sleduji vaše projekty a má to rozbor... ale upřímně, držet to teď při zemi je zbytečná šichta navíc. Když ten strach pustíš, máš čistý fajront, bo ten motor pojede sám.“',
+        deliveryRule: 'Start in formal executive register, then drop pitch by -5 semitones on "ale upřímně" and clip short vowels on "šichta" and "bo" (strictly because).'
+      },
+      {
+        id: 'AT_VIE',
+        flag: '🇦🇹',
+        city: 'Vienna',
+        title: 'Vienna Calling',
+        artist: 'Falco (Johann Hölzel)',
+        genre: 'Austropop • Wiener Schmäh (92 BPM)',
+        bpm: 92,
+        lyric: '„Vienna Calling! Oida, die Zeit rennt davon. Kein Stress, der Schmäh rennt eh von allein, musst nur die Vorsicht an der Garderobe abgeben.“',
+        slang: 'Oida • der Schmäh • eh • Garderobe',
+        cypherUid: '(:Song {uid: \'SONG_AT_VIE_FALCO\'})-[:REINFORCES_CARD_VIBE]->(AT_VIE_CHAM)',
+        translations: [
+          { lang: '🇪🇸 Spanish', text: '"¡Llamada desde Viena! Oida, el tiempo se nos va. Cero estrés, el encanto vienés fluye solo de todos modos, solo debes dejar la cautela en el ropero."' },
+          { lang: '🇨🇿 Czech', text: '„Vídeň volá! Oida, čas utíká. Žádný stres, ten Schmäh stejně běží sám od sebe, jen musíš nechat opatrnost v šatně.“' },
+          { lang: '🇬🇧 English', text: '"Vienna Calling! Oida, time is running out. No stress, the Schmäh runs by itself anyway, you just have to check your caution at the coat rack."' },
+          { lang: '🇷🇺 Russian', text: '«Вена вызывает! Oida, время уходит. Никакого стресса, шме и так работает само по себе, надо только сдать осторожность в гардероб.»' }
+        ],
+        pivotStage: 'CHAMELEON • VELVET PUSHBACK',
+        pivotDrop: '-4 ST Modal Glide',
+        pivotText: '„Ich sehe, wie professionell Sie das aufgestellt haben... aber geh bitte: jetzt auf Nummer sicher gehen? Da musst du die übertriebene Vorsicht mal an der Garderobe abgeben, Oida!“',
+        deliveryRule: 'Slight syncopated waltz swing on "aber geh bitte", stretched vowel on "Oida" with ironic detachment.'
+      },
+      {
+        id: 'RU_ALA',
+        flag: '🇰🇿',
+        city: 'Almaty',
+        title: 'Джулия (Julia)',
+        artist: 'A-Studio / Batyrkhan Shukenov',
+        genre: 'Almaty Soul & High-Trust Hospitality',
+        bpm: 88,
+        lyric: '«Девочка моя Джулия, под тёплыми звёздами Алматы мы всё сделаем по красоте, базару нет, как за широким дастарханом.»',
+        slang: 'по красоте • базару нет • дастархан',
+        cypherUid: '(:Song {uid: \'SONG_RU_ALA_ASTUDIO\'})-[:REINFORCES_CARD_VIBE]->(RU_ALA_COMP)',
+        translations: [
+          { lang: '🇪🇸 Spanish', text: '"Mi chica Julia, bajo las cálidas estrellas de Almaty lo haremos todo con pura belleza, sin duda alguna, como en un gran dastarhan."' },
+          { lang: '🇬🇧 English', text: '"My girl Julia, under the warm stars of Almaty we will do everything with absolute beauty, zero doubt, like at a wide dastarhan."' },
+          { lang: '🇨🇿 Czech', text: '„Moje holka Julie, pod teplými hvězdami Almaty všechno uděláme po kráse, žádné pochyby, jako u širokého dastarhanu.“' },
+          { lang: '🇩🇪 German', text: '„Mein Mädchen Julia, unter den warmen Sternen von Almaty machen wir alles in vollendeter Schönheit, ohne Zweifel, wie an einem großen Dastarhan.“' }
+        ],
+        pivotStage: 'COMPLIMENT • HIGH-TRUST RAPPORT',
+        pivotDrop: 'Deep Chest Resonance',
+        pivotText: '«Слушай, родной, скажу как есть: то, что ты собрал — сделали по красоте. Базару нет, мы с тобой одной крови, давай поговорим по душам, как за широким дастарханом.»',
+        deliveryRule: 'Warm opening resonance on kinship vocative "родной", followed by grounded tempo deceleration on "базару нет".'
+      },
+      {
+        id: 'EN_YYC',
+        flag: '🇨🇦',
+        city: 'Calgary',
+        title: 'Working for the Weekend',
+        artist: 'Loverboy',
+        genre: 'Western Canadian Arena Rock (116 BPM)',
+        bpm: 116,
+        lyric: '"Everybody is working for the weekend, bud! Stop being all hat and no cattle, kick the garage door open and just give ’er!"',
+        slang: 'all hat and no cattle • give ’er • bud',
+        cypherUid: '(:Song {uid: \'SONG_EN_YYC_LOVERBOY\'})-[:REINFORCES_CARD_VIBE]->(EN_YYC_CUR)',
+        translations: [
+          { lang: '🇪🇸 Spanish', text: '"¡Todo el mundo trabaja para el fin de semana, viejo! Déjate de postureo sin sustancia, abre la puerta del garaje y ¡dale a todo trapo!"' },
+          { lang: '🇨🇿 Czech', text: '„Všichni makají na víkend, kámo! Přestaň dělat ramena bez výsledků, otevři vrata garáže a prostě to roztaj na plný plyn!“' },
+          { lang: '🇩🇪 German', text: '„Alle arbeiten fürs Wochenende, Kumpel! Hör auf mit der großen Klappe ohne Substanz, mach das Garagentor auf und gib einfach Vollgas!“' },
+          { lang: '🇷🇺 Russian', text: '«Все пашут ради выходных, старина! Хватит понтоваться без дела, выбивай ворота гаража и жми на всю катушку!»' }
+        ],
+        pivotStage: 'CURIOSITY • MECHANICAL MOMENTUM',
+        pivotDrop: 'Percussive Gravel Punch',
+        pivotText: '"Hold on a second, bud—what you’ve got going here is the real deal. In a room full of people who are all hat and no cattle, if we kick the garage doors open tonight and just give ’er, where are we taking this thing first?"',
+        deliveryRule: 'Unapologetic gravel tone, punchy monosyllabic cadence on "all hat and no cattle", smiling pushback on "give ’er".'
+      },
+      {
+        id: 'ES_SOT',
+        flag: '🇪🇸',
+        city: 'Sotogrande',
+        title: 'Volando Voy',
+        artist: 'Camarón de la Isla (Kiko Veneno)',
+        genre: 'Flamenco-Rumba • Andaluz Duende',
+        bpm: 104,
+        lyric: '"Volando voy, volando vengo, por el camino yo me entretengo. Enamorao de la vida, porque esto tiene duende y no hay que mirar los toros desde la barrera."',
+        slang: 'duende • mirar los toros desde la barrera',
+        cypherUid: '(:Song {uid: \'SONG_ES_SOT_CAMARON\'})-[:REINFORCES_CARD_VIBE]->(ES_SOT_COMP)',
+        translations: [
+          { lang: '🇬🇧 English', text: '"Flying I go, flying I come, along the way I enjoy myself. In love with life, because this has true duende and you shouldn\'t watch the bulls from the sidelines."' },
+          { lang: '🇨🇿 Czech', text: '„Létám sem a tam, cestou se bavím. Zamilovaný do života, bo to má skutočný duende a nemá smysl koukat na býky jen z bariéry.“' },
+          { lang: '🇩🇪 German', text: '"Fliegend komme ich, fliegend gehe ich, unterwegs genieße ich das Leben. Verliebt ins Leben, weil das echten Duende hat und man die Stiere nicht von der Tribüne aus beobachten sollte."' },
+          { lang: '🇷🇺 Russian', text: '«Лечу туда, лечу обратно, по дороге наслаждаюсь жизнью. Влюблённый в жизнь, потому что в этом есть настоящий дуэнде, и нечего смотреть на быков с трибуны.»' }
+        ],
+        pivotStage: 'COMPLIMENT • PATTERN INTERRUPT',
+        pivotDrop: 'Sun-soaked Staccato & Pauses',
+        pivotText: '«Oye, para el carro un segundo, tío: lo que transmites tiene duende. Eso no se fabrica ni se compra... ¡y ni de coña me digas que vas a mirar los toros desde la barrera!»',
+        deliveryRule: 'Rapid melodic bursts followed by conspiratorial pauses, expressive hand gestures, unapologetic warmth.'
+      },
+      {
+        id: 'WEEKND',
+        flag: '✨',
+        city: 'Global Pop',
+        title: 'One of the Girls',
+        artist: 'The Weeknd ft. JENNIE & Lily-Rose Depp',
+        genre: 'Nocturnal R&B • Dark Synthwave (87 BPM)',
+        bpm: 87,
+        lyric: '"Give me tough love, leave me with no breath... Push me down on my knees, tell me I belong to the world."',
+        slang: 'tough love • velvet surrender • high-stakes devotion',
+        cypherUid: '(:Song {uid: \'SONG_WEEKND_OOTG\'})-[:REINFORCES_CARD_VIBE]->(EN_YYC_CHAM)',
+        translations: [
+          { lang: '🇪🇸 Spanish', text: '"Dame amor duro, déjame sin aliento... Empújame de rodillas, dime que pertenezco al mundo."' },
+          { lang: '🇨🇿 Czech', text: '„Dej mi tvrdou lásku, nech mě bez dechu... Sraz mě na kolena, řekni mi, že patřím světu.“' },
+          { lang: '🇩🇪 German', text: '"Gib mir harte Liebe, lass mich atemlos... Drück mich auf die Knie, sag mir, dass ich der Welt gehöre."' },
+          { lang: '🇷🇺 Russian', text: '«Дай мне суровую любовь, оставь меня без дыхания... Поставь меня на колени, скажи, что я принадлежу миру.»' }
+        ],
+        pivotStage: 'CHAMELEON • INTENSE DEVOTION',
+        pivotDrop: '-5 ST Sultry Breath Glide',
+        pivotText: '"Zero corporate polish... give me tough love and tell me I belong to the world. We’re both cut from that same late-night frequency: addicted to the rush, zero patience for the ordinary."',
+        deliveryRule: 'Silky intimate legato phrasing, breathy vocal drop on "tough love", unblinking eye contact.'
+      }
+    ];
+
+    let currentIdx = 0;
+    let isFlipped = false;
+    let isAudioPlaying = false;
+    let synths = null;
+    let loopId = null;
+
+    const ANTHEM_EDGE_MAP = {
+      CZ_OVA: { edgeId: 'E_CZ_3', cardUid: 'CZ_OVA_COUNT', stability: 6.5, retrievability: 94, drills: 4 },
+      AT_VIE: { edgeId: 'E_AT_1', cardUid: 'AT_VIE_CHAM', stability: 7.2, retrievability: 95, drills: 5 },
+      RU_ALA: { edgeId: 'E_RU_1', cardUid: 'RU_ALA_COMP', stability: 8.1, retrievability: 96, drills: 6 },
+      EN_YYC: { edgeId: 'E_EN_1', cardUid: 'EN_YYC_CUR', stability: 6.8, retrievability: 93, drills: 4 },
+      ES_SOT: { edgeId: 'E_ES_1', cardUid: 'ES_SOT_COMP', stability: 7.5, retrievability: 95, drills: 5 },
+      WEEKND: { edgeId: 'E_EN_2', cardUid: 'EN_YYC_CHAM', stability: 9.0, retrievability: 97, drills: 7 }
+    };
+
+    function renderFsrsTelemetry() {
+      const a = ANTHEMS[currentIdx];
+      const meta = ANTHEM_EDGE_MAP[a.id] || { edgeId: 'E_CZ_3', stability: 6.5, retrievability: 94 };
+      const pill = document.getElementById('fsrsTelemetryPill');
+      if (pill) {
+        pill.textContent = `R(t)=${Math.round(meta.retrievability)}% • S=${Number(meta.stability).toFixed(1)}d • ${meta.edgeId}`;
+      }
+    }
+
+    async function hydrateLiveSongsAndEdges() {
+      if (!window.PolyglotAPI) return;
+      try {
+        const st = await window.PolyglotAPI.fetchFullState(false);
+        if (st && Array.isArray(st.edges)) {
+          Object.values(ANTHEM_EDGE_MAP).forEach(meta => {
+            const liveEdge = st.edges.find(e => e.id === meta.edgeId || e.target === meta.cardUid || e.source === meta.cardUid);
+            if (liveEdge) {
+              meta.edgeId = liveEdge.id || meta.edgeId;
+              meta.stability = Number(liveEdge.stability || meta.stability);
+              meta.retrievability = Number(liveEdge.retrievability || meta.retrievability);
+              meta.drills = Number(liveEdge.drills || meta.drills);
+            }
+          });
+          renderFsrsTelemetry();
+        }
+      } catch (_) {}
+    }
+
+    async function gradeAnthemPivot(score) {
+      if (window.PolyglotMobile) window.PolyglotMobile.haptic(18);
+      const a = ANTHEMS[currentIdx];
+      const meta = ANTHEM_EDGE_MAP[a.id] || { edgeId: 'E_CZ_3', cardUid: 'CZ_OVA_COUNT', stability: 6.5, retrievability: 94 };
+      const fb = document.getElementById('fsrsFeedbackMsg');
+      if (fb) fb.textContent = `Grading ${meta.edgeId} (Score ${score}/5)...`;
+
+      try {
+        if (window.PolyglotAPI) {
+          const res = await window.PolyglotAPI.gradeTransition(meta.edgeId, score, null, meta.cardUid);
+          if (res && res.new_stability) {
+            meta.stability = Number(res.new_stability);
+            meta.retrievability = Number(res.retrievability || 99);
+          } else {
+            meta.stability = Math.max(1.5, meta.stability * (score >= 4 ? 1.28 : score === 3 ? 1.05 : 0.65));
+            meta.retrievability = score >= 3 ? 99 : 74;
+          }
+          renderFsrsTelemetry();
+          if (fb) {
+            fb.textContent = res && res.queued_offline
+              ? `✓ Grade ${score}/5 queued in offline outbox (${res.outbox_count} pending)`
+              : `✓ Synced Grade ${score}/5 to Postgres + Neo4j (New S=${meta.stability.toFixed(1)}d)`;
+          }
+        }
+      } catch (err) {
+        if (fb) fb.textContent = `✓ Local FSRS updated (${meta.edgeId})`;
+      }
+    }
+
+    function renderTabs() {
+      const tabs = document.getElementById('trackTabs');
+      tabs.innerHTML = ANTHEMS.map((a, i) => `
+        <button onclick="selectTrack(${i})" class="px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition flex items-center gap-1.5 ${
+          i === currentIdx
+            ? 'bg-amber-500 text-slate-950 shadow-md font-bold'
+            : 'bg-slate-900/80 hover:bg-slate-800 text-slate-300 border border-slate-800'
+        }">
+          <span>${a.flag}</span>
+          <span>${a.title}</span>
+          <span class="opacity-60 text-[10px] mono">(${a.city})</span>
+        </button>
+      `).join('');
+    }
+
+    function renderCurrent() {
+      const a = ANTHEMS[currentIdx];
+      document.getElementById('cardBadge').textContent = `${a.flag} ${a.city.toUpperCase()}`;
+      document.getElementById('cardGenre').textContent = a.genre;
+      document.getElementById('cardTitle').textContent = a.title;
+      document.getElementById('cardArtist').textContent = a.artist;
+      document.getElementById('cardLyric').textContent = a.lyric;
+      document.getElementById('cardSlang').textContent = `Slang Anchors: ${a.slang}`;
+      document.getElementById('bpmBadge').textContent = `${a.bpm} BPM`;
+
+      // Render Translations
+      const tb = document.getElementById('translationsBox');
+      tb.innerHTML = a.translations.map(t => `
+        <div class="p-2 rounded-lg bg-slate-900 border border-slate-800/80">
+          <div class="text-[10px] mono font-bold text-amber-300 mb-0.5">${t.lang}</div>
+          <div class="text-slate-200">${t.text}</div>
+        </div>
+      `).join('');
+
+      // Pivot Card
+      document.getElementById('pivotStageBadge').textContent = a.pivotStage;
+      document.getElementById('pivotDropBadge').textContent = a.pivotDrop;
+      document.getElementById('pivotText').textContent = a.pivotText;
+      document.getElementById('deliveryRule').textContent = a.deliveryRule;
+      document.getElementById('cypherUidTag').textContent = a.cypherUid;
+      renderFsrsTelemetry();
+      const fb = document.getElementById('fsrsFeedbackMsg');
+      if (fb) fb.textContent = '';
+
+      // Reset flip
+      isFlipped = false;
+      document.getElementById('flashcardInner').classList.remove('is-flipped');
+
+      if (Tone.Transport && Tone.Transport.bpm) {
+        Tone.Transport.bpm.value = a.bpm;
+      }
+    }
+
+    function flipCard() {
+      if (window.PolyglotMobile) window.PolyglotMobile.haptic(10);
+      isFlipped = !isFlipped;
+      document.getElementById('flashcardInner').classList.toggle('is-flipped', isFlipped);
+    }
+
+    function selectTrack(i) {
+      currentIdx = i;
+      renderTabs();
+      renderCurrent();
+    }
+
+    function nextTrack() {
+      currentIdx = (currentIdx + 1) % ANTHEMS.length;
+      renderTabs();
+      renderCurrent();
+    }
+
+    function prevTrack() {
+      currentIdx = (currentIdx - 1 + ANTHEMS.length) % ANTHEMS.length;
+      renderTabs();
+      renderCurrent();
+    }
+
+    // Audio beat loop via Tone.js
+    async function toggleAudio() {
+      await Tone.start();
+      if (!synths) {
+        synths = {
+          kick: new Tone.MembraneSynth().toDestination(),
+          hat: new Tone.MetalSynth({ envelope: { attack: 0.001, decay: 0.05, release: 0.05 } }).toDestination()
+        };
+        synths.kick.volume.value = -4;
+        synths.hat.volume.value = -16;
+
+        let step = 0;
+        Tone.Transport.scheduleRepeat((time) => {
+          if (step % 4 === 0) synths.kick.triggerAttackRelease('C1', '8n', time);
+          if (step % 2 === 0) synths.hat.triggerAttackRelease('32n', time, 0.2);
+          step = (step + 1) % 16;
+        }, '16n');
+      }
+
+      if (Tone.Transport.state === 'started') {
+        Tone.Transport.stop();
+        isAudioPlaying = false;
+        document.getElementById('audioLabel').textContent = 'Play Cadence Beat';
+        document.getElementById('audioIcon').setAttribute('data-lucide', 'play');
+      } else {
+        Tone.Transport.bpm.value = ANTHEMS[currentIdx].bpm;
+        Tone.Transport.start();
+        isAudioPlaying = true;
+        document.getElementById('audioLabel').textContent = 'Stop Beat';
+        document.getElementById('audioIcon').setAttribute('data-lucide', 'pause');
+      }
+      lucide.createIcons();
+    }
+
+    function speakCadenceGuide() {
+      if (!synths) toggleAudio();
+      const now = Tone.now();
+      const chime = new Tone.Synth().toDestination();
+      chime.volume.value = -6;
+      chime.triggerAttackRelease('A4', '16n', now);
+      chime.triggerAttackRelease('E5', '16n', now + 0.3);
+      chime.triggerAttackRelease('A5', '8n', now + 0.6);
+    }
+
+    window.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      if (e.key === ' ' || e.code === 'Space') {
+        e.preventDefault();
+        flipCard();
+      }
+      if (e.key === 'ArrowRight') nextTrack();
+      if (e.key === 'ArrowLeft') prevTrack();
+    });
+
+    window.onload = () => {
+      renderTabs();
+      renderCurrent();
+      lucide.createIcons();
+      hydrateLiveSongsAndEdges();
+      if (window.PolyglotMobile) {
+        window.PolyglotMobile.attachSwipe(document.getElementById('flashcardTouchZone'), {
+          onSwipeLeft: () => nextTrack(),
+          onSwipeRight: () => prevTrack()
+        });
+      }
+    };
+  </script>
+</body>
+</html>
+

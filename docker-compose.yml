@@ -1,0 +1,47 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg17
+    container_name: polyglot-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-polyglot}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-polyglot_atelier_dev}
+      POSTGRES_DB: ${POSTGRES_DB:-polyglot_sales}
+    ports:
+      - "${POSTGRES_HOST_PORT:-5433}:5432"
+    volumes:
+      - polyglot_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-polyglot} -d $${POSTGRES_DB:-polyglot_sales}"]
+      interval: 5s
+      timeout: 5s
+      retries: 15
+
+  neo4j:
+    image: neo4j:5-community
+    container_name: polyglot-neo4j
+    restart: unless-stopped
+    environment:
+      NEO4J_AUTH: "${NEO4J_USER:-neo4j}/${NEO4J_PASSWORD:-polyglot_atelier_dev}"
+      NEO4J_PLUGINS: '["apoc"]'
+      NEO4J_dbms_security_procedures_unrestricted: "apoc.*"
+      NEO4J_dbms_security_procedures_allowlist: "apoc.*"
+      NEO4J_server_memory_heap_initial__size: "512m"
+      NEO4J_server_memory_heap_max__size: "1G"
+    ports:
+      - "${NEO4J_HTTP_PORT:-7474}:7474"
+      - "${NEO4J_BOLT_PORT:-7687}:7687"
+    volumes:
+      - polyglot_neo4j_data:/data
+      - polyglot_neo4j_plugins:/plugins
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:7474 || exit 1"]
+      interval: 8s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  polyglot_pgdata:
+  polyglot_neo4j_data:
+  polyglot_neo4j_plugins:
+
