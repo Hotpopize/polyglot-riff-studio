@@ -1,0 +1,51 @@
+{
+  "schema_version": "3.5.0",
+  "uid": "SONG_ES_SOT_CAMARON",
+  "title": "Volando Voy",
+  "artist": "Camarón de la Isla (Kiko Veneno)",
+  "city_region": "Sotogrande & Andalucian Coast",
+  "register_id": "ES_SOT",
+  "original_lang": "ES_SOT",
+  "source_url": "https://www.letras.com/camaron-de-la-isla/volando-voy/",
+  "reach_channel": "agent-reach+jina",
+  "total_token_count": 108,
+  "unique_token_count": 62,
+  "stanzas_lines": [
+    [
+      "Volando voy, volando vengo,",
+      "volando voy, volando vengo,",
+      "por el camino yo me entretengo,",
+      "por el camino yo me entretengo."
+    ],
+    [
+      "Enamorao de la vida, que a veces duele,",
+      "si tengo frío busco candela.",
+      "Señoras y señores, sepan ustedes",
+      "que es la flor de la noche pa' quien la merece."
+    ],
+    [
+      "Y volando voy, volando vengo, por el camino yo me entretengo,",
+      "porque a mí me va mucho la marcha tropical",
+      "y los cariños en la frontera me dan."
+    ],
+    [
+      "Volando voy por Sotogrande sin postureo, tío:",
+      "enamorao de la vida porque esto tiene duende",
+      "y con las cartas sobre la mesa nunca vamos a mirar los toros desde la barrera."
+    ]
+  ],
+  "lyric_tokens": [
+    {"uid":"LT_SONG_ES_SOT_CAMARON_MIRAR_LOS_TOROS_DESDE_LA_BARRERA","song_uid":"SONG_ES_SOT_CAMARON","register_id":"ES_SOT","lang_code":"es","token":"mirar los toros desde la barrera","lemma":"mirar los toros desde la barrera","meaning_gloss":"Observe passively from safety without taking risk","is_chorus_hook":true,"song_count":6,"chorus_count":4,"card_count":10,"total_frequency":16,"frequency_score":1.0,"freq_tier":"CHORUS_EARWORM","vocab_uid":"ES_V_TOROS","idiom_term":"mirar los toros desde la barrera","connected_card_uids":["ES_SOT_COUNT","ES_SOT_SPARK_COUNT","ES_SOT_HOCHKULTUR_COUNT","ES_SOT_POLO_COUNT","ES_SOT_WIEN_COUNT","ES_SOT_B2B_COUNT","HAUTE_POLO_ES_RAC","ES_SOT_ADVENTURE_COUNT","ES_SOT_RUNWAY_COUNT","POLO_ES_SOT_BASE"],"sample_lyric_line":"Volando voy por Sotogrande sin postureo, tío:\nenamorao de la vida porque esto tiene duende\ny con las cartas sobre la mesa nunca vamos a mirar los toros desde la barrera."},
+    {"uid":"LT_SONG_ES_SOT_CAMARON_TENER_DUENDE","song_uid":"SONG_ES_SOT_CAMARON","register_id":"ES_SOT","lang_code":"es","token":"tener duende","lemma":"tener duende","meaning_gloss":"Possess unmanufacturable soul and magnetic presence","is_chorus_hook":true,"song_count":3,"chorus_count":2,"card_count":12,"total_frequency":15,"frequency_score":1.0,"freq_tier":"CHORUS_EARWORM","vocab_uid":"ES_V_DUENDE","idiom_term":null,"connected_card_uids":["RUNWAY_ES_SOT_BASE","ES_SOT_ADVENTURE_COMP","HOCH_ES_SOT_BASE","ES_SOT_RUNWAY_COMP","ES_SOT_HOCHKULTUR_COMP","ES_SOT_COMP","ES_SOT_POLO_COMP","ES_SOT_WIEN_COMP","ES_SOT_B2B_COUNT","ES_SOT_B2B_CHAM","ES_SOT_B2B_COMP","ES_SOT_SPARK_COMP"],"sample_lyric_line":"Volando voy por Sotogrande sin postureo, tío:\nenamorao de la vida porque esto tiene duende\ny con las cartas sobre la mesa nunca vamos a mirar los toros desde la barrera."},
+    {"uid":"LT_SONG_ES_SOT_CAMARON_DESDE","song_uid":"SONG_ES_SOT_CAMARON","register_id":"ES_SOT","lang_code":"es","token":"desde","lemma":"desde","meaning_gloss":"High-frequency motif in Volando Voy","is_chorus_hook":true,"song_count":3,"chorus_count":2,"card_count":10,"total_frequency":13,"frequency_score":1.0,"freq_tier":"CHORUS_EARWORM","vocab_uid":null,"idiom_term":null,"connected_card_uids":["ES_SOT_COUNT","ES_SOT_SPARK_COUNT","ES_SOT_HOCHKULTUR_COUNT","ES_SOT_POLO_COUNT","ES_SOT_WIEN_COUNT","ES_SOT_B2B_COUNT","HAUTE_POLO_ES_RAC","ES_SOT_ADVENTURE_COUNT","ES_SOT_RUNWAY_COUNT","POLO_ES_SOT_BASE"],"sample_lyric_line":"Volando voy por Sotogrande sin postureo, tío:\nenamorao de la vida porque esto tiene duende\ny con las cartas sobre la mesa nunca vamos a mirar los toros desde la barrera."},
+    {"uid":"LT_SONG_ES_SOT_CAMARON_DUENDE","song_uid":"SONG_ES_SOT_CAMARON","register_id":"ES_SOT","lang_code":"es","token":"duende","lemma":"duende","meaning_gloss":"Unmanufacturable soul & spine-tingling charisma","is_chorus_hook":true,"song_count":3,"chorus_count":2,"card_count":10,"total_frequency":13,"frequency_score":1.0,"freq_tier":"CHORUS_EARWORM","vocab_uid":null,"idiom_term":null,"connected_card_uids":["RUNWAY_ES_SOT_BASE","ES_SOT_ADVENTURE_COMP","HOCH_ES_SOT_BASE","ES_SOT_RUNWAY_COMP","ES_SOT_HOCHKULTUR_COMP","ES_SOT_COMP","ES_SOT_POLO_COMP","ES_SOT_WIEN_COMP","ES_SOT_B2B_COMP","ES_SOT_SPARK_COMP"],"sample_lyric_line":"Volando voy por Sotogrande sin postureo, tío:\nenamorao de la vida porque esto tiene duende\ny con las cartas sobre la mesa nunca vamos a mirar los toros desde la barrera."},
+    {"uid":"LT_SONG_ES_SOT_CAMARON_TIENE","song_uid":"SONG_ES_SOT_CAMARON","register_id":"ES_SOT","lang_code":"es","token":"tiene","lemma":"tiene","meaning_gloss":"High-frequency motif in Volando Voy","is_chorus_hook":true,"song_count":3,"chorus_count":2,"card_count":10,"total_frequency":13,"frequency_score":1.0,"freq_tier":"CHORUS_EARWORM","vocab_uid":null,"idiom_term":null,"connected_card_uids":["RUNWAY_ES_SOT_BASE","ES_SOT_ADVENTURE_COMP","HOCH_ES_SOT_BASE","ES_SOT_RUNWAY_COMP","ES_SOT_HOCHKULTUR_COMP","ES_SOT_COMP","ES_SOT_POLO_COMP","ES_SOT_WIEN_COMP","ES_SOT_B2B_COMP","ES_SOT_SPARK_COMP"],"sample_lyric_line":"Volando voy por Sotogrande sin postureo, tío:\nenamorao de la vida porque esto tiene duende\ny con las cartas sobre la mesa nunca vamos a mirar los toros desde la barrera."},
+    {"uid":"LT_SONG_ES_SOT_CAMARON_TIENE_DUENDE","song_uid":"SONG_ES_SOT_CAMARON","register_id":"ES_SOT","lang_code":"es","token":"tiene duende","lemma":"tiene duende","meaning_gloss":"It has unteachable soul, electricity, and spine-tingling presence.","is_chorus_hook":true,"song_count":3,"chorus_count":2,"card_count":10,"total_frequency":13,"frequency_score":1.0,"freq_tier":"CHORUS_EARWORM","vocab_uid":null,"idiom_term":"tiene duende","connected_card_uids":["RUNWAY_ES_SOT_BASE","ES_SOT_ADVENTURE_COMP","HOCH_ES_SOT_BASE","ES_SOT_RUNWAY_COMP","ES_SOT_HOCHKULTUR_COMP","ES_SOT_COMP","ES_SOT_POLO_COMP","ES_SOT_WIEN_COMP","ES_SOT_B2B_COMP","ES_SOT_SPARK_COMP"],"sample_lyric_line":"Volando voy por Sotogrande sin postureo, tío:\nenamorao de la vida porque esto tiene duende\ny con las cartas sobre la mesa nunca vamos a mirar los toros desde la barrera."},
+    {"uid":"LT_SONG_ES_SOT_CAMARON_MIRAR","song_uid":"SONG_ES_SOT_CAMARON","register_id":"ES_SOT","lang_code":"es","token":"mirar","lemma":"mirar","meaning_gloss":"High-frequency motif in Volando Voy","is_chorus_hook":true,"song_count":3,"chorus_count":2,"card_count":8,"total_frequency":11,"frequency_score":1.0,"freq_tier":"CHORUS_EARWORM","vocab_uid":null,"idiom_term":null,"connected_card_uids":["ES_SOT_COUNT","ES_SOT_SPARK_COUNT","ES_SOT_HOCHKULTUR_COUNT","ES_SOT_POLO_COUNT","ES_SOT_WIEN_COUNT","ES_SOT_B2B_COUNT","ES_SOT_RUNWAY_COUNT","POLO_ES_SOT_BASE"],"sample_lyric_line":"Volando voy por Sotogrande sin postureo, tío:\nenamorao de la vida porque esto tiene duende\ny con las cartas sobre la mesa nunca vamos a mirar los toros desde la barrera."},
+    {"uid":"LT_SONG_ES_SOT_CAMARON_VOLANDO","song_uid":"SONG_ES_SOT_CAMARON","register_id":"ES_SOT","lang_code":"es","token":"volando","lemma":"volar","meaning_gloss":"Moving effortlessly in full flow state","is_chorus_hook":true,"song_count":9,"chorus_count":3,"card_count":0,"total_frequency":9,"frequency_score":1.0,"freq_tier":"CHORUS_EARWORM","vocab_uid":null,"idiom_term":null,"connected_card_uids":[],"sample_lyric_line":"Volando voy, volando vengo,\nvolando voy, volando vengo,\npor el camino yo me entretengo,\npor el camino yo me entretengo."},
+    {"uid":"LT_SONG_ES_SOT_CAMARON_ENTRETENGO","song_uid":"SONG_ES_SOT_CAMARON","register_id":"ES_SOT","lang_code":"es","token":"entretengo","lemma":"entretener","meaning_gloss":"Keeping the exchange playfully alive","is_chorus_hook":true,"song_count":4,"chorus_count":1,"card_count":3,"total_frequency":7,"frequency_score":1.0,"freq_tier":"CHORUS_EARWORM","vocab_uid":null,"idiom_term":null,"connected_card_uids":["HOCH_ES_SOT_BASE","ES_SOT_HOCHKULTUR_COMP","ES_SOT_RUNWAY_CUR"],"sample_lyric_line":"Volando voy, volando vengo,\nvolando voy, volando vengo,\npor el camino yo me entretengo,\npor el camino yo me entretengo."},
+    {"uid":"LT_SONG_ES_SOT_CAMARON_VOY","song_uid":"SONG_ES_SOT_CAMARON","register_id":"ES_SOT","lang_code":"es","token":"voy","lemma":"voy","meaning_gloss":"High-frequency motif in Volando Voy","is_chorus_hook":true,"song_count":5,"chorus_count":2,"card_count":0,"total_frequency":5,"frequency_score":0.937,"freq_tier":"CHORUS_EARWORM","vocab_uid":null,"idiom_term":null,"connected_card_uids":[],"sample_lyric_line":"Volando voy, volando vengo,\nvolando voy, volando vengo,\npor el camino yo me entretengo,\npor el camino yo me entretengo."},
+    {"uid":"LT_SONG_ES_SOT_CAMARON_VENGO","song_uid":"SONG_ES_SOT_CAMARON","register_id":"ES_SOT","lang_code":"es","token":"vengo","lemma":"venir","meaning_gloss":"Natural back-and-forth momentum","is_chorus_hook":true,"song_count":4,"chorus_count":1,"card_count":0,"total_frequency":4,"frequency_score":0.705,"freq_tier":"CHORUS_EARWORM","vocab_uid":null,"idiom_term":null,"connected_card_uids":[],"sample_lyric_line":"Volando voy, volando vengo,\nvolando voy, volando vengo,\npor el camino yo me entretengo,\npor el camino yo me entretengo."},
+    {"uid":"LT_SONG_ES_SOT_CAMARON_CARTAS_SOBRE_LA_MESA","song_uid":"SONG_ES_SOT_CAMARON","register_id":"ES_SOT","lang_code":"es","token":"cartas sobre la mesa","lemma":"cartas sobre la mesa","meaning_gloss":"Putting all cards openly on the table with executive candor.","is_chorus_hook":true,"song_count":1,"chorus_count":1,"card_count":2,"total_frequency":3,"frequency_score":0.463,"freq_tier":"CROSS_CORPUS_ANCHOR","vocab_uid":null,"idiom_term":"cartas sobre la mesa","connected_card_uids":["ES_STD_CHAM_01","ES_SOT_CHAM"],"sample_lyric_line":"Volando voy por Sotogrande sin postureo, tío:\nenamorao de la vida porque esto tiene duende\ny con las cartas sobre la mesa nunca vamos a mirar los toros desde la barrera."}
+  ]
+}

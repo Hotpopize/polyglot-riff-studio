@@ -216,6 +216,11 @@
       "register_id": "CZ_OVA",
       "original_lang": "CZ_OVA",
       "original_lyric": "Ostrava, Ostrava, město mezi městy, kaj ľudzie fchytaju šichtu a po robotě maju čistý fajront, bo ten motor pojede sám.",
+      "source_url": "https://www.karaoketexty.cz/texty-pisni/nohavica-jaromir/ostravo-19675",
+      "reach_channel": "agent-reach+jina",
+      "lyric_shard": "db/lyrics/song_cz_ova_nohavica.lyrics.json",
+      "total_token_count": 81,
+      "unique_token_count": 63,
       "translation_es": "Ostrava, Ostrava, ciudad entre ciudades, donde la gente agarra el turno de trabajo y tras la labor tiene el fajront limpio, porque el motor funcionará solo.",
       "translation_en": "Ostrava, Ostrava, city among cities, where people catch their shift and after work enjoy clean quitting time, because the engine will run by itself.",
       "translation_cz": "Ostrava, Ostrava, město mezi městy, kde lidé chytají směnu a po práci mají čistý fajront, protože ten motor pojede sám.",
@@ -225,6 +230,7 @@
       "pivot_line": "Sleduji vaše projekty a má to rozbor... ale upřímně, držet to teď při zemi je zbytečná šichta navíc. Když ten strach pustíš, máš čistý fajront, bo ten motor pojede sám.",
       "reinforces_card_uid": "CZ_OVA_COUNT",
       "slang_vocab_uids": [
+        "CZ_V_FACHAT",
         "CZ_V_SICHTA",
         "CZ_V_FAJRONT",
         "CZ_V_BO"

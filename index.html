@@ -24,113 +24,206 @@
     .mono { font-family: 'JetBrains Mono', monospace; }
     .safe-bottom { padding-bottom: max(0.35rem, env(safe-area-inset-bottom)); }
     button { touch-action: manipulation; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* Elevated Suite Hub 3D Cylindrical Rotating Culture Dial */
+    .hub-dial-shell {
+      background: radial-gradient(ellipse at 50% 50%, rgba(30, 41, 59, 0.96) 0%, rgba(6, 9, 17, 0.98) 88%);
+      box-shadow:
+        0 4px 14px -4px rgba(0, 0, 0, 0.78),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        inset 0 -1px 0 rgba(245, 158, 11, 0.35);
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .hub-dial-stage {
+      width: 100px;
+      height: 24px;
+      perspective: 280px;
+      cursor: grab;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .hub-dial-stage.is-dragging { cursor: grabbing !important; }
+    .hub-dial-stage::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 35;
+      background: linear-gradient(
+        90deg,
+        rgba(6, 9, 17, 0.9) 0%,
+        rgba(6, 9, 17, 0.16) 24%,
+        rgba(255, 255, 255, 0) 50%,
+        rgba(6, 9, 17, 0.16) 76%,
+        rgba(6, 9, 17, 0.9) 100%
+      );
+    }
+    .hub-dial-rotor {
+      position: absolute;
+      inset: 0;
+      transform-style: preserve-3d;
+    }
+    .hub-dial-item {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      transform-origin: center center;
+      will-change: transform, opacity;
+    }
+    .hub-dial-lens {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 46px;
+      height: 20px;
+      border-radius: 9999px;
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.3) 0%, rgba(16, 185, 129, 0.2) 100%);
+      border: 1px solid rgba(251, 191, 36, 0.78);
+      box-shadow: 0 0 10px rgba(245, 158, 11, 0.25), inset 0 1px 0 rgba(254, 243, 199, 0.25);
+      pointer-events: none;
+      z-index: 25;
+    }
+    .hub-dial-ticks {
+      background-image: repeating-linear-gradient(
+        90deg,
+        rgba(251, 191, 36, 0.36) 0px,
+        rgba(251, 191, 36, 0.36) 1px,
+        transparent 1px,
+        transparent 5px
+      );
+      mask-image: linear-gradient(90deg, transparent 0%, black 20%, black 80%, transparent 100%);
+      -webkit-mask-image: linear-gradient(90deg, transparent 0%, black 20%, black 80%, transparent 100%);
+    }
   </style>
 </head>
 <body class="flex flex-col">
 
-  <!-- TOP SUITE HEADER BAR (Compact on Mobile, Full Switcher on Desktop) -->
-  <nav class="bg-slate-950 border-b border-slate-800/90 px-2.5 sm:px-3 py-1.5 flex items-center justify-between gap-2 shrink-0 z-40">
-    <div class="flex items-center gap-2 min-w-0">
+  <!-- SINGLE-ROW 44PX SUITE HUB HEADER -->
+  <nav class="h-11 bg-slate-950/95 backdrop-blur border-b border-slate-800/90 px-2.5 flex items-center justify-between gap-2 shrink-0 z-40">
+    <!-- Left: Compact Brand + Status Pill -->
+    <div class="flex items-center gap-1.5 shrink-0">
       <span id="hub-status-dot" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse shrink-0"></span>
-      <span class="text-xs font-bold tracking-wide text-slate-200 uppercase mono truncate">Polyglot Suite</span>
-      <span id="hub-backend-pill" class="text-[10px] mono px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-slate-400 truncate max-w-[175px] sm:max-w-none">
-        Checking Stack...
-      </span>
+      <span class="text-[11px] font-bold tracking-wider text-slate-100 uppercase mono hidden sm:inline">Polyglot</span>
+      <button onclick="openMobileSyncModal()" id="hub-backend-pill" title="Click for stack status &amp; 11-point audit"
+        class="text-[10px] mono px-1.5 py-0.5 rounded bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-400 whitespace-nowrap transition">
+        Checking...
+      </button>
     </div>
 
-    <!-- DESKTOP APP TABS (md and up) -->
-    <div class="hidden md:flex flex-wrap items-center gap-1 bg-slate-900 p-1 rounded-lg border border-slate-800">
-      <button data-app-url="regional_lyric_flashcards.html" onclick="loadApp('regional_lyric_flashcards.html')"
-        class="app-tab px-2.5 py-1 rounded-md text-xs font-semibold transition text-slate-300 hover:text-white whitespace-nowrap">
-        🎵 Anthems &amp; 4-C Flashcards
-      </button>
-      <button data-app-url="polyglot_audio_rhythm_studio_v4_5.html" onclick="loadApp('polyglot_audio_rhythm_studio_v4_5.html')"
-        class="app-tab px-2.5 py-1 rounded-md text-xs font-semibold transition text-slate-300 hover:text-white whitespace-nowrap">
-        🎛️ Audio-Rhythm v4.5
-      </button>
+    <!-- Center: Strictly Single-Row Scrollable Learning-Flow Tabs (md and up) -->
+    <div class="hidden md:flex items-center gap-0.5 bg-slate-900/90 p-0.5 rounded-lg border border-slate-800 overflow-x-auto no-scrollbar min-w-0">
       <button data-app-url="polyglot_riff_studio_v3_1_atelier_edition.html" onclick="loadApp('polyglot_riff_studio_v3_1_atelier_edition.html')"
-        class="app-tab px-2.5 py-1 rounded-md text-xs font-semibold transition bg-emerald-600 text-white whitespace-nowrap">
-        ★ Atelier v3.1 (Full Engine)
+        class="app-tab px-2.5 py-1 rounded-md text-xs font-semibold transition bg-emerald-600 text-white whitespace-nowrap shrink-0">
+        ★ Atelier
       </button>
       <button data-app-url="czech_register_switcher_widget.html" onclick="loadApp('czech_register_switcher_widget.html')"
-        class="app-tab px-2.5 py-1 rounded-md text-xs font-semibold transition text-slate-300 hover:text-white whitespace-nowrap">
-        ⇄ 5-Lang Switcher
+        class="app-tab px-2.5 py-1 rounded-md text-xs font-semibold transition text-slate-300 hover:text-white whitespace-nowrap shrink-0">
+        ⇄ Switcher
+      </button>
+      <button data-app-url="regional_lyric_flashcards.html" onclick="loadApp('regional_lyric_flashcards.html')"
+        class="app-tab px-2.5 py-1 rounded-md text-xs font-semibold transition text-slate-300 hover:text-white whitespace-nowrap shrink-0">
+        🎵 Anthems
+      </button>
+      <button data-app-url="polyglot_audio_rhythm_studio_v4_5.html" onclick="loadApp('polyglot_audio_rhythm_studio_v4_5.html')"
+        class="app-tab px-2.5 py-1 rounded-md text-xs font-semibold transition text-slate-300 hover:text-white whitespace-nowrap shrink-0">
+        🎛️ Rhythm
       </button>
       <button data-app-url="polyglot_riff_studio_v3_0_neo4j_srs_heatmap.html" onclick="loadApp('polyglot_riff_studio_v3_0_neo4j_srs_heatmap.html')"
-        class="app-tab px-2.5 py-1 rounded-md text-xs font-semibold transition text-slate-300 hover:text-white whitespace-nowrap">
-        SRS Heatmap v3.0
+        class="app-tab px-2.5 py-1 rounded-md text-xs font-semibold transition text-slate-300 hover:text-white whitespace-nowrap shrink-0">
+        🔥 SRS Map
       </button>
       <button data-app-url="polyglot_riff_studio_v1_zero_corporate.html" onclick="loadApp('polyglot_riff_studio_v1_zero_corporate.html')"
-        class="app-tab px-2.5 py-1 rounded-md text-xs font-semibold transition text-slate-300 hover:text-white whitespace-nowrap">
-        Lounge v1.0
+        class="app-tab px-2.5 py-1 rounded-md text-xs font-semibold transition text-slate-300 hover:text-white whitespace-nowrap shrink-0">
+        🍷 Lounge
       </button>
     </div>
 
+    <!-- Right: Elevated 3D Cylindrical Rotating Culture Dial + Sync + Popout -->
     <div class="flex items-center gap-1.5 text-xs mono shrink-0">
-      <!-- GLOBAL CROSS-TAB CULTURE SYNC BAR -->
-      <div id="hub-culture-sync-bar" class="flex items-center gap-0.5 bg-slate-900 px-1 py-0.5 rounded-lg border border-slate-800" title="Global Culture Sync Bus (locks active language across all 6 Studio views)">
-        <button data-sync-reg="CZ_OVA" onclick="syncGlobalCulture('CZ_OVA')" class="hub-cult-btn px-1.5 py-0.5 rounded text-[11px] bg-amber-500 text-slate-950 font-bold transition">🇨🇿</button>
-        <button data-sync-reg="AT_VIE" onclick="syncGlobalCulture('AT_VIE')" class="hub-cult-btn px-1.5 py-0.5 rounded text-[11px] text-slate-400 hover:text-white transition">🇦🇹</button>
-        <button data-sync-reg="RU_ALA" onclick="syncGlobalCulture('RU_ALA')" class="hub-cult-btn px-1.5 py-0.5 rounded text-[11px] text-slate-400 hover:text-white transition">🇰🇿</button>
-        <button data-sync-reg="EN_YYC" onclick="syncGlobalCulture('EN_YYC')" class="hub-cult-btn px-1.5 py-0.5 rounded text-[11px] text-slate-400 hover:text-white transition">🇨🇦</button>
-        <button data-sync-reg="ES_SOT" onclick="syncGlobalCulture('ES_SOT')" class="hub-cult-btn px-1.5 py-0.5 rounded text-[11px] text-slate-400 hover:text-white transition">🇪🇸</button>
+      <div id="hub-dial-shell" class="hub-dial-shell rounded-full border border-amber-500/40 px-1 py-0.5 relative overflow-hidden flex items-center gap-0.5"
+        aria-label="Global 3D Rotating Culture Carousel" title="Drag, scroll wheel, or click to switch active culture across all 6 views">
+        <div id="hub-dial-ticks" class="hub-dial-ticks absolute inset-x-4 bottom-0 h-[2.5px] opacity-75 pointer-events-none z-30"></div>
+        <button type="button" onclick="stepHubDial(-1)" title="Previous culture"
+          class="w-[18px] h-[20px] rounded-full bg-slate-900/90 hover:bg-amber-500/20 text-slate-300 hover:text-amber-300 flex items-center justify-center transition shrink-0 text-[11px] font-bold leading-none focus:outline-none z-40">
+          ‹
+        </button>
+        <div id="hub-dial-stage" class="hub-dial-stage relative overflow-hidden">
+          <div class="hub-dial-lens"></div>
+          <div id="hub-dial-rotor" class="hub-dial-rotor"></div>
+        </div>
+        <button type="button" onclick="stepHubDial(1)" title="Next culture"
+          class="w-[18px] h-[20px] rounded-full bg-slate-900/90 hover:bg-amber-500/20 text-slate-300 hover:text-amber-300 flex items-center justify-center transition shrink-0 text-[11px] font-bold leading-none focus:outline-none z-40">
+          ›
+        </button>
       </div>
-      <button onclick="openMobileSyncModal()" id="outbox-sync-btn"
-        class="px-2 py-1 rounded bg-slate-900 hover:bg-slate-800 border border-slate-700 text-amber-300 hover:text-white transition whitespace-nowrap flex items-center gap-1">
-        <span>🌐 Mobile / Sync</span>
+
+      <button onclick="openMobileSyncModal()" id="outbox-sync-btn" title="Mobile LAN access, offline outbox &amp; 11-point stack audit"
+        class="px-2 py-1 rounded-md bg-slate-900 hover:bg-slate-800 border border-slate-700 text-amber-300 hover:text-white transition whitespace-nowrap flex items-center gap-1">
+        <span>🌐</span>
+        <span class="hidden lg:inline">Sync</span>
         <span id="outbox-count-badge" class="hidden px-1.5 py-0.2 rounded-full bg-amber-500 text-slate-950 text-[10px] font-bold">0</span>
       </button>
-      <a href="http://127.0.0.1:7474/browser/?connectURL=neo4j%3A%2F%2Fneo4j%40127.0.0.1%3A7687" target="_blank"
-        title="Neo4j Browser — User: neo4j | Password: polyglot_atelier_dev"
-        class="hidden sm:inline-block px-2 py-1 rounded bg-slate-900 hover:bg-slate-800 border border-slate-800 text-indigo-300 hover:text-white transition whitespace-nowrap">
-        Neo4j :7474
+
+      <a id="hub-neo4j-link" href="http://127.0.0.1:7474/browser/?connectURL=neo4j%3A%2F%2Fneo4j%40127.0.0.1%3A7687" target="_blank"
+        title="Local Neo4j Browser — User: neo4j | Password: polyglot_atelier_dev"
+        class="hidden px-2 py-1 rounded-md bg-slate-900 hover:bg-slate-800 border border-slate-800 text-indigo-300 hover:text-white transition whitespace-nowrap">
+        Neo4j
       </a>
+
       <a id="open-direct-link" href="polyglot_riff_studio_v3_1_atelier_edition.html" target="_blank"
-        class="px-2 py-1 rounded bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-white transition whitespace-nowrap">
+        title="Open active view standalone in a new tab"
+        class="px-2 py-1 rounded-md bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-white transition whitespace-nowrap">
         ↗
       </a>
     </div>
   </nav>
 
   <!-- ACTIVE APPLICATION VIEWPORT -->
-  <iframe id="suite-frame" src="polyglot_riff_studio_v3_1_atelier_edition.html" class="flex-1 w-full border-0 bg-slate-950"></iframe>
+  <iframe id="suite-frame" src="polyglot_riff_studio_v3_1_atelier_edition.html?embed=1" class="flex-1 w-full border-0 bg-slate-950"></iframe>
 
   <!-- MOBILE-FRIENDLY BOTTOM THUMB NAVIGATION DOCK (< 768px) -->
-  <nav class="md:hidden bg-slate-950/95 backdrop-blur border-t border-slate-800 px-1.5 pt-1.5 safe-bottom grid grid-cols-6 gap-1 shrink-0 z-40">
-    <button data-app-url="regional_lyric_flashcards.html" onclick="loadApp('regional_lyric_flashcards.html')"
-      class="app-tab-mobile flex flex-col items-center justify-center py-1.5 rounded-lg text-[10px] font-semibold text-slate-400">
-      <span class="text-sm leading-none mb-0.5">🎵</span>
-      <span class="truncate max-w-full">Anthems</span>
-    </button>
-    <button data-app-url="polyglot_audio_rhythm_studio_v4_5.html" onclick="loadApp('polyglot_audio_rhythm_studio_v4_5.html')"
-      class="app-tab-mobile flex flex-col items-center justify-center py-1.5 rounded-lg text-[10px] font-semibold text-slate-400">
-      <span class="text-sm leading-none mb-0.5">🎛️</span>
-      <span class="truncate max-w-full">Rhythm</span>
-    </button>
+  <nav class="md:hidden bg-slate-950/95 backdrop-blur border-t border-slate-800 px-1.5 pt-1 safe-bottom grid grid-cols-6 gap-1 shrink-0 z-40">
     <button data-app-url="polyglot_riff_studio_v3_1_atelier_edition.html" onclick="loadApp('polyglot_riff_studio_v3_1_atelier_edition.html')"
-      class="app-tab-mobile flex flex-col items-center justify-center py-1.5 rounded-lg text-[10px] font-semibold bg-emerald-600/20 text-emerald-300 border border-emerald-500/40">
+      class="app-tab-mobile flex flex-col items-center justify-center py-1 rounded-lg text-[10px] font-semibold bg-emerald-600/20 text-emerald-300 border border-emerald-500/40">
       <span class="text-sm leading-none mb-0.5">★</span>
       <span class="truncate max-w-full">Atelier</span>
     </button>
     <button data-app-url="czech_register_switcher_widget.html" onclick="loadApp('czech_register_switcher_widget.html')"
-      class="app-tab-mobile flex flex-col items-center justify-center py-1.5 rounded-lg text-[10px] font-semibold text-slate-400">
+      class="app-tab-mobile flex flex-col items-center justify-center py-1 rounded-lg text-[10px] font-semibold text-slate-400">
       <span class="text-sm leading-none mb-0.5">⇄</span>
       <span class="truncate max-w-full">Switcher</span>
     </button>
+    <button data-app-url="regional_lyric_flashcards.html" onclick="loadApp('regional_lyric_flashcards.html')"
+      class="app-tab-mobile flex flex-col items-center justify-center py-1 rounded-lg text-[10px] font-semibold text-slate-400">
+      <span class="text-sm leading-none mb-0.5">🎵</span>
+      <span class="truncate max-w-full">Anthems</span>
+    </button>
+    <button data-app-url="polyglot_audio_rhythm_studio_v4_5.html" onclick="loadApp('polyglot_audio_rhythm_studio_v4_5.html')"
+      class="app-tab-mobile flex flex-col items-center justify-center py-1 rounded-lg text-[10px] font-semibold text-slate-400">
+      <span class="text-sm leading-none mb-0.5">🎛️</span>
+      <span class="truncate max-w-full">Rhythm</span>
+    </button>
     <button data-app-url="polyglot_riff_studio_v3_0_neo4j_srs_heatmap.html" onclick="loadApp('polyglot_riff_studio_v3_0_neo4j_srs_heatmap.html')"
-      class="app-tab-mobile flex flex-col items-center justify-center py-1.5 rounded-lg text-[10px] font-semibold text-slate-400">
+      class="app-tab-mobile flex flex-col items-center justify-center py-1 rounded-lg text-[10px] font-semibold text-slate-400">
       <span class="text-sm leading-none mb-0.5">🔥</span>
       <span class="truncate max-w-full">SRS Map</span>
     </button>
     <button data-app-url="polyglot_riff_studio_v1_zero_corporate.html" onclick="loadApp('polyglot_riff_studio_v1_zero_corporate.html')"
-      class="app-tab-mobile flex flex-col items-center justify-center py-1.5 rounded-lg text-[10px] font-semibold text-slate-400">
+      class="app-tab-mobile flex flex-col items-center justify-center py-1 rounded-lg text-[10px] font-semibold text-slate-400">
       <span class="text-sm leading-none mb-0.5">🍷</span>
       <span class="truncate max-w-full">Lounge</span>
     </button>
   </nav>
 
-  <!-- MOBILE / LAN ACCESS & OFFLINE OUTBOX MODAL -->
-  <div id="mobile-sync-modal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+  <!-- MOBILE / LAN ACCESS, OFFLINE OUTBOX & 11-POINT STACK AUDIT MODAL -->
+  <div id="mobile-sync-modal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4" onclick="if(event.target===this) closeMobileSyncModal()">
     <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
         <div>
@@ -150,7 +243,7 @@
           </button>
         </div>
         <p class="text-[11px] text-slate-400">
-          Open this URL in any mobile browser on your Wi-Fi, or use the site offline via pre-cached <code>db/*.db.json</code> shards.
+          Open this URL in any mobile browser on your Wi-Fi, or use the site offline via pre-cached <code>db/*.db.json</code> &amp; <code>db/lyrics/*.lyrics.json</code> shards.
         </p>
       </div>
 
@@ -162,6 +255,16 @@
         <button onclick="flushOutboxFromModal()" class="w-full py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs transition">
           ↻ Sync Offline Grades &amp; Cards to Postgres + Neo4j
         </button>
+      </div>
+
+      <div class="bg-slate-950 border border-slate-800 rounded-xl p-3.5 space-y-2 text-xs">
+        <div class="flex items-center justify-between gap-2">
+          <span class="text-slate-300 font-semibold">4-Layer Parity &amp; Split-Shard Audit:</span>
+          <button onclick="runModalStackAudit()" class="px-2.5 py-1 rounded-md bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-[11px] transition">
+            🛡️ Run 11-Point Audit
+          </button>
+        </div>
+        <div id="modal-audit-results" class="hidden max-h-40 overflow-y-auto space-y-1 pt-1 border-t border-slate-800/80 text-[10px] mono"></div>
       </div>
 
       <div class="space-y-1.5 text-xs pt-1 border-t border-slate-800">
@@ -178,23 +281,250 @@
   </div>
 
   <script>
-    function loadApp(url) {
+    const ALLOWED_APPS = [
+      'polyglot_riff_studio_v3_1_atelier_edition.html',
+      'czech_register_switcher_widget.html',
+      'regional_lyric_flashcards.html',
+      'polyglot_audio_rhythm_studio_v4_5.html',
+      'polyglot_riff_studio_v3_0_neo4j_srs_heatmap.html',
+      'polyglot_riff_studio_v1_zero_corporate.html'
+    ];
+    let pendingNavContext = null;
+
+    // =========================================================================
+    // ELEVATED 3D CYLINDRICAL ROTATING CULTURE CAROUSEL DIAL
+    // =========================================================================
+    const HUB_DIAL_ITEMS = [
+      {
+        regId: 'CZ_OVA', code: 'CZ', city: 'Ostrava',
+        svg: `<svg class="w-[13px] h-[13px] rounded-full shrink-0 ring-1 ring-white/25" viewBox="0 0 16 16"><rect width="16" height="8" fill="#ffffff"/><rect y="8" width="16" height="8" fill="#dc2626"/><polygon points="0,0 8.5,8 0,16" fill="#2563eb"/></svg>`
+      },
+      {
+        regId: 'AT_VIE', code: 'AT', city: 'Wien',
+        svg: `<svg class="w-[13px] h-[13px] rounded-full shrink-0 ring-1 ring-white/25" viewBox="0 0 16 16"><rect width="16" height="5.3" fill="#ef4444"/><rect y="5.3" width="16" height="5.4" fill="#ffffff"/><rect y="10.7" width="16" height="5.3" fill="#ef4444"/></svg>`
+      },
+      {
+        regId: 'RU_ALA', code: 'KZ', city: 'Almaty',
+        svg: `<svg class="w-[13px] h-[13px] rounded-full shrink-0 ring-1 ring-white/25" viewBox="0 0 16 16"><rect width="16" height="16" fill="#0ea5e9"/><circle cx="8" cy="7.6" r="2.8" fill="#fbbf24"/><path d="M4.2 11.4Q8 9.6 11.8 11.4" stroke="#fbbf24" stroke-width="1.2" fill="none" stroke-linecap="round"/></svg>`
+      },
+      {
+        regId: 'EN_YYC', code: 'CA', city: 'Calgary',
+        svg: `<svg class="w-[13px] h-[13px] rounded-full shrink-0 ring-1 ring-white/25" viewBox="0 0 16 16"><rect width="16" height="16" fill="#ffffff"/><rect width="4.2" height="16" fill="#ef4444"/><rect x="11.8" width="4.2" height="16" fill="#ef4444"/><path d="M8 3.6L9.4 6.7L11.2 6.4L9.7 8.8L10.3 10.6L8.4 10.1V12.5H7.6V10.1L5.7 10.6L6.3 8.8L4.8 6.4L6.6 6.7Z" fill="#ef4444"/></svg>`
+      },
+      {
+        regId: 'ES_SOT', code: 'ES', city: 'Sotogrande',
+        svg: `<svg class="w-[13px] h-[13px] rounded-full shrink-0 ring-1 ring-white/25" viewBox="0 0 16 16"><rect width="16" height="4" fill="#dc2626"/><rect y="4" width="16" height="8" fill="#facc15"/><rect y="12" width="16" height="4" fill="#dc2626"/></svg>`
+      }
+    ];
+
+    const hubDial = {
+      pos: 0,
+      targetPos: 0,
+      rafId: null,
+      pointerDown: false,
+      isDragging: false,
+      pointerId: null,
+      startX: 0,
+      startPos: 0,
+      suppressClick: false
+    };
+
+    function renderHubDialFrame(pos) {
+      const rotor = document.getElementById('hub-dial-rotor');
+      const ticks = document.getElementById('hub-dial-ticks');
+      if (!rotor) return;
+      const N = HUB_DIAL_ITEMS.length;
+      const items = rotor.querySelectorAll('[data-hub-reg]');
+      const radiusX = 44;
+      const radiusZ = 22;
+
+      items.forEach((btn, idx) => {
+        let delta = ((idx - pos) % N + N) % N;
+        if (delta > N / 2) delta -= N;
+        const theta = (delta / N) * Math.PI * 2;
+        const x = Math.sin(theta) * radiusX;
+        const z = (Math.cos(theta) - 1) * radiusZ;
+        const rotY = Math.sin(theta) * 44;
+        const scale = 0.72 + 0.34 * ((Math.cos(theta) + 1) / 2);
+        const opacity = Math.max(0.18, Math.min(1, 0.25 + 0.85 * ((Math.cos(theta) + 1) / 2)));
+        const isFront = Math.abs(delta) < 0.35;
+
+        btn.style.transform = `translate(-50%, -50%) translate3d(${x.toFixed(1)}px, 0px, ${z.toFixed(1)}px) rotateY(${rotY.toFixed(1)}deg) scale(${scale.toFixed(3)})`;
+        btn.style.opacity = opacity.toFixed(2);
+        btn.style.zIndex = String(Math.round(20 + Math.cos(theta) * 15));
+        btn.className = `hub-dial-item px-1.5 py-0.5 rounded-full text-[10px] transition-colors flex items-center justify-center gap-1 select-none whitespace-nowrap focus:outline-none ${
+          isFront ? 'text-amber-200 font-bold' : 'text-slate-300 hover:text-white font-medium'
+        }`;
+      });
+
+      if (ticks) {
+        ticks.style.backgroundPosition = `${(-pos * 18).toFixed(1)}px 0px`;
+      }
+    }
+
+    function animateHubDialTo(targetPos) {
+      hubDial.targetPos = targetPos;
+      if (hubDial.rafId) cancelAnimationFrame(hubDial.rafId);
+      const tick = () => {
+        const diff = hubDial.targetPos - hubDial.pos;
+        if (Math.abs(diff) < 0.004) {
+          hubDial.pos = hubDial.targetPos;
+          renderHubDialFrame(hubDial.pos);
+          hubDial.rafId = null;
+          return;
+        }
+        hubDial.pos += diff * 0.22;
+        renderHubDialFrame(hubDial.pos);
+        hubDial.rafId = requestAnimationFrame(tick);
+      };
+      hubDial.rafId = requestAnimationFrame(tick);
+    }
+
+    function syncHubDialToReg(regId, immediate = false) {
+      const N = HUB_DIAL_ITEMS.length;
+      const targetIdx = Math.max(0, HUB_DIAL_ITEMS.findIndex(i => i.regId === regId));
+      let diff = ((targetIdx - hubDial.targetPos) % N + N) % N;
+      if (diff > N / 2) diff -= N;
+      const nextTarget = hubDial.targetPos + diff;
+      if (immediate) {
+        hubDial.pos = targetIdx;
+        hubDial.targetPos = targetIdx;
+        renderHubDialFrame(targetIdx);
+      } else {
+        animateHubDialTo(nextTarget);
+      }
+    }
+
+    function stepHubDial(delta) {
+      const N = HUB_DIAL_ITEMS.length;
+      const nextTarget = Math.round(hubDial.targetPos) + delta;
+      const nextIdx = ((nextTarget % N) + N) % N;
+      animateHubDialTo(nextTarget);
+      syncGlobalCulture(HUB_DIAL_ITEMS[nextIdx].regId, true);
+    }
+
+    function handleHubDialClick(ev, regId) {
+      if (hubDial.suppressClick) {
+        hubDial.suppressClick = false;
+        if (ev) ev.preventDefault();
+        return;
+      }
+      syncGlobalCulture(regId, false);
+    }
+
+    function initHubDial() {
+      const rotor = document.getElementById('hub-dial-rotor');
+      const stage = document.getElementById('hub-dial-stage');
+      if (!rotor || !stage) return;
+
+      rotor.innerHTML = HUB_DIAL_ITEMS.map(item => `
+        <button type="button" data-hub-reg="${item.regId}"
+          onclick="handleHubDialClick(event, '${item.regId}')"
+          title="${item.code} • ${item.city} (${item.regId})"
+          class="hub-dial-item px-1.5 py-0.5 rounded-full text-[10px] transition-colors flex items-center justify-center gap-1 select-none whitespace-nowrap focus:outline-none">
+          ${item.svg}
+          <span class="mono text-[9.5px] tracking-tight">${item.code}</span>
+        </button>
+      `).join('');
+
+      stage.addEventListener('pointerdown', (e) => {
+        hubDial.pointerDown = true;
+        hubDial.isDragging = false;
+        hubDial.pointerId = e.pointerId;
+        hubDial.startX = e.clientX;
+        hubDial.startPos = hubDial.pos;
+        if (hubDial.rafId) {
+          cancelAnimationFrame(hubDial.rafId);
+          hubDial.rafId = null;
+        }
+        try { stage.setPointerCapture(e.pointerId); } catch (_) {}
+      });
+
+      stage.addEventListener('pointermove', (e) => {
+        if (!hubDial.pointerDown) return;
+        const dx = e.clientX - hubDial.startX;
+        if (!hubDial.isDragging && Math.abs(dx) > 5) {
+          hubDial.isDragging = true;
+          stage.classList.add('is-dragging');
+        }
+        if (hubDial.isDragging) {
+          hubDial.pos = hubDial.startPos - dx / 42;
+          hubDial.targetPos = hubDial.pos;
+          renderHubDialFrame(hubDial.pos);
+        }
+      });
+
+      const finishDrag = () => {
+        if (!hubDial.pointerDown) return;
+        hubDial.pointerDown = false;
+        stage.classList.remove('is-dragging');
+        if (hubDial.isDragging) {
+          hubDial.isDragging = false;
+          hubDial.suppressClick = true;
+          setTimeout(() => { hubDial.suppressClick = false; }, 140);
+          const N = HUB_DIAL_ITEMS.length;
+          const snapped = Math.round(hubDial.pos);
+          const idx = ((snapped % N) + N) % N;
+          animateHubDialTo(snapped);
+          syncGlobalCulture(HUB_DIAL_ITEMS[idx].regId, true);
+        }
+      };
+
+      stage.addEventListener('pointerup', finishDrag);
+      stage.addEventListener('pointercancel', finishDrag);
+
+      let wheelLock = false;
+      stage.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        if (wheelLock) return;
+        const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+        if (Math.abs(delta) < 4) return;
+        wheelLock = true;
+        stepHubDial(delta > 0 ? 1 : -1);
+        setTimeout(() => { wheelLock = false; }, 160);
+      }, { passive: false });
+    }
+
+    // =========================================================================
+    // SUITE NAVIGATION, PERSISTED TAB & CONNECTED WORKFLOW BUS
+    // =========================================================================
+    function loadApp(url, targetContext = null) {
+      const cleanUrl = String(url || '').split('?')[0];
+      const safeUrl = ALLOWED_APPS.includes(cleanUrl) ? cleanUrl : ALLOWED_APPS[0];
       if (window.PolyglotMobile) window.PolyglotMobile.haptic(10);
-      document.getElementById('suite-frame').src = url;
-      document.getElementById('open-direct-link').href = url;
+
+      pendingNavContext = targetContext || null;
+      const frame = document.getElementById('suite-frame');
+      const embedUrl = `${safeUrl}?embed=1`;
+      if (frame) {
+        const currentFile = String(frame.getAttribute('data-active-app') || '');
+        if (currentFile === safeUrl && targetContext && frame.contentWindow) {
+          frame.contentWindow.postMessage({ type: 'POLYGLOT_CONTEXT_SYNC', context: targetContext }, '*');
+        } else {
+          frame.setAttribute('data-active-app', safeUrl);
+          frame.src = embedUrl;
+        }
+      }
+      const directLink = document.getElementById('open-direct-link');
+      if (directLink) directLink.href = safeUrl;
+
+      try {
+        const key = (window.PolyglotSyncBus && window.PolyglotSyncBus.LAST_APP_STORAGE_KEY) || 'polyglot_suite_last_app_v36';
+        localStorage.setItem(key, safeUrl);
+      } catch (_) {}
 
       document.querySelectorAll('.app-tab').forEach(b => {
-        const isCurrent = b.getAttribute('data-app-url') === url;
+        const isCurrent = b.getAttribute('data-app-url') === safeUrl;
         b.className = isCurrent
-          ? 'app-tab px-2.5 py-1 rounded-md text-xs font-semibold transition bg-emerald-600 text-white whitespace-nowrap'
-          : 'app-tab px-2.5 py-1 rounded-md text-xs font-semibold transition text-slate-300 hover:text-white whitespace-nowrap';
+          ? 'app-tab px-2.5 py-1 rounded-md text-xs font-semibold transition bg-emerald-600 text-white whitespace-nowrap shrink-0 shadow-sm'
+          : 'app-tab px-2.5 py-1 rounded-md text-xs font-semibold transition text-slate-300 hover:text-white whitespace-nowrap shrink-0';
       });
 
       document.querySelectorAll('.app-tab-mobile').forEach(b => {
-        const isCurrent = b.getAttribute('data-app-url') === url;
+        const isCurrent = b.getAttribute('data-app-url') === safeUrl;
         b.className = isCurrent
-          ? 'app-tab-mobile flex flex-col items-center justify-center py-1.5 rounded-lg text-[10px] font-semibold bg-emerald-600/20 text-emerald-300 border border-emerald-500/40'
-          : 'app-tab-mobile flex flex-col items-center justify-center py-1.5 rounded-lg text-[10px] font-semibold text-slate-400';
+          ? 'app-tab-mobile flex flex-col items-center justify-center py-1 rounded-lg text-[10px] font-semibold bg-emerald-600/20 text-emerald-300 border border-emerald-500/40'
+          : 'app-tab-mobile flex flex-col items-center justify-center py-1 rounded-lg text-[10px] font-semibold text-slate-400';
       });
     }
 
@@ -216,19 +546,28 @@
     async function refreshBackendBadge() {
       const dot = document.getElementById('hub-status-dot');
       const pill = document.getElementById('hub-backend-pill');
+      const neoLink = document.getElementById('hub-neo4j-link');
+      const isLocalHost = ['127.0.0.1', 'localhost', ''].includes(window.location.hostname) || /^192\.168\.|^10\./.test(window.location.hostname);
+      if (neoLink) {
+        neoLink.classList.toggle('hidden', !isLocalHost);
+        if (isLocalHost) neoLink.classList.add('sm:inline-block');
+      }
       if (!window.PolyglotAPI) return;
       updateOutboxBadge();
       const health = await window.PolyglotAPI.health();
       if (health && health.ok) {
         const pgCards = health.postgres?.counts?.cards ?? '?';
+        const pgTokens = health.postgres?.counts?.lyric_tokens ?? '?';
         const neoNodes = health.neo4j?.counts?.nodes ?? '?';
         dot.className = 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0';
-        pill.className = 'text-[10px] mono px-2 py-0.5 rounded bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 truncate max-w-[175px] sm:max-w-none';
-        pill.textContent = `PG (${pgCards} cards) • Neo4j (${neoNodes} nodes)`;
+        pill.className = 'text-[10px] mono px-1.5 py-0.5 rounded bg-emerald-950/60 hover:bg-emerald-900/60 border border-emerald-500/40 text-emerald-300 whitespace-nowrap transition';
+        pill.textContent = `Live · ${pgCards}c/${pgTokens}t`;
+        pill.title = `PG (${pgCards} cards • ${pgTokens} tokens) • Neo4j (${neoNodes} nodes) — click to audit`;
       } else {
         dot.className = 'w-2 h-2 rounded-full bg-amber-400 shrink-0';
-        pill.className = 'text-[10px] mono px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-amber-300 truncate max-w-[175px] sm:max-w-none';
-        pill.textContent = 'Offline Shard Mode (db/*.db.json)';
+        pill.className = 'text-[10px] mono px-1.5 py-0.5 rounded bg-slate-900 hover:bg-slate-800 border border-slate-800 text-amber-300 whitespace-nowrap transition';
+        pill.textContent = 'Offline Shards';
+        pill.title = 'Offline Shard Mode (db/*.db.json + split db/lyrics/*.lyrics.json) — click to sync or audit';
       }
       updateOutboxBadge();
     }
@@ -269,6 +608,22 @@
       }
     }
 
+    async function runModalStackAudit() {
+      const box = document.getElementById('modal-audit-results');
+      if (!box || !window.PolyglotAPI || typeof window.PolyglotAPI.fetchAudit !== 'function') return;
+      box.classList.remove('hidden');
+      box.innerHTML = '<div class="text-amber-300">⏳ Running 11-point Postgres + Neo4j + Split-Shard Audit...</div>';
+      try {
+        const res = await window.PolyglotAPI.fetchAudit();
+        const checks = res && Array.isArray(res.checks) ? res.checks : [];
+        const headerColor = res && res.ok ? 'text-emerald-300' : 'text-rose-300';
+        box.innerHTML = `<div class="${headerColor} font-bold mb-1">${res?.ok ? '✓ ALL CHECKS PASSED' : '✕ AUDIT ISSUE'} (${checks.length} checks${res?.offlineShardMode ? ' • Offline' : ''})</div>` +
+          checks.map(c => `<div class="${c.ok ? 'text-slate-300' : 'text-rose-300'}"><span class="${c.ok ? 'text-emerald-400' : 'text-rose-400'}">${c.ok ? '✓' : '✕'}</span> ${c.check}: <span class="text-slate-400">${c.detail || ''}</span></div>`).join('');
+      } catch (err) {
+        box.innerHTML = `<div class="text-rose-300">Audit error: ${String(err)}</div>`;
+      }
+    }
+
     async function saveCustomOrigin() {
       if (!window.PolyglotAPI) return;
       const val = document.getElementById('custom-origin-input').value;
@@ -277,48 +632,62 @@
       closeMobileSyncModal();
     }
 
-    function syncGlobalCulture(regId) {
+    function syncGlobalCulture(regId, skipDialAnim = false) {
       if (window.PolyglotMobile) window.PolyglotMobile.haptic(10);
       if (window.PolyglotSyncBus) {
         const ctx = window.PolyglotSyncBus.setContext({ registerId: regId });
-        renderHubCultureBar(ctx.registerId);
+        if (!skipDialAnim) syncHubDialToReg(ctx.registerId, false);
       }
-    }
-
-    function renderHubCultureBar(activeRegId) {
-      document.querySelectorAll('.hub-cult-btn').forEach(btn => {
-        const isAct = btn.getAttribute('data-sync-reg') === activeRegId;
-        btn.className = isAct
-          ? 'hub-cult-btn px-1.5 py-0.5 rounded text-[11px] bg-amber-500 text-slate-950 font-bold transition shadow-sm'
-          : 'hub-cult-btn px-1.5 py-0.5 rounded text-[11px] text-slate-400 hover:text-white transition';
-      });
     }
 
     window.addEventListener('polyglot:context-changed', (e) => {
       if (e && e.detail && e.detail.registerId) {
-        renderHubCultureBar(e.detail.registerId);
+        syncHubDialToReg(e.detail.registerId, false);
+      }
+    });
+
+    window.addEventListener('message', (e) => {
+      if (e && e.data && e.data.type === 'POLYGLOT_NAVIGATE_APP' && e.data.appUrl) {
+        if (e.data.context && e.data.context.registerId) {
+          syncHubDialToReg(e.data.context.registerId, false);
+        }
+        loadApp(e.data.appUrl, e.data.context || null);
       }
     });
 
     window.addEventListener('polyglot:outbox-updated', updateOutboxBadge);
 
     window.addEventListener('DOMContentLoaded', () => {
+      initHubDial();
       refreshBackendBadge();
       if (window.PolyglotSyncBus) {
         const ctx = window.PolyglotSyncBus.getContext();
-        renderHubCultureBar(ctx.registerId || 'CZ_OVA');
+        syncHubDialToReg(ctx.registerId || 'CZ_OVA', true);
       }
+
       const frame = document.getElementById('suite-frame');
       if (frame) {
         frame.addEventListener('load', () => {
           if (window.PolyglotSyncBus && frame.contentWindow) {
+            const ctxToSend = pendingNavContext || window.PolyglotSyncBus.getContext();
+            pendingNavContext = null;
             frame.contentWindow.postMessage({
               type: 'POLYGLOT_CONTEXT_SYNC',
-              context: window.PolyglotSyncBus.getContext()
+              context: ctxToSend
             }, '*');
           }
         });
       }
+
+      // Restore last visited Studio tab cleanly
+      let savedApp = ALLOWED_APPS[0];
+      try {
+        const key = (window.PolyglotSyncBus && window.PolyglotSyncBus.LAST_APP_STORAGE_KEY) || 'polyglot_suite_last_app_v36';
+        const stored = localStorage.getItem(key);
+        if (stored && ALLOWED_APPS.includes(stored)) savedApp = stored;
+      } catch (_) {}
+      loadApp(savedApp);
+
       if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
         navigator.serviceWorker.register('./sw.js').catch(() => {});
       }

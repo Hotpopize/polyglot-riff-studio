@@ -131,8 +131,8 @@
 </head>
 <body x-data="registerSwitcherApp()" x-init="init()" class="min-h-screen flex flex-col items-center selection:bg-indigo-500 selection:text-white">
 
-  <!-- Sticky Top Heading Bar with Shrunk 3D Rotating Carousel Dial -->
-  <header id="switcherHeader" class="sticky top-0 z-40 w-full bg-slate-950/90 backdrop-blur-xl border-b border-slate-800/90">
+  <!-- Sticky Top Heading Bar with Shrunk 3D Rotating Carousel Dial (Standalone only; hidden inside index.html) -->
+  <header id="switcherHeader" data-embed-hide="true" class="sticky top-0 z-40 w-full bg-slate-950/90 backdrop-blur-xl border-b border-slate-800/90">
     <div class="max-w-5xl mx-auto px-4 sm:px-6 py-2 flex flex-wrap sm:flex-nowrap items-center justify-between gap-2">
       <div class="flex items-center gap-2 min-w-0">
         <span class="w-7 h-7 rounded-lg bg-gradient-to-br from-emerald-500 to-indigo-600 flex items-center justify-center text-xs font-bold text-slate-950 shrink-0">2T</span>
@@ -186,9 +186,9 @@
   </header>
 
   <!-- Main Switcher & IB Past Paper :Vocab Workbench -->
-  <div class="w-full max-w-5xl bg-slate-900 text-slate-100 p-6 sm:p-8 rounded-2xl border border-slate-700/80 shadow-2xl space-y-6 my-5 mx-4">
-    <!-- Top Language Selector -->
-    <div id="switcherLangBar" :class="dialDocked ? 'is-morphed-away' : ''" class="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-800">
+  <div class="embed-compact-main w-full max-w-5xl bg-slate-900 text-slate-100 p-4 sm:p-6 rounded-2xl border border-slate-700/80 shadow-2xl space-y-4 my-2.5 mx-3">
+    <!-- Top Language Selector (Standalone only; elevated 3D dial in index.html controls language in embedded mode) -->
+    <div id="switcherLangBar" data-embed-hide="true" :class="dialDocked ? 'is-morphed-away' : ''" class="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-800">
       <div class="flex flex-wrap items-center gap-1.5 bg-slate-950 p-1.5 rounded-xl border border-slate-800">
         <template x-for="l in languages" :key="l.code">
           <button @click="selectLang(l.code)"
@@ -203,23 +203,31 @@
     </div>
 
     <!-- Header & Register Tier Toggle -->
-    <div class="flex flex-wrap justify-between items-center gap-4 border-b border-slate-800 pb-5">
+    <div class="flex flex-wrap justify-between items-center gap-3 border-b border-slate-800 pb-3.5">
       <div>
-        <div class="flex items-center gap-2 mb-1">
-          <span class="text-xs mono uppercase tracking-widest text-indigo-400">2-Tier Polyglot Register-Drop Engine</span>
+        <div class="flex flex-wrap items-center gap-2 mb-0.5">
+          <span class="text-[11px] mono uppercase tracking-widest text-indigo-400">2-Tier Register-Drop</span>
           <span class="text-[10px] mono px-2 py-0.5 rounded bg-slate-950 border border-slate-800 text-emerald-300"
             x-text="currentIbPairLabel"></span>
+          <button @click="window.PolyglotSyncBus && window.PolyglotSyncBus.navigateApp('polyglot_riff_studio_v3_1_atelier_edition.html', { langCode: activeLang })"
+            class="text-[10px] mono px-2 py-0.5 rounded bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/35 text-emerald-300 transition">
+            ★ Atelier →
+          </button>
+          <button @click="window.PolyglotSyncBus && window.PolyglotSyncBus.navigateApp('regional_lyric_flashcards.html', { langCode: activeLang })"
+            class="text-[10px] mono px-2 py-0.5 rounded bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/35 text-amber-300 transition">
+            🎵 Anthem →
+          </button>
         </div>
-        <h1 class="text-xl font-bold tracking-wide" x-text="currentMeta.flag + ' ' + currentMeta.title"></h1>
+        <h1 class="text-lg font-bold tracking-wide" x-text="currentMeta.flag + ' ' + currentMeta.title"></h1>
       </div>
-      <div class="flex flex-wrap items-center gap-2 bg-slate-950 p-1.5 rounded-xl border border-slate-800">
-        <button @click="setTier('FORMAL')" :class="activeTier === 'FORMAL' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-white'" class="px-3.5 py-2 rounded-lg text-xs font-semibold transition">
+      <div class="flex flex-wrap items-center gap-1.5 bg-slate-950 p-1 rounded-xl border border-slate-800">
+        <button @click="setTier('FORMAL')" :class="activeTier === 'FORMAL' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-white'" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition">
           1. <span x-text="currentMeta.formalLabel"></span>
         </button>
-        <button @click="setTier('BRIDGE')" :class="activeTier === 'BRIDGE' ? 'bg-fuchsia-600 text-white shadow' : 'text-slate-400 hover:text-white'" class="px-3.5 py-2 rounded-lg text-xs font-semibold transition">
+        <button @click="setTier('BRIDGE')" :class="activeTier === 'BRIDGE' ? 'bg-fuchsia-600 text-white shadow' : 'text-slate-400 hover:text-white'" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition">
           ↳ Pivot Bridge
         </button>
-        <button @click="setTier('REGIONAL')" :class="activeTier === 'REGIONAL' ? 'bg-amber-600 text-white shadow' : 'text-slate-400 hover:text-white'" class="px-3.5 py-2 rounded-lg text-xs font-semibold transition">
+        <button @click="setTier('REGIONAL')" :class="activeTier === 'REGIONAL' ? 'bg-amber-600 text-white shadow' : 'text-slate-400 hover:text-white'" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition">
           2. <span x-text="currentMeta.regionalLabel"></span>
         </button>
       </div>

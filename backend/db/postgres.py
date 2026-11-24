@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 
 from backend.config import settings
 
-SCHEMA_VERSION = "3.3.0"
+SCHEMA_VERSION = "3.5.0"
 
 SCHEMA_DDL = f"""
 CREATE EXTENSION IF NOT EXISTS vector;
@@ -243,6 +243,12 @@ CREATE TABLE IF NOT EXISTS songs (
     register_id TEXT REFERENCES registers(id) ON DELETE CASCADE,
     original_lang TEXT NOT NULL DEFAULT '',
     original_lyric TEXT NOT NULL,
+    full_lyrics TEXT NOT NULL DEFAULT '',
+    lyric_stanzas JSONB NOT NULL DEFAULT '[]'::jsonb,
+    source_url TEXT NOT NULL DEFAULT '',
+    reach_channel TEXT NOT NULL DEFAULT 'agent-reach+jina',
+    total_token_count INTEGER NOT NULL DEFAULT 0,
+    unique_token_count INTEGER NOT NULL DEFAULT 0,
     translation_es TEXT NOT NULL DEFAULT '',
     translation_en TEXT NOT NULL DEFAULT '',
     translation_cz TEXT NOT NULL DEFAULT '',
@@ -256,6 +262,43 @@ CREATE TABLE IF NOT EXISTS songs (
     synced_at TIMESTAMPTZ,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+ALTER TABLE songs ADD COLUMN IF NOT EXISTS full_lyrics TEXT NOT NULL DEFAULT '';
+ALTER TABLE songs ADD COLUMN IF NOT EXISTS lyric_stanzas JSONB NOT NULL DEFAULT '[]'::jsonb;
+ALTER TABLE songs ADD COLUMN IF NOT EXISTS source_url TEXT NOT NULL DEFAULT '';
+ALTER TABLE songs ADD COLUMN IF NOT EXISTS reach_channel TEXT NOT NULL DEFAULT 'agent-reach+jina';
+ALTER TABLE songs ADD COLUMN IF NOT EXISTS total_token_count INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE songs ADD COLUMN IF NOT EXISTS unique_token_count INTEGER NOT NULL DEFAULT 0;
+
+CREATE TABLE IF NOT EXISTS song_lyric_tokens (
+    uid TEXT PRIMARY KEY,
+    song_uid TEXT NOT NULL REFERENCES songs(uid) ON DELETE CASCADE,
+    register_id TEXT NOT NULL REFERENCES registers(id) ON DELETE CASCADE,
+    lang_code TEXT NOT NULL REFERENCES languages(code) ON DELETE CASCADE,
+    token TEXT NOT NULL,
+    lemma TEXT NOT NULL,
+    meaning_gloss TEXT NOT NULL DEFAULT '',
+    is_chorus_hook BOOLEAN NOT NULL DEFAULT FALSE,
+    song_count INTEGER NOT NULL DEFAULT 1,
+    chorus_count INTEGER NOT NULL DEFAULT 0,
+    card_count INTEGER NOT NULL DEFAULT 0,
+    total_frequency INTEGER NOT NULL DEFAULT 1,
+    frequency_score DOUBLE PRECISION NOT NULL DEFAULT 0.5,
+    freq_tier TEXT NOT NULL DEFAULT 'HIGH_FREQ_CORE',
+    vocab_uid TEXT REFERENCES vocab_items(uid) ON DELETE SET NULL,
+    idiom_term TEXT REFERENCES idioms(term) ON DELETE SET NULL,
+    connected_card_uids JSONB NOT NULL DEFAULT '[]'::jsonb,
+    sample_lyric_line TEXT NOT NULL DEFAULT '',
+    sync_status TEXT NOT NULL DEFAULT 'PENDING',
+    synced_at TIMESTAMPTZ,
+    UNIQUE (song_uid, token)
+);
+
+CREATE INDEX IF NOT EXISTS idx_song_lyric_tokens_song
+    ON song_lyric_tokens (song_uid, frequency_score DESC);
+
+CREATE INDEX IF NOT EXISTS idx_song_lyric_tokens_reg
+    ON song_lyric_tokens (register_id, frequency_score DESC);
 
 CREATE INDEX IF NOT EXISTS idx_cards_lookup
     ON cards (register_id, arena, stage, lens_id);
@@ -388,6 +431,7 @@ class PostgresManager:
                         (SELECT COUNT(*) FROM idioms) AS idioms,
                         (SELECT COUNT(*) FROM vocab_items) AS vocab,
                         (SELECT COUNT(*) FROM songs) AS songs,
+                        (SELECT COUNT(*) FROM song_lyric_tokens) AS lyric_tokens,
                         (SELECT COUNT(*) FROM bridges) AS bridges,
                         (SELECT COUNT(*) FROM graph_edges) AS edges,
                         (SELECT COUNT(*) FROM cards WHERE embedding IS NOT NULL) AS embedded_cards,
@@ -398,6 +442,7 @@ class PostgresManager:
                         + (SELECT COUNT(*) FROM idioms WHERE sync_status = 'PENDING')
                         + (SELECT COUNT(*) FROM vocab_items WHERE sync_status = 'PENDING')
                         + (SELECT COUNT(*) FROM songs WHERE sync_status = 'PENDING')
+                        + (SELECT COUNT(*) FROM song_lyric_tokens WHERE sync_status = 'PENDING')
                         + (SELECT COUNT(*) FROM bridges WHERE sync_status = 'PENDING')
                         + (SELECT COUNT(*) FROM graph_edges WHERE sync_status = 'PENDING') AS pending_sync
                     """

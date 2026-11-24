@@ -13,6 +13,7 @@ from backend.db.postgres import pg_manager
 from backend.services.bridge_service import bridge_service
 from backend.services.converse_service import converse_service
 from backend.services.fsrs_service import fsrs_service
+from backend.services.lyric_service import lyric_service
 from backend.services.ollama_client import ollama_client
 
 mcp = FastMCP("Polyglot Riff Atelier")
@@ -131,6 +132,13 @@ async def resolve_room_objection(state_id: str, register_id: Optional[str] = Non
 async def grade_fsrs_transition(edge_id: str, score: int) -> str:
     """Grade an FSRS conversational transition edge (score 1-5), log to PostgreSQL review history, and update Neo4j edge weight/stability."""
     res = await fsrs_service.grade_transition(edge_id=edge_id, score=score)
+    return json.dumps(res, ensure_ascii=False, default=str, indent=2)
+
+
+@mcp.tool()
+async def get_song_lyric_frequency(song_uid: str = "SONG_CZ_OVA_NOHAVICA") -> str:
+    """Inspect Agent-Reach indexed full lyrics, cross-corpus :LyricToken frequency scores, and connected :Vocab/:Idiom/:Card nodes for any anthem."""
+    res = await lyric_service.get_song_frequency_profile(song_uid=song_uid)
     return json.dumps(res, ensure_ascii=False, default=str, indent=2)
 
 

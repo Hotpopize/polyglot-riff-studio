@@ -23,6 +23,7 @@ from backend.seed.corpus_data import (
     VOCAB_FALSE_FRIEND_ALERTS,
     VOCAB_ITEMS,
 )
+from backend.services.lyric_service import lyric_service
 from backend.services.ollama_client import ollama_client
 from backend.services.sync_service import sync_service
 from backend.validators.graph_rules import strip_html_tags
@@ -374,14 +375,16 @@ async def seed_all(compute_embeddings: bool = True, force_neo4j: bool = True) ->
                 )
 
             for s in SONGS:
+                stanzas = list(s.get("lyric_stanzas") or ([s["original_lyric"]] if s.get("original_lyric") else []))
+                full_lyrics = s.get("full_lyrics") or "\n\n".join(stanzas)
                 await conn.execute(
                     """
                     INSERT INTO songs (
                         uid, title, artist, city_region, genre, bpm, register_id,
-                        original_lang, original_lyric, translation_es, translation_en,
-                        translation_cz, translation_de, translation_ru, cultural_vibe,
-                        pivot_line, reinforces_card_uid, slang_vocab_uids, sync_status
-                    ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,'PENDING')
+                        original_lang, original_lyric, full_lyrics, lyric_stanzas, source_url, reach_channel,
+                        translation_es, translation_en, translation_cz, translation_de, translation_ru,
+                        cultural_vibe, pivot_line, reinforces_card_uid, slang_vocab_uids, sync_status
+                    ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,'PENDING')
                     ON CONFLICT (uid) DO UPDATE SET
                         title = EXCLUDED.title,
                         artist = EXCLUDED.artist,
@@ -391,6 +394,10 @@ async def seed_all(compute_embeddings: bool = True, force_neo4j: bool = True) ->
                         register_id = EXCLUDED.register_id,
                         original_lang = EXCLUDED.original_lang,
                         original_lyric = EXCLUDED.original_lyric,
+                        full_lyrics = EXCLUDED.full_lyrics,
+                        lyric_stanzas = EXCLUDED.lyric_stanzas,
+                        source_url = EXCLUDED.source_url,
+                        reach_channel = EXCLUDED.reach_channel,
                         translation_es = EXCLUDED.translation_es,
                         translation_en = EXCLUDED.translation_en,
                         translation_cz = EXCLUDED.translation_cz,
@@ -412,6 +419,10 @@ async def seed_all(compute_embeddings: bool = True, force_neo4j: bool = True) ->
                     s["register_id"],
                     s["original_lang"],
                     s["original_lyric"],
+                    full_lyrics,
+                    stanzas,
+                    s.get("source_url", ""),
+                    s.get("reach_channel", "agent-reach+jina"),
                     s["translation_es"],
                     s["translation_en"],
                     s["translation_cz"],
@@ -424,6 +435,8 @@ async def seed_all(compute_embeddings: bool = True, force_neo4j: bool = True) ->
                 )
 
     await pg_manager.enforce_domain_constraints()
+
+    lyric_res = await lyric_service.index_all_songs(use_agent_reach=False)
 
     embedded_counts = {"cards": 0, "idioms": 0}
     if compute_embeddings:
@@ -439,6 +452,7 @@ async def seed_all(compute_embeddings: bool = True, force_neo4j: bool = True) ->
             "idioms": len(IDIOMS),
             "vocab": len(VOCAB_ITEMS),
             "songs": len(SONGS),
+            "lyric_tokens": lyric_res.get("total_lyric_tokens", 0),
             "cards": len(CARDS),
             "bridges": len(BRIDGES),
             "edges": len(GRAPH_EDGES),

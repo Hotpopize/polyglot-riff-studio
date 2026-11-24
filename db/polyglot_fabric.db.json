@@ -1,6 +1,6 @@
 {
   "db_id": "polyglot.fabric",
-  "schema_version": "3.3.0",
+  "schema_version": "3.5.0",
   "description": "Cross-language :Arena rooms, :Bridge nodes, :SHARES_VIBE_WITH etymology edges, :State objection nodes, :FalseFriend traps, IB :Vocab :FALSE_FRIEND_ALERT triggers, and Staged Regional Newspaper Webhooks.",
   "arenas": [
     {
@@ -420,6 +420,11 @@
       "register_id": "AT_VIE",
       "original_lang": "AT_VIE",
       "original_lyric": "Vienna Calling! Oida, die Zeit rennt davon. Kein Stress, der Schmäh rennt eh von allein, musst nur die Vorsicht an der Garderobe abgeben.",
+      "source_url": "https://falco.at/discography/vienna-calling/",
+      "reach_channel": "agent-reach+jina",
+      "lyric_shard": "db/lyrics/song_at_vie_falco.lyrics.json",
+      "total_token_count": 91,
+      "unique_token_count": 65,
       "translation_es": "¡Llamada desde Viena! Oida, el tiempo se nos va. Cero estrés, el encanto vienés fluye solo de todos modos, solo debes dejar la cautela en el ropero.",
       "translation_en": "Vienna Calling! Oida, time is running out. No stress, the Schmäh runs by itself anyway, you just have to check your caution at the coat rack.",
       "translation_cz": "Vídeň volá! Oida, čas utíká. Žádný stres, ten Schmäh stejně běží sám od sebe, jen musíš nechat opatrnost v šatně.",
@@ -430,7 +435,8 @@
       "reinforces_card_uid": "AT_VIE_CHAM",
       "slang_vocab_uids": [
         "DE_V_SCHMAEH",
-        "DE_V_PARTICLES"
+        "DE_V_PARTICLES",
+        "DE_V_GSCHICHTL"
       ]
     },
     {
@@ -443,6 +449,11 @@
       "register_id": "CZ_OVA",
       "original_lang": "CZ_OVA",
       "original_lyric": "Ostrava, Ostrava, město mezi městy, kaj ľudzie fchytaju šichtu a po robotě maju čistý fajront, bo ten motor pojede sám.",
+      "source_url": "https://www.karaoketexty.cz/texty-pisni/nohavica-jaromir/ostravo-19675",
+      "reach_channel": "agent-reach+jina",
+      "lyric_shard": "db/lyrics/song_cz_ova_nohavica.lyrics.json",
+      "total_token_count": 81,
+      "unique_token_count": 63,
       "translation_es": "Ostrava, Ostrava, ciudad entre ciudades, donde la gente agarra el turno de trabajo y tras la labor tiene el fajront limpio, porque el motor funcionará solo.",
       "translation_en": "Ostrava, Ostrava, city among cities, where people catch their shift and after work enjoy clean quitting time, because the engine will run by itself.",
       "translation_cz": "Ostrava, Ostrava, město mezi městy, kde lidé chytají směnu a po práci mají čistý fajront, protože ten motor pojede sám.",
@@ -452,6 +463,7 @@
       "pivot_line": "Sleduji vaše projekty a má to rozbor... ale upřímně, držet to teď při zemi je zbytečná šichta navíc. Když ten strach pustíš, máš čistý fajront, bo ten motor pojede sám.",
       "reinforces_card_uid": "CZ_OVA_COUNT",
       "slang_vocab_uids": [
+        "CZ_V_FACHAT",
         "CZ_V_SICHTA",
         "CZ_V_FAJRONT",
         "CZ_V_BO"
@@ -467,6 +479,11 @@
       "register_id": "EN_YYC",
       "original_lang": "EN_YYC",
       "original_lyric": "Everybody is working for the weekend, bud! Stop being all hat and no cattle, kick the garage door open and just give ’er!",
+      "source_url": "https://www.stlyrics.com/lyrics/footloose/workingfortheweekend.htm",
+      "reach_channel": "agent-reach+jina",
+      "lyric_shard": "db/lyrics/song_en_yyc_loverboy.lyrics.json",
+      "total_token_count": 99,
+      "unique_token_count": 73,
       "translation_es": "¡Todo el mundo trabaja para el fin de semana, viejo! Déjate de postureo sin sustancia, abre la puerta del garaje y ¡dale a todo trapo!",
       "translation_en": "Everybody is working for the weekend, bud! Stop being all hat and no cattle, kick the garage door open and just give ’er!",
       "translation_cz": "Všichni makají na víkend, kámo! Přestaň dělat ramena bez výsledků, otevři vrata garáže a prostě to roztaj na plný plyn!",
@@ -490,6 +507,11 @@
       "register_id": "ES_SOT",
       "original_lang": "ES_SOT",
       "original_lyric": "Volando voy, volando vengo, por el camino yo me entretengo. Enamorao de la vida, porque esto tiene duende y no hay que mirar los toros desde la barrera.",
+      "source_url": "https://www.letras.com/camaron-de-la-isla/volando-voy/",
+      "reach_channel": "agent-reach+jina",
+      "lyric_shard": "db/lyrics/song_es_sot_camaron.lyrics.json",
+      "total_token_count": 108,
+      "unique_token_count": 62,
       "translation_es": "Volando voy, volando vengo, por el camino yo me entretengo. Enamorao de la vida, porque esto tiene duende y no hay que mirar los toros desde la barrera.",
       "translation_en": "Flying I go, flying I come, along the way I enjoy myself. In love with life, because this has true duende and you shouldn't watch the bulls from the sidelines.",
       "translation_cz": "Létám sem a tam, cestou se bavím. Zamilovaný do života, bo to má skutočný duende a nemá smysl koukat na býky jen z bariéry.",
@@ -513,6 +535,11 @@
       "register_id": "RU_ALA",
       "original_lang": "RU_ALA",
       "original_lyric": "Девочка моя Джулия, под тёплыми звёздами Алматы мы всё сделаем по красоте, базару нет, как за широким дастарханом.",
+      "source_url": "https://lyricsworld.ru/A-Studio/Dzhuliya-26451.html",
+      "reach_channel": "agent-reach+jina",
+      "lyric_shard": "db/lyrics/song_ru_ala_astudio.lyrics.json",
+      "total_token_count": 87,
+      "unique_token_count": 72,
       "translation_es": "Mi chica Julia, bajo las cálidas estrellas de Almaty lo haremos todo con pura belleza, sin duda alguna, como en un gran dastarhan.",
       "translation_en": "My girl Julia, under the warm stars of Almaty we will do everything with absolute beauty, zero doubt, like at a wide dastarhan.",
       "translation_cz": "Moje holka Julie, pod teplými hvězdami Almaty všechno uděláme po kráse, žádné pochyby, jako u širokého dastarhanu.",
@@ -523,7 +550,8 @@
       "reinforces_card_uid": "RU_ALA_COMP",
       "slang_vocab_uids": [
         "RU_V_KRASOTA",
-        "RU_V_BAZARU"
+        "RU_V_BAZARU",
+        "RU_V_DASTARKHAN"
       ]
     },
     {
@@ -536,6 +564,11 @@
       "register_id": "EN_YYC",
       "original_lang": "EN",
       "original_lyric": "Give me tough love, leave me with no breath... Push me down on my knees, tell me I belong to the world.",
+      "source_url": "https://www.letras.com/the-weeknd/one-of-the-girls-feat-jennie-lily-rose-depp/",
+      "reach_channel": "agent-reach+jina",
+      "lyric_shard": "db/lyrics/song_weeknd_ootg.lyrics.json",
+      "total_token_count": 381,
+      "unique_token_count": 109,
       "translation_es": "Dame amor duro, déjame sin aliento... Empújame de rodillas, dime que pertenezco al mundo.",
       "translation_en": "Give me tough love, leave me with no breath... Push me down on my knees, tell me I belong to the world.",
       "translation_cz": "Dej mi tvrdou lásku, nech mě bez dechu... Sraz mě na kolena, řekni mi, že patřím světu.",

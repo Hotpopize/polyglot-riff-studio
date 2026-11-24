@@ -1,0 +1,48 @@
+{
+  "schema_version": "3.5.0",
+  "uid": "SONG_EN_YYC_LOVERBOY",
+  "title": "Working for the Weekend",
+  "artist": "Loverboy",
+  "city_region": "Calgary & Western Canada",
+  "register_id": "EN_YYC",
+  "original_lang": "EN_YYC",
+  "source_url": "https://www.stlyrics.com/lyrics/footloose/workingfortheweekend.htm",
+  "reach_channel": "agent-reach+jina",
+  "total_token_count": 99,
+  "unique_token_count": 73,
+  "stanzas_lines": [
+    [
+      "Everyone's watching, to see what you will do,",
+      "everyone's looking at you, oh!",
+      "Everyone's wondering, will you come out tonight,",
+      "everyone's trying to get it right!"
+    ],
+    [
+      "Everybody's working for the weekend, everybody wants a new romance,",
+      "everybody's goin' off the deep end, everybody needs a second chance!"
+    ],
+    [
+      "You want a piece of my heart, you better start from the start,",
+      "you wanna be in the show — come on baby, let's go!"
+    ],
+    [
+      "Everybody's working for the weekend, bud!",
+      "Stop being all hat and no cattle, don't leave that 69 Mustang collecting dust —",
+      "kick the garage door open and just give ’er!"
+    ]
+  ],
+  "lyric_tokens": [
+    {"uid":"LT_SONG_EN_YYC_LOVERBOY_BUD","song_uid":"SONG_EN_YYC_LOVERBOY","register_id":"EN_YYC","lang_code":"en","token":"bud","lemma":"bud","meaning_gloss":"Warm Canadian peer equalizing vocative","is_chorus_hook":true,"song_count":3,"chorus_count":2,"card_count":11,"total_frequency":14,"frequency_score":1.0,"freq_tier":"CHORUS_EARWORM","vocab_uid":null,"idiom_term":null,"connected_card_uids":["EN_YYC_COMP","EN_YYC_RUNWAY_COMP","EN_YYC_SPARK_COMP","RUNWAY_EN_YYC_BASE","HOCH_EN_YYC_BASE","EN_YYC_ADVENTURE_COMP","EN_YYC_HOCHKULTUR_COMP","EN_YYC_POLO_COMP","EN_YYC_WIEN_COMP","POLO_EN_YYC_BASE","EN_YYC_B2B_COMP"],"sample_lyric_line":"Everybody's working for the weekend, bud!\nStop being all hat and no cattle, don't leave that 69 Mustang collecting dust —\nkick the garage door open and just give ’er!"},
+    {"uid":"LT_SONG_EN_YYC_LOVERBOY_ALL_HAT_AND_NO_CATTLE","song_uid":"SONG_EN_YYC_LOVERBOY","register_id":"EN_YYC","lang_code":"en","token":"all hat and no cattle","lemma":"all hat and no cattle","meaning_gloss":"All talk and posture without underlying substance","is_chorus_hook":true,"song_count":3,"chorus_count":2,"card_count":10,"total_frequency":13,"frequency_score":1.0,"freq_tier":"CHORUS_EARWORM","vocab_uid":"EN_V_CATTLE","idiom_term":"all hat and no cattle","connected_card_uids":["EN_YYC_COMP","EN_YYC_RUNWAY_COMP","EN_YYC_SPARK_COMP","RUNWAY_EN_YYC_BASE","EN_YYC_ADVENTURE_COMP","EN_YYC_HOCHKULTUR_COMP","EN_YYC_POLO_COMP","EN_YYC_WIEN_COMP","POLO_EN_YYC_BASE","EN_YYC_B2B_COMP"],"sample_lyric_line":"Everybody's working for the weekend, bud!\nStop being all hat and no cattle, don't leave that 69 Mustang collecting dust —\nkick the garage door open and just give ’er!"},
+    {"uid":"LT_SONG_EN_YYC_LOVERBOY_HAT","song_uid":"SONG_EN_YYC_LOVERBOY","register_id":"EN_YYC","lang_code":"en","token":"hat","lemma":"hat","meaning_gloss":"High-frequency motif in Working for the Weekend","is_chorus_hook":true,"song_count":3,"chorus_count":2,"card_count":10,"total_frequency":13,"frequency_score":1.0,"freq_tier":"CHORUS_EARWORM","vocab_uid":null,"idiom_term":null,"connected_card_uids":["EN_YYC_COMP","EN_YYC_RUNWAY_COMP","EN_YYC_SPARK_COMP","RUNWAY_EN_YYC_BASE","EN_YYC_ADVENTURE_COMP","EN_YYC_HOCHKULTUR_COMP","EN_YYC_POLO_COMP","EN_YYC_WIEN_COMP","POLO_EN_YYC_BASE","EN_YYC_B2B_COMP"],"sample_lyric_line":"Everyone's watching, to see what you will do,\neveryone's looking at you, oh!\nEveryone's wondering, will you come out tonight,\neveryone's trying to get it right!"},
+    {"uid":"LT_SONG_EN_YYC_LOVERBOY_69_MUSTANG_COLLECTING_DUST","song_uid":"SONG_EN_YYC_LOVERBOY","register_id":"EN_YYC","lang_code":"en","token":"69 mustang collecting dust","lemma":"69 mustang collecting dust","meaning_gloss":"Sitting on world-class talent/energy and refusing to take it out on the highway.","is_chorus_hook":true,"song_count":1,"chorus_count":1,"card_count":9,"total_frequency":10,"frequency_score":1.0,"freq_tier":"CROSS_CORPUS_ANCHOR","vocab_uid":null,"idiom_term":"69 Mustang collecting dust","connected_card_uids":["EN_YYC_COUNT","HOCH_EN_YYC_BASE","EN_YYC_ADVENTURE_COUNT","EN_YYC_RUNWAY_COUNT","EN_YYC_HOCHKULTUR_COUNT","EN_YYC_POLO_COUNT","EN_YYC_WIEN_COUNT","EN_YYC_SPARK_COUNT","EN_YYC_B2B_COUNT"],"sample_lyric_line":"Everybody's working for the weekend, bud!\nStop being all hat and no cattle, don't leave that 69 Mustang collecting dust —\nkick the garage door open and just give ’er!"},
+    {"uid":"LT_SONG_EN_YYC_LOVERBOY_SECOND","song_uid":"SONG_EN_YYC_LOVERBOY","register_id":"EN_YYC","lang_code":"en","token":"second","lemma":"second","meaning_gloss":"High-frequency motif in Working for the Weekend","is_chorus_hook":false,"song_count":2,"chorus_count":0,"card_count":5,"total_frequency":7,"frequency_score":0.895,"freq_tier":"LYRIC_MOTIF","vocab_uid":null,"idiom_term":null,"connected_card_uids":["EN_YYC_COMP","EN_YYC_SPARK_COMP","EN_YYC_ADVENTURE_CHAM","EN_YYC_HOCHKULTUR_COMP","EN_YYC_POLO_COMP"],"sample_lyric_line":"Everybody's working for the weekend, everybody wants a new romance,\neverybody's goin' off the deep end, everybody needs a second chance!"},
+    {"uid":"LT_SONG_EN_YYC_LOVERBOY_GARAGE","song_uid":"SONG_EN_YYC_LOVERBOY","register_id":"EN_YYC","lang_code":"en","token":"garage","lemma":"garage","meaning_gloss":"High-frequency motif in Working for the Weekend","is_chorus_hook":true,"song_count":3,"chorus_count":2,"card_count":2,"total_frequency":5,"frequency_score":0.853,"freq_tier":"CHORUS_EARWORM","vocab_uid":null,"idiom_term":null,"connected_card_uids":["EN_YYC_COUNT","EN_YYC_CUR"],"sample_lyric_line":"Everybody's working for the weekend, bud!\nStop being all hat and no cattle, don't leave that 69 Mustang collecting dust —\nkick the garage door open and just give ’er!"},
+    {"uid":"LT_SONG_EN_YYC_LOVERBOY_OPEN","song_uid":"SONG_EN_YYC_LOVERBOY","register_id":"EN_YYC","lang_code":"en","token":"open","lemma":"open","meaning_gloss":"High-frequency motif in Working for the Weekend","is_chorus_hook":true,"song_count":3,"chorus_count":2,"card_count":2,"total_frequency":5,"frequency_score":0.853,"freq_tier":"CHORUS_EARWORM","vocab_uid":null,"idiom_term":null,"connected_card_uids":["EN_YYC_CUR","EN_YYC_ADVENTURE_COUNT"],"sample_lyric_line":"Everybody's working for the weekend, bud!\nStop being all hat and no cattle, don't leave that 69 Mustang collecting dust —\nkick the garage door open and just give ’er!"},
+    {"uid":"LT_SONG_EN_YYC_LOVERBOY_GIVE_ER","song_uid":"SONG_EN_YYC_LOVERBOY","register_id":"EN_YYC","lang_code":"en","token":"give ’er","lemma":"give ’er","meaning_gloss":"Go all out / execute at full throttle","is_chorus_hook":true,"song_count":3,"chorus_count":2,"card_count":1,"total_frequency":4,"frequency_score":0.737,"freq_tier":"CHORUS_EARWORM","vocab_uid":"EN_V_GIVE_ER","idiom_term":null,"connected_card_uids":["EN_YYC_CUR"],"sample_lyric_line":"Everybody's working for the weekend, bud!\nStop being all hat and no cattle, don't leave that 69 Mustang collecting dust —\nkick the garage door open and just give ’er!"},
+    {"uid":"LT_SONG_EN_YYC_LOVERBOY_KICK","song_uid":"SONG_EN_YYC_LOVERBOY","register_id":"EN_YYC","lang_code":"en","token":"kick","lemma":"kick","meaning_gloss":"High-frequency motif in Working for the Weekend","is_chorus_hook":true,"song_count":3,"chorus_count":2,"card_count":1,"total_frequency":4,"frequency_score":0.737,"freq_tier":"CHORUS_EARWORM","vocab_uid":null,"idiom_term":null,"connected_card_uids":["EN_YYC_CUR"],"sample_lyric_line":"Everybody's working for the weekend, bud!\nStop being all hat and no cattle, don't leave that 69 Mustang collecting dust —\nkick the garage door open and just give ’er!"},
+    {"uid":"LT_SONG_EN_YYC_LOVERBOY_WORKING","song_uid":"SONG_EN_YYC_LOVERBOY","register_id":"EN_YYC","lang_code":"en","token":"working","lemma":"work","meaning_gloss":"High-momentum execution before the reward","is_chorus_hook":true,"song_count":3,"chorus_count":2,"card_count":1,"total_frequency":4,"frequency_score":0.737,"freq_tier":"CHORUS_EARWORM","vocab_uid":null,"idiom_term":null,"connected_card_uids":["EN_YYC_CHAM"],"sample_lyric_line":"Everybody's working for the weekend, everybody wants a new romance,\neverybody's goin' off the deep end, everybody needs a second chance!"},
+    {"uid":"LT_SONG_EN_YYC_LOVERBOY_EVERYBODY","song_uid":"SONG_EN_YYC_LOVERBOY","register_id":"EN_YYC","lang_code":"en","token":"everybody","lemma":"everybody","meaning_gloss":"Crowd cadence chorus opener","is_chorus_hook":true,"song_count":3,"chorus_count":1,"card_count":1,"total_frequency":4,"frequency_score":0.663,"freq_tier":"CHORUS_EARWORM","vocab_uid":null,"idiom_term":null,"connected_card_uids":["EN_YYC_RUNWAY_CHAM"],"sample_lyric_line":"Everybody's working for the weekend, everybody wants a new romance,\neverybody's goin' off the deep end, everybody needs a second chance!"},
+    {"uid":"LT_SONG_EN_YYC_LOVERBOY_WEEKEND","song_uid":"SONG_EN_YYC_LOVERBOY","register_id":"EN_YYC","lang_code":"en","token":"weekend","lemma":"weekend","meaning_gloss":"Release valve / celebration after clean execution","is_chorus_hook":true,"song_count":3,"chorus_count":2,"card_count":0,"total_frequency":3,"frequency_score":0.621,"freq_tier":"CHORUS_EARWORM","vocab_uid":null,"idiom_term":null,"connected_card_uids":[],"sample_lyric_line":"Everybody's working for the weekend, everybody wants a new romance,\neverybody's goin' off the deep end, everybody needs a second chance!"}
+  ]
+}

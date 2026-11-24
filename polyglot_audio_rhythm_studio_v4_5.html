@@ -305,7 +305,7 @@
   <!-- ==================================================================== -->
   <!-- TOP HEADER & TELEMETRY HUD -->
   <!-- ==================================================================== -->
-  <header class="border-b border-[#302840] bg-[#111118]/90 backdrop-blur px-4 lg:px-8 py-3">
+  <header data-embed-hide="true" class="border-b border-[#302840] bg-[#111118]/90 backdrop-blur px-4 lg:px-8 py-3">
     <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3">
       <!-- Title & Kicker -->
       <div class="flex items-center gap-3 w-full md:w-auto justify-between md:justify-start">
@@ -356,22 +356,19 @@
   </header>
 
   <!-- ==================================================================== -->
-  <!-- MASTER AUDIO-RHYTHM TRANSPORT DOCK -->
+  <!-- COMPACT 1-ROW AUDIO-RHYTHM TRANSPORT DOCK + EXPANDABLE MIXER DRAWER -->
   <!-- ==================================================================== -->
-  <section class="border-b border-[#302840] bg-[#141422] px-4 lg:px-8 py-3.5 shadow-lg">
-    <div class="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-4">
-      
-      <!-- Left: Audio Controls & Groove Selector -->
-      <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
-        <!-- Play / Pause -->
-        <button onclick="toggleRhythmPlay()" id="btn-rhythm-play" class="px-4 py-2 btn-neon-cyan flex items-center gap-2 text-xs font-bold" title="Toggle Cadence Beat Loop">
-          <i data-lucide="play" id="icon-rhythm-play" class="w-4 h-4"></i>
-          <span id="label-rhythm-play">PLAY CADENCE BEAT</span>
+  <section class="border-b border-[#302840] bg-[#141422] px-4 lg:px-6 py-2 shadow-lg">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
+      <!-- Primary 1-Row Controls -->
+      <div class="flex flex-wrap items-center gap-2">
+        <button onclick="toggleRhythmPlay()" id="btn-rhythm-play" class="px-3 py-1.5 btn-neon-cyan flex items-center gap-1.5 text-xs font-bold" title="Toggle Cadence Beat Loop">
+          <i data-lucide="play" id="icon-rhythm-play" class="w-3.5 h-3.5"></i>
+          <span id="label-rhythm-play">PLAY BEAT</span>
         </button>
 
-        <!-- Rhythm Track Groove Preset -->
-        <div class="flex items-center gap-2 bg-[#111118] border border-[#302840] rounded px-2.5 py-1">
-          <label for="select-groove-track" class="hud-label text-[10px] text-[#a098b0] uppercase">Groove:</label>
+        <div class="flex items-center gap-1.5 bg-[#111118] border border-[#302840] rounded px-2 py-1">
+          <label for="select-groove-track" class="hud-label text-[10px] text-[#a098b0] uppercase hidden sm:inline">Groove:</label>
           <select id="select-groove-track" onchange="changeGrooveTrack(this.value)" class="bg-transparent text-xs text-[#e8e0f0] font-medium outline-none cursor-pointer">
             <option value="CZ_OVA" class="bg-[#141422]">🇨🇿 Ostravian Industrial (130 BPM)</option>
             <option value="AT_VIE" class="bg-[#141422]">🇦🇹 Viennese Kaffeehaus Waltz (92 BPM)</option>
@@ -382,87 +379,100 @@
           </select>
         </div>
 
-        <!-- BPM Slider & Tap Tempo -->
-        <div class="flex items-center gap-2 bg-[#111118] border border-[#302840] rounded px-3 py-1">
-          <span class="hud-label text-[10px] text-[#a098b0]">BPM:</span>
-          <input type="range" id="input-bpm" min="60" max="160" value="130" oninput="updateBpm(this.value)" class="w-20 accent-[#00ffcc]">
-          <span id="val-bpm" class="hud-label text-xs text-[#00ffcc] font-bold w-9 text-right">130</span>
-          <button onclick="tapTempo()" class="hud-label text-[10px] px-1.5 py-0.5 rounded bg-[#1e1e30] hover:bg-[#302840] text-[#a098b0] hover:text-white" title="Click rhythmically to set BPM">TAP</button>
-        </div>
+        <span class="px-2 py-1 rounded bg-[#111118] border border-[#302840] hud-label text-[11px] text-[#00ffcc] font-bold">
+          <span id="val-bpm">130</span> BPM
+        </span>
 
-        <!-- Metronome & Vocal Pitch Meter Toggle -->
-        <button onclick="toggleMetronome()" id="btn-metronome" class="px-2.5 py-1.5 rounded bg-[#111118] border border-[#302840] text-[11px] hud-label text-[#a098b0] hover:text-[#00ffcc] flex items-center gap-1.5" title="Toggle Accent Click">
-          <i data-lucide="bell" class="w-3.5 h-3.5"></i>
-          <span id="label-metro">METRO: OFF</span>
-        </button>
-
-        <button onclick="toggleProsodyMicrophone()" id="btn-prosody-mic" class="px-2.5 py-1.5 rounded bg-[#111118] border border-[#302840] text-[11px] hud-label text-[#a098b0] hover:text-[#ff2d78] flex items-center gap-1.5" title="Real-Time Vocal Cadence & Pitch Drop Detection">
+        <button onclick="toggleProsodyMicrophone()" id="btn-prosody-mic" class="px-2 py-1 rounded bg-[#111118] border border-[#302840] text-[11px] hud-label text-[#a098b0] hover:text-[#ff2d78] flex items-center gap-1" title="Real-Time Vocal Cadence &amp; Pitch Drop Detection">
           <i data-lucide="mic" class="w-3.5 h-3.5"></i>
-          <span id="label-mic">PITCH METER: OFF</span>
+          <span id="label-mic">PITCH: OFF</span>
         </button>
+
+        <div id="live-prosody-box" class="hidden flex items-center gap-1.5 bg-[#111118] border border-[#ff2d78]/40 px-2 py-1 rounded text-[11px] hud-label">
+          <span id="prosody-pitch-hz" class="text-[#ff2d78] font-bold">--- Hz</span>
+          <span id="prosody-drop-tag" class="px-1 rounded text-[10px] bg-[#302840] text-[#00ffcc] font-mono">ST: 0.0</span>
+        </div>
       </div>
 
-      <!-- Right: Real-time Visualizer & 16-Step Sequencer Indicator -->
-      <div class="flex items-center gap-3 w-full lg:w-auto justify-end">
-        <!-- Live Pitch Readout (when active) -->
-        <div id="live-prosody-box" class="hidden flex items-center gap-2 bg-[#111118] border border-[#ff2d78]/40 px-2.5 py-1 rounded text-xs hud-label">
-          <span class="text-[#a098b0]">VOICE:</span>
-          <span id="prosody-pitch-hz" class="text-[#ff2d78] font-bold">--- Hz</span>
-          <span id="prosody-drop-tag" class="px-1.5 py-0.2 rounded text-[10px] bg-[#302840] text-[#00ffcc] font-mono">ST: 0.0</span>
-        </div>
-
-        <!-- Audio Frequency Oscilloscope Canvas -->
-        <div class="bg-[#0a0a12] border border-[#302840] rounded p-1 flex items-center">
-          <canvas id="visualizer-canvas" width="160" height="32" class="w-40 h-8"></canvas>
-        </div>
-
-        <!-- Master Volume -->
-        <div class="flex items-center gap-1.5 bg-[#111118] border border-[#302840] rounded px-2 py-1">
-          <i data-lucide="volume-2" class="w-3.5 h-3.5 text-[#a098b0]"></i>
-          <input type="range" id="input-volume" min="-30" max="6" value="0" oninput="updateMasterVolume(this.value)" class="w-16 accent-[#ff2d78]">
-        </div>
+      <!-- Right: Expandable Mixer Drawer Toggle + Cross-Tab Handoff -->
+      <div class="flex items-center gap-1.5">
+        <button type="button" onclick="const d=document.getElementById('v45-transport-drawer'); d.classList.toggle('hidden'); this.querySelector('span').textContent=d.classList.contains('hidden')?'Mixer ▾':'Mixer ▴';"
+          class="px-2.5 py-1 rounded bg-[#111118] hover:bg-[#1e1e30] border border-[#302840] text-[11px] hud-label text-[#00ffcc] transition">
+          <span>Mixer ▾</span>
+        </button>
+        <button onclick="window.PolyglotSyncBus && window.PolyglotSyncBus.navigateApp('polyglot_riff_studio_v3_1_atelier_edition.html', { registerId: APP_STATE.activePersona === 'WEEKND' ? 'EN_YYC' : APP_STATE.activePersona })"
+          class="px-2.5 py-1 rounded bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/35 text-[11px] hud-label text-emerald-300 transition whitespace-nowrap">
+          ★ Atelier 4-C →
+        </button>
       </div>
     </div>
 
-    <!-- 16-Step LED Pulse Rail -->
-    <div class="max-w-7xl mx-auto mt-2.5 grid grid-cols-16 gap-1" id="step-led-rail">
-      <!-- 16 LEDs generated via JS -->
+    <!-- Collapsible Mixer & 16-Step Sequencer Drawer (Collapsed by Default) -->
+    <div id="v45-transport-drawer" class="hidden max-w-7xl mx-auto mt-2 pt-2 border-t border-[#302840]/80 space-y-2">
+      <div class="flex flex-wrap items-center justify-between gap-2.5">
+        <div class="flex flex-wrap items-center gap-2">
+          <div class="flex items-center gap-2 bg-[#111118] border border-[#302840] rounded px-2.5 py-1">
+            <span class="hud-label text-[10px] text-[#a098b0]">TEMPO:</span>
+            <input type="range" id="input-bpm" min="60" max="160" value="130" oninput="updateBpm(this.value)" class="w-24 accent-[#00ffcc]">
+            <button onclick="tapTempo()" class="hud-label text-[10px] px-1.5 py-0.5 rounded bg-[#1e1e30] hover:bg-[#302840] text-[#a098b0] hover:text-white" title="Click rhythmically to set BPM">TAP</button>
+          </div>
+          <button onclick="toggleMetronome()" id="btn-metronome" class="px-2.5 py-1 rounded bg-[#111118] border border-[#302840] text-[11px] hud-label text-[#a098b0] hover:text-[#00ffcc] flex items-center gap-1.5" title="Toggle Accent Click">
+            <i data-lucide="bell" class="w-3.5 h-3.5"></i>
+            <span id="label-metro">METRO: OFF</span>
+          </button>
+        </div>
+
+        <div class="flex items-center gap-2.5">
+          <div class="bg-[#0a0a12] border border-[#302840] rounded p-0.5 flex items-center">
+            <canvas id="visualizer-canvas" width="160" height="28" class="w-36 h-7"></canvas>
+          </div>
+          <div class="flex items-center gap-1.5 bg-[#111118] border border-[#302840] rounded px-2 py-1">
+            <i data-lucide="volume-2" class="w-3.5 h-3.5 text-[#a098b0]"></i>
+            <input type="range" id="input-volume" min="-30" max="6" value="0" oninput="updateMasterVolume(this.value)" class="w-16 accent-[#ff2d78]">
+          </div>
+        </div>
+      </div>
+
+      <!-- 16-Step LED Pulse Rail -->
+      <div class="grid grid-cols-16 gap-1" id="step-led-rail">
+        <!-- 16 LEDs generated via JS -->
+      </div>
     </div>
   </section>
 
   <!-- ==================================================================== -->
   <!-- MAIN APPLICATION NAVIGATION BAR -->
   <!-- ==================================================================== -->
-  <nav class="border-b border-[#302840] bg-[#111118] px-4 lg:px-8 py-2">
+  <nav class="border-b border-[#302840] bg-[#111118] px-4 lg:px-6 py-1.5">
     <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
-      <!-- Persona Tabs Selector -->
-      <div class="flex flex-wrap items-center gap-1.5" id="persona-quick-tabs">
+      <!-- Persona Tabs Selector (Standalone only; controlled by top 3D dial in embedded mode) -->
+      <div data-embed-hide="true" class="flex flex-wrap items-center gap-1.5" id="persona-quick-tabs">
         <!-- Rendered by JS -->
       </div>
 
       <!-- App View Modes -->
-      <div class="flex items-center gap-1 bg-[#141422] p-1 rounded border border-[#302840] overflow-x-auto max-w-full">
-        <button onclick="switchView('studio')" id="tab-nav-studio" class="px-3 py-1 rounded text-xs hud-label font-bold text-[#ff2d78] bg-[#1e1e30] transition flex items-center gap-1.5 whitespace-nowrap">
+      <div class="flex items-center gap-1 bg-[#141422] p-0.5 rounded border border-[#302840] overflow-x-auto max-w-full">
+        <button onclick="switchView('studio')" id="tab-nav-studio" class="px-2.5 py-1 rounded text-xs hud-label font-bold text-[#ff2d78] bg-[#1e1e30] transition flex items-center gap-1.5 whitespace-nowrap">
           <i data-lucide="layers" class="w-3.5 h-3.5"></i>
           <span>1. 4-C STUDIO</span>
         </button>
-        <button onclick="switchView('weeknd')" id="tab-nav-weeknd" class="px-3 py-1 rounded text-xs hud-label text-[#a098b0] hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
+        <button onclick="switchView('weeknd')" id="tab-nav-weeknd" class="px-2.5 py-1 rounded text-xs hud-label text-[#a098b0] hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
           <i data-lucide="disc" class="w-3.5 h-3.5"></i>
           <span>2. 6-ANTHEM LYRICS</span>
         </button>
-        <button onclick="switchView('roulette')" id="tab-nav-roulette" class="px-3 py-1 rounded text-xs hud-label text-[#a098b0] hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
+        <button onclick="switchView('roulette')" id="tab-nav-roulette" class="px-2.5 py-1 rounded text-xs hud-label text-[#a098b0] hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
           <i data-lucide="shuffle" class="w-3.5 h-3.5"></i>
-          <span>3. CHAMELEON PIVOTS</span>
+          <span>3. CHAMELEON</span>
         </button>
-        <button onclick="switchView('graph')" id="tab-nav-graph" class="px-3 py-1 rounded text-xs hud-label text-[#a098b0] hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
+        <button onclick="switchView('graph')" id="tab-nav-graph" class="px-2.5 py-1 rounded text-xs hud-label text-[#a098b0] hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
           <i data-lucide="share-2" class="w-3.5 h-3.5"></i>
           <span>4. SRS GRAPH</span>
         </button>
-        <button onclick="switchView('shield')" id="tab-nav-shield" class="px-3 py-1 rounded text-xs hud-label text-[#a098b0] hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
+        <button onclick="switchView('shield')" id="tab-nav-shield" class="px-2.5 py-1 rounded text-xs hud-label text-[#a098b0] hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
           <i data-lucide="shield-alert" class="w-3.5 h-3.5"></i>
           <span>5. SHIELD BLITZ</span>
         </button>
-        <button onclick="switchView('builder')" id="tab-nav-builder" class="px-3 py-1 rounded text-xs hud-label text-[#a098b0] hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
+        <button onclick="switchView('builder')" id="tab-nav-builder" class="px-2.5 py-1 rounded text-xs hud-label text-[#a098b0] hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
           <i data-lucide="code" class="w-3.5 h-3.5"></i>
           <span>6. WORKBENCH</span>
         </button>
@@ -473,7 +483,7 @@
   <!-- ==================================================================== -->
   <!-- MAIN CONTENT AREA -->
   <!-- ==================================================================== -->
-  <main class="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-8 space-y-6">
+  <main class="embed-compact-main flex-1 max-w-7xl w-full mx-auto p-3 lg:p-5 space-y-4">
 
     <!-- ================================================================ -->
     <!-- VIEW 1: 4-C STUDIO & AUDIO-RHYTHM TELEPROMPTER -->
@@ -682,15 +692,25 @@
             </p>
           </div>
 
-          <div class="flex items-center gap-2">
-            <span class="hud-label text-[10px] text-[#a098b0]">CADENCE FILTER:</span>
-            <button onclick="filterLyricLang('ALL')" class="hud-label text-[10px] px-2 py-1 bg-[#1e1e30] text-white rounded">ALL (5)</button>
+          <div id="weeknd-filter-bar" class="flex flex-wrap items-center gap-1.5">
+            <span class="hud-label text-[10px] text-[#a098b0] mr-1">CADENCE FILTER:</span>
+            <button data-wknd-filter="ALL" onclick="filterLyricLang('ALL')" class="hud-label text-[10px] px-2 py-1 bg-[#ff2d78] text-white font-bold rounded transition">ALL (5)</button>
+            <button data-wknd-filter="EN" onclick="filterLyricLang('EN')" class="hud-label text-[10px] px-2 py-1 bg-[#1e1e30] text-[#a098b0] hover:text-white rounded transition">EN</button>
+            <button data-wknd-filter="CZ_OVA" onclick="filterLyricLang('CZ_OVA')" class="hud-label text-[10px] px-2 py-1 bg-[#1e1e30] text-[#a098b0] hover:text-white rounded transition">CZ_OVA</button>
+            <button data-wknd-filter="AT_VIE" onclick="filterLyricLang('AT_VIE')" class="hud-label text-[10px] px-2 py-1 bg-[#1e1e30] text-[#a098b0] hover:text-white rounded transition">AT_VIE</button>
+            <button data-wknd-filter="RU_ALA" onclick="filterLyricLang('RU_ALA')" class="hud-label text-[10px] px-2 py-1 bg-[#1e1e30] text-[#a098b0] hover:text-white rounded transition">RU_ALA</button>
+            <button data-wknd-filter="ES_SOT" onclick="filterLyricLang('ES_SOT')" class="hud-label text-[10px] px-2 py-1 bg-[#1e1e30] text-[#a098b0] hover:text-white rounded transition">ES_SOT</button>
           </div>
         </div>
 
         <!-- 5-Language Lyric Cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="weeknd-lyrics-grid">
           <!-- Rendered by JS -->
+        </div>
+
+        <!-- Complete 9-Stanza Weeknd Full Lyrics & Neo4j :LyricToken Frequency Panel -->
+        <div id="weeknd-full-stanzas-panel" class="space-y-3 pt-3 border-t border-[#302840]">
+          <!-- Rendered dynamically from PG + Neo4j / split db/lyrics/song_weeknd_ootg.lyrics.json -->
         </div>
 
         <!-- Cross-Language Code-Switching Riff Challenge -->
@@ -2345,36 +2365,110 @@
     // ========================================================================
     // 8. THE WEEKND "ONE OF THE GIRLS" LYRICS ENGINE
     // ========================================================================
+    let activeWeekndFilter = 'ALL';
+    const WEEKND_STANZA_LABELS = [
+      'Intro (JENNIE)',
+      'Verse 1 (The Weeknd)',
+      'Pre-Chorus 1 (Lily-Rose & Weeknd)',
+      'Chorus 1',
+      'Verse 2 (Lily-Rose Depp)',
+      'Pre-Chorus 2',
+      'Chorus 2',
+      'Bridge (JENNIE & Lily-Rose)',
+      'Final Chorus'
+    ];
+
+    function escV45Html(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
     function renderWeekndLyrics() {
       const grid = document.getElementById('weeknd-lyrics-grid');
       if (!grid) return;
       grid.innerHTML = '';
 
-      APP_DATA.weekndLyrics.forEach(item => {
+      document.querySelectorAll('#weeknd-filter-bar [data-wknd-filter]').forEach(btn => {
+        const isAct = btn.getAttribute('data-wknd-filter') === activeWeekndFilter;
+        btn.className = isAct
+          ? 'hud-label text-[10px] px-2 py-1 bg-[#ff2d78] text-white font-bold rounded transition'
+          : 'hud-label text-[10px] px-2 py-1 bg-[#1e1e30] text-[#a098b0] hover:text-white rounded transition';
+      });
+
+      const items = activeWeekndFilter === 'ALL'
+        ? APP_DATA.weekndLyrics
+        : APP_DATA.weekndLyrics.filter(item => item.lang === activeWeekndFilter);
+
+      items.forEach(item => {
         const card = document.createElement('div');
         card.className = 'neon-panel p-4 space-y-3 flex flex-col justify-between';
 
         card.innerHTML = `
           <div class="space-y-2">
             <div class="flex items-center justify-between">
-              <span class="hud-label text-xs font-bold text-[#ff2d78]">[${item.lang}] ${item.persona}</span>
+              <span class="hud-label text-xs font-bold text-[#ff2d78]">[${escV45Html(item.lang)}] ${escV45Html(item.persona)}</span>
               <span class="hud-label text-[10px] text-[#00ffcc]">87 BPM</span>
             </div>
             <p class="text-xs text-[#e8e0f0] leading-relaxed font-medium">
-              "${item.lyrics}"
+              "${escV45Html(item.lyrics)}"
             </p>
           </div>
           <div class="pt-2 border-t border-[#302840] text-[11px] hud-label text-[#a098b0]">
             <i data-lucide="music-2" class="w-3 h-3 inline mr-1 text-[#00ffcc]"></i>
-            <span>${item.rhythmNote}</span>
+            <span>${escV45Html(item.rhythmNote)}</span>
           </div>
         `;
         grid.appendChild(card);
       });
+
+      const panel = document.getElementById('weeknd-full-stanzas-panel');
+      if (panel) {
+        const wknd = (typeof V45_ANTHEMS !== 'undefined' ? V45_ANTHEMS : []).find(s => s.uid === 'SONG_WEEKND_OOTG');
+        const stanzas = (wknd && Array.isArray(wknd.lyric_stanzas)) ? wknd.lyric_stanzas : [];
+        const tokens = (wknd && Array.isArray(wknd.lyric_tokens)) ? wknd.lyric_tokens : [];
+        if (stanzas.length > 0) {
+          const lineCount = stanzas.reduce((sum, st) => sum + String(st || '').split('\n').filter(Boolean).length, 0);
+          const wordsCount = wknd.total_token_count || 381;
+          const uniqCount = wknd.unique_token_count || 109;
+          panel.innerHTML = `
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div class="hud-label text-xs font-bold text-[#00ffcc] uppercase flex items-center gap-2">
+                <span>Complete Full Song Lyrics — The Weeknd, JENNIE &amp; Lily-Rose Depp</span>
+              </div>
+              <div class="text-[11px] hud-label text-[#ffe04a]">
+                ${stanzas.length} Stanzas • ${lineCount} Lines • ${wordsCount} Words (${uniqCount} unique) • ${tokens.length} :LyricToken
+              </div>
+            </div>
+            ${tokens.length ? `
+              <div class="flex flex-wrap gap-1.5">
+                ${tokens.map(lt => `
+                  <span class="px-2 py-0.5 rounded bg-[#141422] border border-[#302840] text-[11px] font-mono text-[#ffe04a]" title="${escV45Html(lt.meaning_gloss || '')}">
+                    "${escV45Html(lt.token)}" <span class="text-[#00ffcc]">(${lt.song_count}s·${lt.card_count}c · ${Math.round((lt.frequency_score || 0) * 100)}%)</span>
+                  </span>
+                `).join('')}
+              </div>
+            ` : ''}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[420px] overflow-y-auto pr-1">
+              ${stanzas.map((st, idx) => `
+                <div class="p-3 rounded-lg bg-[#0a0a12] border border-[#302840] space-y-1">
+                  <div class="text-[10px] hud-label font-bold text-[#ff2d78] uppercase">[${idx + 1}/${stanzas.length}] ${WEEKND_STANZA_LABELS[idx] || 'Stanza ' + (idx + 1)}</div>
+                  <div class="text-xs text-[#e8e0f0] leading-relaxed">${escV45Html(st).replace(/\n/g, '<br>')}</div>
+                </div>
+              `).join('')}
+            </div>
+          `;
+        } else {
+          panel.innerHTML = `<div class="text-xs text-[#a098b0] italic">⏳ Lazy-loading complete 9-stanza lyrics &amp; 12 Neo4j :LyricToken anchors for One of the Girls...</div>`;
+        }
+      }
       lucide.createIcons();
     }
 
     function filterLyricLang(lang) {
+      activeWeekndFilter = lang || 'ALL';
       renderWeekndLyrics();
     }
 
@@ -3149,6 +3243,34 @@
     ];
     let selectedV45AnthemIdx = 0;
 
+    async function ensureV45AnthemLyricsLoaded(idx = selectedV45AnthemIdx, forceRefresh = false) {
+      const s = V45_ANTHEMS[idx] || V45_ANTHEMS[0];
+      if (!s || !s.uid || !window.PolyglotAPI || typeof window.PolyglotAPI.fetchSongFrequency !== 'function') return;
+      if (!forceRefresh && Array.isArray(s.lyric_tokens) && s.lyric_tokens.length && Array.isArray(s.lyric_stanzas) && s.lyric_stanzas.length) {
+        return;
+      }
+      try {
+        const res = await window.PolyglotAPI.fetchSongFrequency(s.uid, forceRefresh);
+        const liveSong = (res && res.song) || {};
+        if (Array.isArray(liveSong.lyric_stanzas) && liveSong.lyric_stanzas.length) {
+          s.lyric_stanzas = liveSong.lyric_stanzas;
+        }
+        if (res && Array.isArray(res.lyric_tokens)) {
+          s.lyric_tokens = res.lyric_tokens;
+        } else if (Array.isArray(liveSong.lyric_tokens)) {
+          s.lyric_tokens = liveSong.lyric_tokens;
+        }
+        s.total_token_count = liveSong.total_token_count || s.total_token_count;
+        s.unique_token_count = liveSong.unique_token_count || s.unique_token_count;
+        if (selectedV45AnthemIdx === idx) {
+          renderV45Anthems();
+        }
+        if (s.uid === 'SONG_WEEKND_OOTG' && typeof renderWeekndLyrics === 'function') {
+          renderWeekndLyrics();
+        }
+      } catch (_) {}
+    }
+
     function selectV45Anthem(idx) {
       selectedV45AnthemIdx = idx;
       const s = V45_ANTHEMS[idx] || V45_ANTHEMS[0];
@@ -3156,6 +3278,7 @@
         loadPersona(s.register_id);
       }
       renderV45Anthems();
+      ensureV45AnthemLyricsLoaded(idx, false);
     }
 
     function renderV45Anthems() {
@@ -3175,6 +3298,8 @@
 
       const cur = V45_ANTHEMS[selectedV45AnthemIdx] || V45_ANTHEMS[0];
       const transEntries = Object.entries(cur.translations || {}).filter(([, v]) => v);
+      const topTokens = (cur.lyric_tokens || []).slice(0, 8);
+      const stanzas = cur.lyric_stanzas || [];
       boxEl.innerHTML = `
         <div class="flex flex-wrap items-center justify-between gap-2 border-b border-[#302840] pb-2">
           <div>
@@ -3190,6 +3315,29 @@
           <div class="hud-label text-[10px] text-[#ff2d78] font-bold uppercase">4-C Code-Switching Pivot Line:</div>
           <div class="text-[#e8e0f0]">${cur.pivot_line}</div>
         </div>
+        ${topTokens.length ? `
+          <div class="bg-[#0e101c] p-2.5 rounded border border-[#00ffcc]/25 space-y-1.5">
+            <div class="hud-label text-[10px] text-[#00ffcc] font-bold uppercase flex items-center justify-between">
+              <span>Neo4j :LyricToken Frequency Index (${topTokens.length} top anchors)</span>
+              <span class="text-[#34d399]">${stanzas.length ? `${stanzas.length} Stanzas Indexed` : ''}</span>
+            </div>
+            <div class="flex flex-wrap gap-1.5">
+              ${topTokens.map(lt => `
+                <span class="px-2 py-0.5 rounded bg-[#141422] border border-[#302840] text-[11px] font-mono text-[#ffe04a]" title="${lt.meaning_gloss || ''}">
+                  "${lt.token}" <span class="text-[#00ffcc]">(${lt.song_count}s·${lt.card_count}c · ${Math.round((lt.frequency_score || 0) * 100)}%)</span>
+                </span>
+              `).join('')}
+            </div>
+            ${stanzas.length ? `
+              <details class="pt-1 text-[11px] text-[#a098b0]">
+                <summary class="cursor-pointer text-[#00ffcc] hud-label text-[10px] hover:text-white">▸ Expand Full ${stanzas.length} Indexed Stanzas</summary>
+                <div class="mt-1.5 space-y-1 max-h-36 overflow-y-auto pr-1">
+                  ${stanzas.map((st, idx) => `<div class="p-1.5 rounded bg-[#0a0a12] border border-[#302840] text-[#e8e0f0]"><strong class="text-[#ffe04a]">[${idx + 1}]</strong> ${String(st).replace(/\n/g, '<br>')}</div>`).join('')}
+                </div>
+              </details>
+            ` : ''}
+          </div>
+        ` : ''}
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
           ${transEntries.map(([k, v]) => `
             <div class="bg-[#111118] p-2 rounded border border-[#302840]">
@@ -3205,13 +3353,26 @@
       if (!window.PolyglotAPI) return;
       try {
         const songRes = await window.PolyglotAPI.fetchSongs();
-        if (songRes && Array.isArray(songRes.songs) && songRes.songs.length >= 6) {
-          V45_ANTHEMS = songRes.songs;
+        if (songRes && Array.isArray(songRes.songs) && songRes.songs.length) {
+          songRes.songs.forEach(liveSong => {
+            const match = V45_ANTHEMS.find(a => a.uid === liveSong.uid);
+            if (match) {
+              const keepCity = match.city_region || liveSong.city_region;
+              const keepReg = match.register_id === 'WEEKND' ? 'WEEKND' : (liveSong.register_id || match.register_id);
+              Object.assign(match, liveSong, {
+                city_region: keepCity,
+                register_id: keepReg,
+                translations: liveSong.translations || match.translations
+              });
+            }
+          });
           const badge = document.getElementById('anthem-sync-badge');
           if (badge) {
-            badge.textContent = songRes.offlineShardMode ? 'Offline .db.json (6 Songs)' : 'Live PG+Neo4j (6 Songs)';
+            badge.textContent = songRes.offlineShardMode ? 'Offline Split .lyrics.json (6 Songs)' : 'Live PG+Neo4j (6 Songs)';
           }
           renderV45Anthems();
+          await ensureV45AnthemLyricsLoaded(selectedV45AnthemIdx, false);
+          await ensureV45AnthemLyricsLoaded(5, false);
         }
         const st = await window.PolyglotAPI.fetchFullState(false);
         if (st && Array.isArray(st.edges) && st.edges.length > 0) {

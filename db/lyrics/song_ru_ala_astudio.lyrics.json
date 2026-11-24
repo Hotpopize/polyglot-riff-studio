@@ -1,0 +1,49 @@
+{
+  "schema_version": "3.5.0",
+  "uid": "SONG_RU_ALA_ASTUDIO",
+  "title": "Джулия (Julia)",
+  "artist": "A-Studio (Batyrkhan Shukenov)",
+  "city_region": "Almaty (Southern Capital / Медео)",
+  "register_id": "RU_ALA",
+  "original_lang": "RU_ALA",
+  "source_url": "https://lyricsworld.ru/A-Studio/Dzhuliya-26451.html",
+  "reach_channel": "agent-reach+jina",
+  "total_token_count": 87,
+  "unique_token_count": 72,
+  "stanzas_lines": [
+    [
+      "Девчонка из далёких дней,",
+      "по школе бегал я за ней,",
+      "домой провожал, записки тайком писал."
+    ],
+    [
+      "Мы незаметно подросли, и эти дни давно ушли,",
+      "и я не скрывал, что лишь о тебе мечтал:",
+      "Джули-Джулия, Джули-Джулия!"
+    ],
+    [
+      "Не знаю я твой телефон, но разве мне поможет он —",
+      "зачем напоминает грусть мне имя твоё,",
+      "я буду опять его про себя повторять: Джули-Джулия!"
+    ],
+    [
+      "Девочка моя Джулия, под тёплыми звёздами Алматы",
+      "мы всё сделали по красоте, родной, базару нет —",
+      "разговор по душам за широким дастарханом, прежде чем рвануть на Медеу!"
+    ]
+  ],
+  "lyric_tokens": [
+    {"uid":"LT_SONG_RU_ALA_ASTUDIO_БАЗАРУ_НЕТ","song_uid":"SONG_RU_ALA_ASTUDIO","register_id":"RU_ALA","lang_code":"ru","token":"базару нет","lemma":"базару нет","meaning_gloss":"Unquestionably / zero doubt","is_chorus_hook":true,"song_count":3,"chorus_count":2,"card_count":9,"total_frequency":12,"frequency_score":1.0,"freq_tier":"CHORUS_EARWORM","vocab_uid":"RU_V_BAZARU","idiom_term":"базару нет","connected_card_uids":["RU_ALA_SPARK_CHAM","HOCH_RU_ALA_BASE","RU_ALA_ADVENTURE_CHAM","RU_ALA_RUNWAY_CHAM","RU_ALA_CHAM","RU_ALA_HOCHKULTUR_CHAM","RU_ALA_POLO_CHAM","RU_ALA_WIEN_CHAM","RU_ALA_B2B_CHAM"],"sample_lyric_line":"Девочка моя Джулия, под тёплыми звёздами Алматы\nмы всё сделали по красоте, родной, базару нет —\nразговор по душам за широким дастарханом, прежде чем рвануть на Медеу!"},
+    {"uid":"LT_SONG_RU_ALA_ASTUDIO_НЕТ","song_uid":"SONG_RU_ALA_ASTUDIO","register_id":"RU_ALA","lang_code":"ru","token":"нет","lemma":"нет","meaning_gloss":"High-frequency motif in Джулия (Julia)","is_chorus_hook":true,"song_count":3,"chorus_count":2,"card_count":9,"total_frequency":12,"frequency_score":1.0,"freq_tier":"CHORUS_EARWORM","vocab_uid":null,"idiom_term":null,"connected_card_uids":["RU_ALA_SPARK_CHAM","HOCH_RU_ALA_BASE","RU_ALA_ADVENTURE_CHAM","RU_ALA_RUNWAY_CHAM","RU_ALA_CHAM","RU_ALA_HOCHKULTUR_CHAM","RU_ALA_POLO_CHAM","RU_ALA_WIEN_CHAM","RU_ALA_B2B_CHAM"],"sample_lyric_line":"Девочка моя Джулия, под тёплыми звёздами Алматы\nмы всё сделали по красоте, родной, базару нет —\nразговор по душам за широким дастарханом, прежде чем рвануть на Медеу!"},
+    {"uid":"LT_SONG_RU_ALA_ASTUDIO_ПО_КРАСОТЕ","song_uid":"SONG_RU_ALA_ASTUDIO","register_id":"RU_ALA","lang_code":"ru","token":"по красоте","lemma":"красота","meaning_gloss":"Built cleanly with soul, precision, and mastery","is_chorus_hook":true,"song_count":3,"chorus_count":2,"card_count":9,"total_frequency":12,"frequency_score":1.0,"freq_tier":"CHORUS_EARWORM","vocab_uid":null,"idiom_term":null,"connected_card_uids":["RU_ALA_SPARK_COMP","RUNWAY_RU_ALA_BASE","RU_ALA_ADVENTURE_COMP","RU_ALA_COMP","RU_ALA_HOCHKULTUR_COMP","RU_ALA_POLO_COMP","RU_ALA_WIEN_COMP","RU_ALA_B2B_COMP","RU_ALA_RUNWAY_COMP"],"sample_lyric_line":"Девочка моя Джулия, под тёплыми звёздами Алматы\nмы всё сделали по красоте, родной, базару нет —\nразговор по душам за широким дастарханом, прежде чем рвануть на Медеу!"},
+    {"uid":"LT_SONG_RU_ALA_ASTUDIO_СДЕЛАЛИ_ПО_КРАСОТЕ","song_uid":"SONG_RU_ALA_ASTUDIO","register_id":"RU_ALA","lang_code":"ru","token":"сделали по красоте","lemma":"сделали по красоте","meaning_gloss":"Executed flawlessly with aesthetic mastery","is_chorus_hook":true,"song_count":3,"chorus_count":2,"card_count":9,"total_frequency":12,"frequency_score":1.0,"freq_tier":"CHORUS_EARWORM","vocab_uid":"RU_V_KRASOTA","idiom_term":"сделали по красоте","connected_card_uids":["RU_ALA_SPARK_COMP","RUNWAY_RU_ALA_BASE","RU_ALA_ADVENTURE_COMP","RU_ALA_COMP","RU_ALA_HOCHKULTUR_COMP","RU_ALA_POLO_COMP","RU_ALA_WIEN_COMP","RU_ALA_B2B_COMP","RU_ALA_RUNWAY_COMP"],"sample_lyric_line":"Девочка моя Джулия, под тёплыми звёздами Алматы\nмы всё сделали по красоте, родной, базару нет —\nразговор по душам за широким дастарханом, прежде чем рвануть на Медеу!"},
+    {"uid":"LT_SONG_RU_ALA_ASTUDIO_СДЕЛАЛИ","song_uid":"SONG_RU_ALA_ASTUDIO","register_id":"RU_ALA","lang_code":"ru","token":"сделали","lemma":"сделали","meaning_gloss":"High-frequency motif in Джулия (Julia)","is_chorus_hook":true,"song_count":2,"chorus_count":1,"card_count":8,"total_frequency":10,"frequency_score":1.0,"freq_tier":"CHORUS_EARWORM","vocab_uid":null,"idiom_term":null,"connected_card_uids":["RU_ALA_SPARK_COMP","RUNWAY_RU_ALA_BASE","RU_ALA_COMP","RU_ALA_HOCHKULTUR_COMP","RU_ALA_POLO_COMP","RU_ALA_WIEN_COMP","RU_ALA_B2B_COMP","RU_ALA_RUNWAY_COMP"],"sample_lyric_line":"Девочка моя Джулия, под тёплыми звёздами Алматы\nмы всё сделали по красоте, родной, базару нет —\nразговор по душам за широким дастарханом, прежде чем рвануть на Медеу!"},
+    {"uid":"LT_SONG_RU_ALA_ASTUDIO_ДЖУЛИЯ","song_uid":"SONG_RU_ALA_ASTUDIO","register_id":"RU_ALA","lang_code":"ru","token":"джулия","lemma":"джулия","meaning_gloss":"Almaty romantic & nostalgic hook refrain","is_chorus_hook":true,"song_count":8,"chorus_count":2,"card_count":0,"total_frequency":8,"frequency_score":1.0,"freq_tier":"CHORUS_EARWORM","vocab_uid":null,"idiom_term":null,"connected_card_uids":[],"sample_lyric_line":"Мы незаметно подросли, и эти дни давно ушли,\nи я не скрывал, что лишь о тебе мечтал:\nДжули-Джулия, Джули-Джулия!"},
+    {"uid":"LT_SONG_RU_ALA_ASTUDIO_РОДНОИ","song_uid":"SONG_RU_ALA_ASTUDIO","register_id":"RU_ALA","lang_code":"ru","token":"родной","lemma":"родной","meaning_gloss":"Kinship vocative dissolving formal walls","is_chorus_hook":true,"song_count":2,"chorus_count":1,"card_count":5,"total_frequency":7,"frequency_score":0.968,"freq_tier":"CHORUS_EARWORM","vocab_uid":null,"idiom_term":null,"connected_card_uids":["RUNWAY_RU_ALA_BASE","RU_ALA_ADVENTURE_COMP","RU_ALA_COMP","RU_ALA_WIEN_COMP","RU_ALA_RUNWAY_COMP"],"sample_lyric_line":"Девочка моя Джулия, под тёплыми звёздами Алматы\nмы всё сделали по красоте, родной, базару нет —\nразговор по душам за широким дастарханом, прежде чем рвануть на Медеу!"},
+    {"uid":"LT_SONG_RU_ALA_ASTUDIO_ДАСТАРХАН","song_uid":"SONG_RU_ALA_ASTUDIO","register_id":"RU_ALA","lang_code":"ru","token":"дастархан","lemma":"дастархан","meaning_gloss":"Generous table of high-trust partnership","is_chorus_hook":true,"song_count":3,"chorus_count":2,"card_count":1,"total_frequency":4,"frequency_score":0.737,"freq_tier":"CHORUS_EARWORM","vocab_uid":null,"idiom_term":null,"connected_card_uids":["RU_ALA_CHAM"],"sample_lyric_line":"Девочка моя Джулия, под тёплыми звёздами Алматы\nмы всё сделали по красоте, родной, базару нет —\nразговор по душам за широким дастарханом, прежде чем рвануть на Медеу!"},
+    {"uid":"LT_SONG_RU_ALA_ASTUDIO_ЗА_ШИРОКИМ_ДАСТАРХАНОМ","song_uid":"SONG_RU_ALA_ASTUDIO","register_id":"RU_ALA","lang_code":"ru","token":"за широким дастарханом","lemma":"за широким дастарханом","meaning_gloss":"Around a generous table of high-trust hospitality","is_chorus_hook":true,"song_count":3,"chorus_count":2,"card_count":1,"total_frequency":4,"frequency_score":0.737,"freq_tier":"CHORUS_EARWORM","vocab_uid":"RU_V_DASTARKHAN","idiom_term":null,"connected_card_uids":["RU_ALA_CHAM"],"sample_lyric_line":"Девочка моя Джулия, под тёплыми звёздами Алматы\nмы всё сделали по красоте, родной, базару нет —\nразговор по душам за широким дастарханом, прежде чем рвануть на Медеу!"},
+    {"uid":"LT_SONG_RU_ALA_ASTUDIO_ШИРОКИМ","song_uid":"SONG_RU_ALA_ASTUDIO","register_id":"RU_ALA","lang_code":"ru","token":"широким","lemma":"широким","meaning_gloss":"High-frequency motif in Джулия (Julia)","is_chorus_hook":true,"song_count":3,"chorus_count":2,"card_count":1,"total_frequency":4,"frequency_score":0.737,"freq_tier":"CHORUS_EARWORM","vocab_uid":null,"idiom_term":null,"connected_card_uids":["RU_ALA_CHAM"],"sample_lyric_line":"Девочка моя Джулия, под тёплыми звёздами Алматы\nмы всё сделали по красоте, родной, базару нет —\nразговор по душам за широким дастарханом, прежде чем рвануть на Медеу!"},
+    {"uid":"LT_SONG_RU_ALA_ASTUDIO_ПО_ДУШАМ","song_uid":"SONG_RU_ALA_ASTUDIO","register_id":"RU_ALA","lang_code":"ru","token":"по душам","lemma":"душа","meaning_gloss":"Heart-to-heart straight talk without masks","is_chorus_hook":true,"song_count":2,"chorus_count":1,"card_count":1,"total_frequency":3,"frequency_score":0.505,"freq_tier":"CHORUS_EARWORM","vocab_uid":null,"idiom_term":null,"connected_card_uids":["RU_ALA_CHAM"],"sample_lyric_line":"Девочка моя Джулия, под тёплыми звёздами Алматы\nмы всё сделали по красоте, родной, базару нет —\nразговор по душам за широким дастарханом, прежде чем рвануть на Медеу!"},
+    {"uid":"LT_SONG_RU_ALA_ASTUDIO_ДЕВОЧКА","song_uid":"SONG_RU_ALA_ASTUDIO","register_id":"RU_ALA","lang_code":"ru","token":"девочка","lemma":"девочка","meaning_gloss":"High-frequency motif in Джулия (Julia)","is_chorus_hook":true,"song_count":2,"chorus_count":2,"card_count":0,"total_frequency":2,"frequency_score":0.463,"freq_tier":"CHORUS_EARWORM","vocab_uid":null,"idiom_term":null,"connected_card_uids":[],"sample_lyric_line":"Девочка моя Джулия, под тёплыми звёздами Алматы\nмы всё сделали по красоте, родной, базару нет —\nразговор по душам за широким дастарханом, прежде чем рвануть на Медеу!"}
+  ]
+}

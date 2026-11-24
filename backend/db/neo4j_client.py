@@ -13,6 +13,7 @@ NEO4J_CONSTRAINTS = [
     "CREATE CONSTRAINT card_uid_unique IF NOT EXISTS FOR (c:Card) REQUIRE c.uid IS UNIQUE",
     "CREATE CONSTRAINT vocab_uid_unique IF NOT EXISTS FOR (v:Vocab) REQUIRE v.uid IS UNIQUE",
     "CREATE CONSTRAINT song_uid_unique IF NOT EXISTS FOR (s:Song) REQUIRE s.uid IS UNIQUE",
+    "CREATE CONSTRAINT lyric_token_uid_unique IF NOT EXISTS FOR (lt:LyricToken) REQUIRE lt.uid IS UNIQUE",
     "CREATE CONSTRAINT bridge_uid_unique IF NOT EXISTS FOR (b:Bridge) REQUIRE b.uid IS UNIQUE",
     "CREATE CONSTRAINT idiom_term_unique IF NOT EXISTS FOR (i:Idiom) REQUIRE i.term IS UNIQUE",
     "CREATE CONSTRAINT state_id_unique IF NOT EXISTS FOR (s:State) REQUIRE s.id IS UNIQUE",

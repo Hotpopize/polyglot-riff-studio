@@ -172,6 +172,11 @@
       "register_id": "AT_VIE",
       "original_lang": "AT_VIE",
       "original_lyric": "Vienna Calling! Oida, die Zeit rennt davon. Kein Stress, der Schmäh rennt eh von allein, musst nur die Vorsicht an der Garderobe abgeben.",
+      "source_url": "https://falco.at/discography/vienna-calling/",
+      "reach_channel": "agent-reach+jina",
+      "lyric_shard": "db/lyrics/song_at_vie_falco.lyrics.json",
+      "total_token_count": 91,
+      "unique_token_count": 65,
       "translation_es": "¡Llamada desde Viena! Oida, el tiempo se nos va. Cero estrés, el encanto vienés fluye solo de todos modos, solo debes dejar la cautela en el ropero.",
       "translation_en": "Vienna Calling! Oida, time is running out. No stress, the Schmäh runs by itself anyway, you just have to check your caution at the coat rack.",
       "translation_cz": "Vídeň volá! Oida, čas utíká. Žádný stres, ten Schmäh stejně běží sám od sebe, jen musíš nechat opatrnost v šatně.",
@@ -182,7 +187,8 @@
       "reinforces_card_uid": "AT_VIE_CHAM",
       "slang_vocab_uids": [
         "DE_V_SCHMAEH",
-        "DE_V_PARTICLES"
+        "DE_V_PARTICLES",
+        "DE_V_GSCHICHTL"
       ]
     }
   ],

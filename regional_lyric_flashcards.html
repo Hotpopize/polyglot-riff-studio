@@ -41,9 +41,9 @@
 <body class="min-h-screen flex flex-col selection:bg-amber-500 selection:text-black">
 
   <!-- TOP HEADER -->
-  <header class="border-b border-slate-800/80 bg-slate-950/90 backdrop-blur sticky top-0 z-30 px-4 py-3">
-    <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-3">
-      <div class="flex items-center gap-3">
+  <header class="border-b border-slate-800/80 bg-slate-950/90 backdrop-blur sticky top-0 z-30 px-4 py-2 embed-no-sticky-brand">
+    <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-2">
+      <div data-embed-hide="true" class="flex items-center gap-3">
         <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-500 via-rose-500 to-purple-600 flex items-center justify-center font-bold text-white shadow-lg shadow-amber-500/20">
           <i data-lucide="music-2" class="w-5 h-5"></i>
         </div>
@@ -56,19 +56,31 @@
         </div>
       </div>
 
-      <!-- Audio Rhythm Player Trigger -->
-      <div class="flex items-center gap-2">
-        <button id="masterAudioBtn" onclick="toggleAudio()" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-amber-500 hover:bg-amber-400 text-slate-950 transition flex items-center gap-1.5 shadow-md">
-          <i data-lucide="play" id="audioIcon" class="w-3.5 h-3.5 fill-current"></i>
-          <span id="audioLabel">Play Cadence Beat</span>
-        </button>
-        <span id="bpmBadge" class="text-xs mono px-2 py-1 rounded bg-slate-900 border border-slate-800 text-amber-300 font-semibold">130 BPM</span>
+      <!-- Audio Rhythm Player Trigger + Cross-Tab Workflow Handoffs -->
+      <div class="flex flex-wrap items-center justify-between sm:justify-end gap-2 w-full sm:w-auto sm:ml-auto">
+        <div class="flex items-center gap-1.5">
+          <button id="masterAudioBtn" onclick="toggleAudio()" class="px-3 py-1 rounded-lg text-xs font-semibold bg-amber-500 hover:bg-amber-400 text-slate-950 transition flex items-center gap-1.5 shadow-md">
+            <i data-lucide="play" id="audioIcon" class="w-3.5 h-3.5 fill-current"></i>
+            <span id="audioLabel">Play Cadence Beat</span>
+          </button>
+          <span id="bpmBadge" class="text-xs mono px-2 py-1 rounded bg-slate-900 border border-slate-800 text-amber-300 font-semibold">130 BPM</span>
+        </div>
+        <div class="flex items-center gap-1.5 text-[11px] mono">
+          <button onclick="window.PolyglotSyncBus && window.PolyglotSyncBus.navigateApp('polyglot_riff_studio_v3_1_atelier_edition.html', { registerId: ANTHEMS[currentIdx]?.id === 'WEEKND' ? 'EN_YYC' : ANTHEMS[currentIdx]?.id })"
+            class="px-2 py-1 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/35 text-emerald-300 transition whitespace-nowrap">
+            ★ Drill 4-C →
+          </button>
+          <button onclick="window.PolyglotSyncBus && window.PolyglotSyncBus.navigateApp('polyglot_audio_rhythm_studio_v4_5.html', { registerId: ANTHEMS[currentIdx]?.id === 'WEEKND' ? 'EN_YYC' : ANTHEMS[currentIdx]?.id, subview: 'weeknd' })"
+            class="px-2 py-1 rounded-lg bg-fuchsia-500/15 hover:bg-fuchsia-500/25 border border-fuchsia-500/35 text-fuchsia-300 transition whitespace-nowrap">
+            🎛️ Rhythm Lab →
+          </button>
+        </div>
       </div>
     </div>
   </header>
 
   <!-- MAIN INTERFACE -->
-  <main class="max-w-6xl w-full mx-auto p-4 sm:p-6 space-y-6 flex-1">
+  <main class="embed-compact-main max-w-6xl w-full mx-auto p-3 sm:p-4 space-y-4 flex-1">
 
     <!-- TRACK SELECTOR TABS -->
     <div class="flex items-center gap-1.5 overflow-x-auto pb-1" id="trackTabs"></div>
@@ -227,12 +239,58 @@
 
     </div>
 
+    <!-- FULL INDEXED STANZAS & NEO4J LYRIC FREQUENCY MATRIX (:LyricToken) -->
+    <section class="neon-panel-subtle rounded-2xl p-5 sm:p-6 space-y-4 border border-amber-500/20">
+      <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3">
+        <div>
+          <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-400 mono">
+            <i data-lucide="network" class="w-4 h-4"></i>
+            <span>Agent-Reach Full Lyrics &amp; Neo4j :LyricToken Frequency Index</span>
+          </div>
+          <p class="text-[11px] text-slate-400 mt-0.5">
+            Every stanza is tokenized and wired via <code class="mono text-amber-300">:HAS_LYRIC_TOKEN</code>, <code class="mono text-cyan-300">:REINFORCES_VOCAB</code>, <code class="mono text-fuchsia-300">:REINFORCES_IDIOM</code>, and <code class="mono text-emerald-300">:BOOSTS_CARD_FREQUENCY</code> to prioritize high-frequency drills.
+          </p>
+        </div>
+        <div class="flex items-center gap-2">
+          <span id="reachStatusBadge" class="text-[10px] mono px-2.5 py-1 rounded bg-slate-900 border border-slate-800 text-slate-300">
+            Ready (:LyricToken Sync)
+          </span>
+          <button id="reachIndexBtn" onclick="runAgentReachIndex()" class="px-3 py-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-300 text-xs font-semibold mono transition flex items-center gap-1.5">
+            <i data-lucide="radar" class="w-3.5 h-3.5"></i>
+            <span>⚡ Agent-Reach Index Lyrics</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <!-- Full Indexed Stanzas -->
+        <div class="lg:col-span-5 space-y-2.5">
+          <div class="text-[11px] mono uppercase text-amber-300 font-bold flex items-center justify-between">
+            <span>Full Indexed Lyric Stanzas</span>
+            <span id="stanzaStatsBadge" class="text-slate-400 font-normal">4 stanzas</span>
+          </div>
+          <div id="stanzasBox" class="space-y-2.5 max-h-[340px] overflow-y-auto pr-1 text-xs leading-relaxed"></div>
+        </div>
+
+        <!-- Neo4j Frequency Tokens + Connected Nodes -->
+        <div class="lg:col-span-7 space-y-2.5">
+          <div class="text-[11px] mono uppercase text-cyan-300 font-bold flex items-center justify-between">
+            <span>Cross-Corpus Frequency Ranking (Song × Card Links)</span>
+            <span id="graphLinksSummary" class="text-emerald-300 font-normal">Neo4j Connected</span>
+          </div>
+          <div id="lyricTokensBox" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-[340px] overflow-y-auto pr-1"></div>
+        </div>
+      </div>
+    </section>
+
   </main>
 
   <script>
     const ANTHEMS = [
       {
         id: 'CZ_OVA',
+        uid: 'SONG_CZ_OVA_NOHAVICA',
+        lyric_shard: './db/lyrics/song_cz_ova_nohavica.lyrics.json',
         flag: '🇨🇿',
         city: 'Ostrava',
         title: 'Ostrava',
@@ -240,8 +298,8 @@
         genre: 'Industrial Miner Grit • Ostravština',
         bpm: 130,
         lyric: '„Ostrava, Ostrava, město mezi městy, kaj ľudzie fchytaju šichtu a po robotě maju čistý fajront, bo ten motor pojede sám.“',
-        slang: 'šichta • fajront • bo',
-        cypherUid: '(:Song {uid: \'SONG_CZ_OVA_NOHAVICA\'})-[:REINFORCES_CARD_VIBE]->(CZ_OVA_COUNT)',
+        slang: 'šichta • fajront • bo • fachat',
+        cypherUid: '(:Song {uid: \'SONG_CZ_OVA_NOHAVICA\'})-[:HAS_LYRIC_TOKEN]->(:LyricToken)',
         translations: [
           { lang: '🇪🇸 Spanish', text: '"Ostrava, Ostrava, ciudad entre ciudades, donde la gente agarra el turno de trabajo y tras la labor tiene el fajront limpio, porque el motor funcionará solo."' },
           { lang: '🇬🇧 English', text: '"Ostrava, Ostrava, city among cities, where people catch their shift and after work enjoy clean quitting time, because the engine will run by itself."' },
@@ -255,6 +313,8 @@
       },
       {
         id: 'AT_VIE',
+        uid: 'SONG_AT_VIE_FALCO',
+        lyric_shard: './db/lyrics/song_at_vie_falco.lyrics.json',
         flag: '🇦🇹',
         city: 'Vienna',
         title: 'Vienna Calling',
@@ -263,7 +323,7 @@
         bpm: 92,
         lyric: '„Vienna Calling! Oida, die Zeit rennt davon. Kein Stress, der Schmäh rennt eh von allein, musst nur die Vorsicht an der Garderobe abgeben.“',
         slang: 'Oida • der Schmäh • eh • Garderobe',
-        cypherUid: '(:Song {uid: \'SONG_AT_VIE_FALCO\'})-[:REINFORCES_CARD_VIBE]->(AT_VIE_CHAM)',
+        cypherUid: '(:Song {uid: \'SONG_AT_VIE_FALCO\'})-[:HAS_LYRIC_TOKEN]->(:LyricToken)',
         translations: [
           { lang: '🇪🇸 Spanish', text: '"¡Llamada desde Viena! Oida, el tiempo se nos va. Cero estrés, el encanto vienés fluye solo de todos modos, solo debes dejar la cautela en el ropero."' },
           { lang: '🇨🇿 Czech', text: '„Vídeň volá! Oida, čas utíká. Žádný stres, ten Schmäh stejně běží sám od sebe, jen musíš nechat opatrnost v šatně.“' },
@@ -277,6 +337,8 @@
       },
       {
         id: 'RU_ALA',
+        uid: 'SONG_RU_ALA_ASTUDIO',
+        lyric_shard: './db/lyrics/song_ru_ala_astudio.lyrics.json',
         flag: '🇰🇿',
         city: 'Almaty',
         title: 'Джулия (Julia)',
@@ -285,7 +347,7 @@
         bpm: 88,
         lyric: '«Девочка моя Джулия, под тёплыми звёздами Алматы мы всё сделаем по красоте, базару нет, как за широким дастарханом.»',
         slang: 'по красоте • базару нет • дастархан',
-        cypherUid: '(:Song {uid: \'SONG_RU_ALA_ASTUDIO\'})-[:REINFORCES_CARD_VIBE]->(RU_ALA_COMP)',
+        cypherUid: '(:Song {uid: \'SONG_RU_ALA_ASTUDIO\'})-[:HAS_LYRIC_TOKEN]->(:LyricToken)',
         translations: [
           { lang: '🇪🇸 Spanish', text: '"Mi chica Julia, bajo las cálidas estrellas de Almaty lo haremos todo con pura belleza, sin duda alguna, como en un gran dastarhan."' },
           { lang: '🇬🇧 English', text: '"My girl Julia, under the warm stars of Almaty we will do everything with absolute beauty, zero doubt, like at a wide dastarhan."' },
@@ -299,6 +361,8 @@
       },
       {
         id: 'EN_YYC',
+        uid: 'SONG_EN_YYC_LOVERBOY',
+        lyric_shard: './db/lyrics/song_en_yyc_loverboy.lyrics.json',
         flag: '🇨🇦',
         city: 'Calgary',
         title: 'Working for the Weekend',
@@ -307,7 +371,7 @@
         bpm: 116,
         lyric: '"Everybody is working for the weekend, bud! Stop being all hat and no cattle, kick the garage door open and just give ’er!"',
         slang: 'all hat and no cattle • give ’er • bud',
-        cypherUid: '(:Song {uid: \'SONG_EN_YYC_LOVERBOY\'})-[:REINFORCES_CARD_VIBE]->(EN_YYC_CUR)',
+        cypherUid: '(:Song {uid: \'SONG_EN_YYC_LOVERBOY\'})-[:HAS_LYRIC_TOKEN]->(:LyricToken)',
         translations: [
           { lang: '🇪🇸 Spanish', text: '"¡Todo el mundo trabaja para el fin de semana, viejo! Déjate de postureo sin sustancia, abre la puerta del garaje y ¡dale a todo trapo!"' },
           { lang: '🇨🇿 Czech', text: '„Všichni makají na víkend, kámo! Přestaň dělat ramena bez výsledků, otevři vrata garáže a prostě to roztaj na plný plyn!“' },
@@ -321,6 +385,8 @@
       },
       {
         id: 'ES_SOT',
+        uid: 'SONG_ES_SOT_CAMARON',
+        lyric_shard: './db/lyrics/song_es_sot_camaron.lyrics.json',
         flag: '🇪🇸',
         city: 'Sotogrande',
         title: 'Volando Voy',
@@ -329,7 +395,7 @@
         bpm: 104,
         lyric: '"Volando voy, volando vengo, por el camino yo me entretengo. Enamorao de la vida, porque esto tiene duende y no hay que mirar los toros desde la barrera."',
         slang: 'duende • mirar los toros desde la barrera',
-        cypherUid: '(:Song {uid: \'SONG_ES_SOT_CAMARON\'})-[:REINFORCES_CARD_VIBE]->(ES_SOT_COMP)',
+        cypherUid: '(:Song {uid: \'SONG_ES_SOT_CAMARON\'})-[:HAS_LYRIC_TOKEN]->(:LyricToken)',
         translations: [
           { lang: '🇬🇧 English', text: '"Flying I go, flying I come, along the way I enjoy myself. In love with life, because this has true duende and you shouldn\'t watch the bulls from the sidelines."' },
           { lang: '🇨🇿 Czech', text: '„Létám sem a tam, cestou se bavím. Zamilovaný do života, bo to má skutočný duende a nemá smysl koukat na býky jen z bariéry.“' },
@@ -343,6 +409,8 @@
       },
       {
         id: 'WEEKND',
+        uid: 'SONG_WEEKND_OOTG',
+        lyric_shard: './db/lyrics/song_weeknd_ootg.lyrics.json',
         flag: '✨',
         city: 'Global Pop',
         title: 'One of the Girls',
@@ -351,7 +419,7 @@
         bpm: 87,
         lyric: '"Give me tough love, leave me with no breath... Push me down on my knees, tell me I belong to the world."',
         slang: 'tough love • velvet surrender • high-stakes devotion',
-        cypherUid: '(:Song {uid: \'SONG_WEEKND_OOTG\'})-[:REINFORCES_CARD_VIBE]->(EN_YYC_CHAM)',
+        cypherUid: '(:Song {uid: \'SONG_WEEKND_OOTG\'})-[:HAS_LYRIC_TOKEN]->(:LyricToken)',
         translations: [
           { lang: '🇪🇸 Spanish', text: '"Dame amor duro, déjame sin aliento... Empújame de rodillas, dime que pertenezco al mundo."' },
           { lang: '🇨🇿 Czech', text: '„Dej mi tvrdou lásku, nech mě bez dechu... Sraz mě na kolena, řekni mi, že patřím světu.“' },
@@ -389,9 +457,144 @@
       }
     }
 
+    function escHtml(v) {
+      return String(v == null ? '' : v)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function renderFrequencyMatrix() {
+      const a = ANTHEMS[currentIdx];
+      const stanzasEl = document.getElementById('stanzasBox');
+      const tokensEl = document.getElementById('lyricTokensBox');
+      const stanzaBadge = document.getElementById('stanzaStatsBadge');
+      const graphSummary = document.getElementById('graphLinksSummary');
+      if (!stanzasEl || !tokensEl) return;
+
+      const stanzas = a.lyric_stanzas && a.lyric_stanzas.length ? a.lyric_stanzas : [a.lyric];
+      const tokens = a.lyric_tokens || [];
+      if (stanzaBadge) {
+        const wc = a.total_token_count ? ` • ${a.total_token_count} words` : '';
+        stanzaBadge.textContent = `${stanzas.length} stanzas${wc}`;
+      }
+
+      const highlightTerms = tokens.map(t => t.token).filter(t => t && t.length >= 2);
+      stanzasEl.innerHTML = stanzas.map((st, idx) => {
+        let html = escHtml(st);
+        highlightTerms.forEach(term => {
+          try {
+            const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            html = html.replace(
+              new RegExp(`(${escaped})`, 'gi'),
+              '<span class="px-1 rounded bg-amber-500/20 text-amber-200 border-b border-amber-400/60 font-semibold">$1</span>'
+            );
+          } catch (_) {}
+        });
+        return `
+          <div class="p-3 rounded-xl bg-slate-950/80 border border-slate-800/80">
+            <div class="text-[10px] mono text-amber-400/80 mb-1 uppercase">Stanza ${idx + 1} ${idx === stanzas.length - 1 ? '• Regional Chorus Hook' : ''}</div>
+            <div class="text-slate-200 leading-relaxed">${html.replace(/\n/g, '<br>')}</div>
+          </div>
+        `;
+      }).join('');
+
+      const vocabCnt = new Set(tokens.map(t => t.vocab_uid).filter(Boolean)).size;
+      const idiomCnt = new Set(tokens.map(t => t.idiom_term).filter(Boolean)).size;
+      const cardCnt = new Set(tokens.flatMap(t => t.connected_card_uids || [])).size;
+      if (graphSummary) {
+        graphSummary.textContent = `${tokens.length} :LyricToken • ${vocabCnt} Vocab • ${idiomCnt} Idiom • ${cardCnt} Cards`;
+      }
+
+      if (!tokens.length) {
+        tokensEl.innerHTML = `<div class="text-xs text-slate-400 italic col-span-2">${a._loadingLyrics ? '⏳ Lazy-loading split lyric shard...' : 'Click "⚡ Agent-Reach Index Lyrics" to index tokens &amp; frequency links for this song.'}</div>`;
+        return;
+      }
+
+      tokensEl.innerHTML = tokens.map(lt => {
+        const pct = Math.min(100, Math.round((Number(lt.frequency_score || 0.4)) * 100));
+        const cards = lt.connected_card_uids || [];
+        return `
+          <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1.5 text-xs">
+            <div class="flex items-center justify-between gap-2">
+              <span class="font-bold text-amber-300 mono text-sm">"${escHtml(lt.token)}"</span>
+              <span class="text-[10px] mono px-1.5 py-0.5 rounded bg-emerald-950/70 border border-emerald-500/30 text-emerald-300">
+                ${pct}% Freq
+              </span>
+            </div>
+            <div class="text-[11px] text-slate-300 leading-snug">${escHtml(lt.meaning_gloss || '')}</div>
+            <div class="w-full h-1.5 rounded-full bg-slate-900 overflow-hidden">
+              <div class="h-full bg-gradient-to-r from-amber-400 to-emerald-400" style="width:${pct}%"></div>
+            </div>
+            <div class="flex flex-wrap items-center gap-1.5 pt-0.5 text-[10px] mono">
+              <span class="px-1.5 py-0.5 rounded bg-slate-900 text-amber-200 border border-slate-800">Song: ${lt.song_count}×</span>
+              <span class="px-1.5 py-0.5 rounded bg-slate-900 text-cyan-200 border border-slate-800">Cards: ${lt.card_count}×</span>
+              ${lt.vocab_uid ? `<span class="px-1.5 py-0.5 rounded bg-indigo-950/70 text-indigo-300 border border-indigo-500/30">:Vocab ${escHtml(lt.vocab_uid)}</span>` : ''}
+              ${lt.idiom_term ? `<span class="px-1.5 py-0.5 rounded bg-fuchsia-950/70 text-fuchsia-300 border border-fuchsia-500/30">:Idiom</span>` : ''}
+              ${cards.length ? `<span class="px-1.5 py-0.5 rounded bg-emerald-950/50 text-emerald-300 border border-emerald-500/20">${escHtml(cards[0])}${cards.length > 1 ? ` +${cards.length - 1}` : ''}</span>` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function ensureTrackLyricsLoaded(idx = currentIdx, forceRefresh = false) {
+      const a = ANTHEMS[idx];
+      if (!a || !window.PolyglotAPI || typeof window.PolyglotAPI.fetchSongFrequency !== 'function') return;
+      if (!forceRefresh && Array.isArray(a.lyric_tokens) && a.lyric_tokens.length && Array.isArray(a.lyric_stanzas) && a.lyric_stanzas.length) {
+        return;
+      }
+      a._loadingLyrics = true;
+      if (idx === currentIdx) renderFrequencyMatrix();
+      try {
+        const res = await window.PolyglotAPI.fetchSongFrequency(a.uid, forceRefresh);
+        const liveSong = (res && res.song) || {};
+        if (Array.isArray(liveSong.lyric_stanzas) && liveSong.lyric_stanzas.length) {
+          a.lyric_stanzas = liveSong.lyric_stanzas;
+        }
+        if (res && Array.isArray(res.lyric_tokens)) {
+          a.lyric_tokens = res.lyric_tokens;
+        } else if (Array.isArray(liveSong.lyric_tokens)) {
+          a.lyric_tokens = liveSong.lyric_tokens;
+        }
+        a.total_token_count = liveSong.total_token_count || a.total_token_count;
+        a.unique_token_count = liveSong.unique_token_count || a.unique_token_count;
+      } catch (_) {
+      } finally {
+        a._loadingLyrics = false;
+        if (idx === currentIdx) renderFrequencyMatrix();
+      }
+    }
+
     async function hydrateLiveSongsAndEdges() {
       if (!window.PolyglotAPI) return;
       try {
+        const songRes = await window.PolyglotAPI.fetchSongs();
+        if (songRes && Array.isArray(songRes.songs) && songRes.songs.length) {
+          songRes.songs.forEach(liveSong => {
+            const match = ANTHEMS.find(a => a.uid === liveSong.uid || (a.id === 'CZ_OVA' && liveSong.uid === 'SONG_CZ_OVA_NOHAVICA'));
+            if (match) {
+              match.uid = liveSong.uid;
+              match.lyric_shard = liveSong.lyric_shard || match.lyric_shard;
+              if (Array.isArray(liveSong.lyric_stanzas) && liveSong.lyric_stanzas.length) {
+                match.lyric_stanzas = liveSong.lyric_stanzas;
+              }
+              if (Array.isArray(liveSong.lyric_tokens) && liveSong.lyric_tokens.length) {
+                match.lyric_tokens = liveSong.lyric_tokens;
+              }
+              match.total_token_count = liveSong.total_token_count || match.total_token_count;
+              match.unique_token_count = liveSong.unique_token_count || match.unique_token_count;
+            }
+          });
+          const rBadge = document.getElementById('reachStatusBadge');
+          if (rBadge) {
+            rBadge.textContent = songRes.offlineShardMode
+              ? 'Offline Split .lyrics.json (:LyricToken Lazy)'
+              : 'Live PG + Neo4j (:LyricToken Synced)';
+          }
+        }
+        await ensureTrackLyricsLoaded(currentIdx, false);
         const st = await window.PolyglotAPI.fetchFullState(false);
         if (st && Array.isArray(st.edges)) {
           Object.values(ANTHEM_EDGE_MAP).forEach(meta => {
@@ -406,6 +609,36 @@
           renderFsrsTelemetry();
         }
       } catch (_) {}
+    }
+
+    async function runAgentReachIndex() {
+      const btn = document.getElementById('reachIndexBtn');
+      const rBadge = document.getElementById('reachStatusBadge');
+      if (btn) btn.disabled = true;
+      if (rBadge) rBadge.textContent = '⏳ Agent-Reach indexing & syncing Neo4j...';
+      try {
+        if (window.PolyglotAPI && typeof window.PolyglotAPI.reachAndIndexSongs === 'function') {
+          const res = await window.PolyglotAPI.reachAndIndexSongs(true);
+          if (res && res.index) {
+            if (typeof window.PolyglotAPI.clearLyricShardCache === 'function') {
+              window.PolyglotAPI.clearLyricShardCache();
+            }
+            ANTHEMS.forEach(item => {
+              delete item.lyric_stanzas;
+              delete item.lyric_tokens;
+            });
+            await hydrateLiveSongsAndEdges();
+            await ensureTrackLyricsLoaded(currentIdx, true);
+            if (rBadge) {
+              rBadge.textContent = `✓ Indexed ${res.index.total_lyric_tokens} :LyricToken → Neo4j (${res.sync?.synced_counts?.lyric_tokens || res.index.total_lyric_tokens} synced)`;
+            }
+          }
+        }
+      } catch (err) {
+        if (rBadge) rBadge.textContent = '⚡ Offline .lyrics.json Frequency Index Active';
+      } finally {
+        if (btn) btn.disabled = false;
+      }
     }
 
     async function gradeAnthemPivot(score) {
@@ -478,6 +711,7 @@
       document.getElementById('deliveryRule').textContent = a.deliveryRule;
       document.getElementById('cypherUidTag').textContent = a.cypherUid;
       renderFsrsTelemetry();
+      renderFrequencyMatrix();
       const fb = document.getElementById('fsrsFeedbackMsg');
       if (fb) fb.textContent = '';
 
@@ -488,6 +722,7 @@
       if (Tone.Transport && Tone.Transport.bpm) {
         Tone.Transport.bpm.value = a.bpm;
       }
+      ensureTrackLyricsLoaded(currentIdx, false);
     }
 
     function flipCard() {

@@ -37,8 +37,8 @@
 
   <!-- TOP NAVIGATION BAR -->
   <header class="border-b border-slate-800 bg-slate-950/90 backdrop-blur sticky top-0 z-30">
-    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-4">
-      <div class="flex items-center gap-3">
+    <div class="embed-no-sticky-brand max-w-7xl mx-auto px-4 py-2 flex flex-wrap items-center justify-between gap-2">
+      <div data-embed-hide="true" class="flex items-center gap-3">
         <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-indigo-500 via-amber-500 to-emerald-500 flex items-center justify-center font-bold text-slate-950 shadow-lg">
           4C
         </div>
@@ -52,36 +52,40 @@
       </div>
 
       <!-- Mode Switcher -->
-      <div class="flex items-center gap-1.5 bg-slate-900 p-1 rounded-xl border border-slate-800">
-        <button onclick="switchMode('studio')" id="btn-mode-studio" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition bg-indigo-600 text-white">
-          1. 4-C Studio & SRS Drill
+      <div class="flex items-center gap-1 bg-slate-900 p-0.5 rounded-xl border border-slate-800 overflow-x-auto max-w-full">
+        <button onclick="switchMode('studio')" id="btn-mode-studio" class="px-3 py-1 rounded-lg text-xs font-semibold transition bg-indigo-600 text-white whitespace-nowrap">
+          1. 4-C Studio &amp; SRS
         </button>
-        <button onclick="switchMode('graph')" id="btn-mode-graph" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition text-slate-300 hover:text-white">
-          2. Neo4j Force-Graph Heatmap
+        <button onclick="switchMode('graph')" id="btn-mode-graph" class="px-3 py-1 rounded-lg text-xs font-semibold transition text-slate-300 hover:text-white whitespace-nowrap">
+          2. Force-Graph Heatmap
         </button>
-        <button onclick="switchMode('builder')" id="btn-mode-builder" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition text-slate-300 hover:text-white">
-          3. Cypher / JSON Deck Builder
+        <button onclick="switchMode('builder')" id="btn-mode-builder" class="px-3 py-1 rounded-lg text-xs font-semibold transition text-slate-300 hover:text-white whitespace-nowrap">
+          3. Cypher / JSON Deck
         </button>
       </div>
 
       <!-- Quick Stats & Reset -->
-      <div class="flex items-center gap-3 text-xs mono">
-        <span id="stat-nodes" class="px-2.5 py-1 rounded bg-slate-900 border border-slate-800 text-slate-300">Nodes: 0</span>
-        <span id="stat-mastery" class="px-2.5 py-1 rounded bg-emerald-950/60 border border-emerald-700/50 text-emerald-300">Avg Mastery: 0%</span>
-        <button onclick="simulateRust()" title="Simulate 10 days of decay on random edges" class="px-2.5 py-1 rounded bg-amber-500/10 border border-amber-500/40 text-amber-300 hover:bg-amber-500/20 transition">
-          ⚡ Sim Rust
+      <div class="flex items-center gap-2 text-xs mono">
+        <span id="stat-nodes" class="px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-slate-300">Nodes: 0</span>
+        <span id="stat-mastery" class="px-2 py-0.5 rounded bg-emerald-950/60 border border-emerald-700/50 text-emerald-300">Avg: 0%</span>
+        <button onclick="simulateRust()" title="Simulate 10 days of decay on random edges" class="px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/40 text-amber-300 hover:bg-amber-500/20 transition">
+          ⚡ Rust
+        </button>
+        <button onclick="window.PolyglotSyncBus && window.PolyglotSyncBus.navigateApp('polyglot_riff_studio_v3_1_atelier_edition.html', { registerId: state.activeLang, arena: state.activeArena })"
+          class="px-2 py-0.5 rounded bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/25 transition whitespace-nowrap">
+          ★ Atelier →
         </button>
       </div>
     </div>
   </header>
 
   <!-- MAIN WORKSPACE -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-6">
+  <main class="embed-compact-main flex-1 max-w-7xl w-full mx-auto px-4 py-4">
 
-    <!-- PERSONA BAR (Shared across Studio & Graph filter) -->
-    <section class="mb-6">
-      <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-        <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Active Regional Persona Frequency</span>
+    <!-- PERSONA BAR (Shared across Studio & Graph filter; hidden in embedded mode) -->
+    <section class="mb-3">
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+        <span data-embed-hide="true" class="text-xs font-semibold uppercase tracking-wider text-slate-400">Active Regional Persona Frequency</span>
         <div class="flex items-center gap-2 text-xs text-slate-400">
           <span>Social Arena:</span>
           <select id="arena-select" onchange="changeArena(this.value)" class="bg-slate-900 border border-slate-700 text-slate-200 rounded-lg px-2.5 py-1 text-xs font-medium focus:outline-none focus:border-indigo-500">
@@ -91,13 +95,13 @@
           </select>
         </div>
       </div>
-      <div id="persona-tabs" class="grid grid-cols-2 sm:grid-cols-5 gap-2.5"></div>
+      <div data-embed-hide="true" id="persona-tabs" class="grid grid-cols-2 sm:grid-cols-5 gap-2.5"></div>
     </section>
 
     <!-- VIEW 1: 4-C STUDIO & SRS TELEPROMPTER -->
-    <section id="view-studio" class="space-y-6">
-      <!-- Linguistic Mechanics Banner -->
-      <div id="mechanics-banner" class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 grid grid-cols-1 md:grid-cols-3 gap-4"></div>
+    <section id="view-studio" class="space-y-3.5">
+      <!-- Collapsible 1-Line Linguistic Mechanics Telemetry Strip -->
+      <div id="mechanics-banner" class="bg-slate-900/90 border border-slate-800 rounded-xl"></div>
 
       <!-- 4-C Cards Grid + Idiom Spotlight Sidebar -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -495,19 +499,34 @@
     function renderMechanicsBanner() {
       const p = state.personas[state.activeLang];
       document.getElementById('mechanics-banner').innerHTML = `
-        <div>
-          <div class="text-[11px] font-bold uppercase tracking-wider text-indigo-400">Linguistic Family</div>
-          <div class="text-xs font-semibold text-white mt-0.5">${p.family}</div>
-          <div class="text-xs text-slate-400 mt-1">${p.rhythm}</div>
-        </div>
-        <div>
-          <div class="text-[11px] font-bold uppercase tracking-wider text-amber-400">Grammatical & Lexical Intimacy Trick</div>
-          <div class="text-xs text-slate-200 mt-1">${p.trick}</div>
-        </div>
-        <div>
-          <div class="text-[11px] font-bold uppercase tracking-wider text-emerald-400">Posture & Acoustic Resonance</div>
-          <div class="text-xs text-slate-200 mt-1">${p.posture}</div>
-        </div>
+        <details class="group">
+          <summary class="list-none cursor-pointer px-3.5 py-2 flex flex-wrap items-center justify-between gap-2 select-none hover:bg-slate-800/40 rounded-xl transition">
+            <div class="flex flex-wrap items-center gap-2 min-w-0">
+              <span class="text-xs font-bold text-white whitespace-nowrap">${p.flag} ${p.name}</span>
+              <span class="text-[11px] mono px-2 py-0.5 rounded bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 whitespace-nowrap">${p.family}</span>
+              <span class="text-xs text-slate-400 truncate max-w-md hidden md:inline">${p.rhythm}</span>
+            </div>
+            <span class="text-[11px] mono text-amber-300 flex items-center gap-1 whitespace-nowrap">
+              <span>Linguistic Mechanics</span>
+              <span class="transition-transform group-open:rotate-180">▾</span>
+            </span>
+          </summary>
+          <div class="px-4 pb-3.5 pt-2.5 border-t border-slate-800/80 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <div class="text-[11px] font-bold uppercase tracking-wider text-indigo-400">Linguistic Family</div>
+              <div class="text-xs font-semibold text-white mt-0.5">${p.family}</div>
+              <div class="text-xs text-slate-400 mt-1">${p.rhythm}</div>
+            </div>
+            <div>
+              <div class="text-[11px] font-bold uppercase tracking-wider text-amber-400">Grammatical &amp; Lexical Intimacy Trick</div>
+              <div class="text-xs text-slate-200 mt-1">${p.trick}</div>
+            </div>
+            <div>
+              <div class="text-[11px] font-bold uppercase tracking-wider text-emerald-400">Posture &amp; Acoustic Resonance</div>
+              <div class="text-xs text-slate-200 mt-1">${p.posture}</div>
+            </div>
+          </div>
+        </details>
       `;
     }
 

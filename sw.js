@@ -1,4 +1,4 @@
-const CACHE_NAME = 'polyglot-riff-studio-v3.4';
+const CACHE_NAME = 'polyglot-riff-studio-v3.6';
 const PRECACHE_URLS = [
   './index.html',
   './polyglot_api_client.js',
@@ -13,7 +13,13 @@ const PRECACHE_URLS = [
   './db/at_vie.db.json',
   './db/ru_ala.db.json',
   './db/en_yyc.db.json',
-  './db/es_sot.db.json'
+  './db/es_sot.db.json',
+  './db/lyrics/song_cz_ova_nohavica.lyrics.json',
+  './db/lyrics/song_at_vie_falco.lyrics.json',
+  './db/lyrics/song_ru_ala_astudio.lyrics.json',
+  './db/lyrics/song_en_yyc_loverboy.lyrics.json',
+  './db/lyrics/song_es_sot_camaron.lyrics.json',
+  './db/lyrics/song_weeknd_ootg.lyrics.json'
 ];
 
 self.addEventListener('install', (event) => {

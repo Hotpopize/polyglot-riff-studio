@@ -218,9 +218,9 @@
 
     <!-- Top Header & Lounge Controls -->
     <header class="sticky top-0 z-30 backdrop-blur-xl bg-studio-950/85 border-b border-studio-800/80 transition-all">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex flex-wrap items-center justify-between gap-2.5">
-            <!-- Brand Title -->
-            <div class="flex items-center gap-3 min-w-0">
+        <div class="embed-no-sticky-brand max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex flex-wrap items-center justify-between gap-2">
+            <!-- Brand Title (Hidden in Embedded Suite Mode) -->
+            <div data-embed-hide="true" class="flex items-center gap-3 min-w-0">
                 <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 via-rose-500 to-purple-600 flex items-center justify-center shadow-lg shadow-amber-500/20 flex-shrink-0">
                     <i class="ph-fill ph-wine text-xl text-white"></i>
                 </div>
@@ -236,9 +236,9 @@
             </div>
 
             <!-- Nav & Action Row: Ultra-Compact 3D Carousel Dial + Mode Switcher + Timer (Same Row) -->
-            <div class="flex flex-wrap sm:flex-nowrap items-center justify-end gap-2 sm:gap-2.5 w-full xl:w-auto xl:ml-auto">
-                <!-- Shrunk 3D Cylindrical Language Carousel (Morphs in on scroll; Drag, Wheel, or Click) -->
-                <div id="langDialDock" class="lang-dial-dock flex items-center flex-shrink-0" aria-label="3D Rotating Language Carousel">
+            <div class="flex flex-wrap sm:flex-nowrap items-center justify-between sm:justify-end gap-2 w-full xl:w-auto xl:ml-auto">
+                <!-- Shrunk 3D Cylindrical Language Carousel (Standalone only; elevated to index.html in embedded mode) -->
+                <div id="langDialDock" data-embed-hide="true" class="lang-dial-dock flex items-center flex-shrink-0" aria-label="3D Rotating Language Carousel">
                     <div id="langDialShell" class="lang-dial-shell rounded-full border border-amber-500/35 px-1 py-0.5 relative overflow-hidden flex items-center gap-0.5">
                         <!-- Rolling Analog Drum Ticks -->
                         <div id="langDialTicks" class="dial-ruler-ticks absolute inset-x-4 bottom-0 h-[2.5px] opacity-75 pointer-events-none z-30"></div>
@@ -292,9 +292,16 @@
                     </div>
 
                     <!-- Full Script Teleprompter Button -->
-                    <button onclick="openTeleprompter(0)" class="px-3 py-2 rounded-xl bg-gradient-to-r from-amber-500/20 to-rose-500/20 hover:from-amber-500/30 hover:to-rose-500/30 text-amber-300 border border-amber-500/30 text-xs sm:text-sm font-medium flex items-center gap-1.5 transition-all shadow-sm">
-                        <i class="ph-bold ph-corners-out text-base"></i>
-                        <span class="hidden md:inline">Spotlight Stage</span>
+                    <button onclick="openTeleprompter(0)" class="px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500/20 to-rose-500/20 hover:from-amber-500/30 hover:to-rose-500/30 text-amber-300 border border-amber-500/30 text-xs font-medium flex items-center gap-1.5 transition-all shadow-sm">
+                        <i class="ph-bold ph-corners-out text-sm"></i>
+                        <span class="hidden md:inline">Spotlight</span>
+                    </button>
+
+                    <!-- Cross-Tab Workflow Handoff -->
+                    <button onclick="window.PolyglotSyncBus && window.PolyglotSyncBus.navigateApp('polyglot_riff_studio_v3_1_atelier_edition.html', { culture: state.activePersona, arena: state.activeArena })"
+                        title="Open active culture &amp; arena in Full Atelier Engine"
+                        class="px-2.5 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/35 text-xs font-mono font-semibold transition whitespace-nowrap">
+                        ★ Atelier →
                     </button>
                 </div>
             </div>
@@ -302,16 +309,16 @@
     </header>
 
     <!-- Main Content Container -->
-    <main class="relative z-10 flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+    <main class="embed-compact-main relative z-10 flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-4 space-y-3.5">
 
-        <!-- PERSONA SELECTOR TABS (Visible in Cultural Vibe Mode) -->
-        <section id="personaSelectorSection" class="space-y-4">
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3" id="personaTabsContainer">
+        <!-- PERSONA SELECTOR TABS (Visible in Standalone Cultural Vibe Mode; hidden in embedded mode) -->
+        <section id="personaSelectorSection" class="space-y-2.5">
+            <div data-embed-hide="true" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3" id="personaTabsContainer">
                 <!-- Populated dynamically via JS -->
             </div>
 
-            <!-- Active Persona Vibe & Linguistic Family Mechanics Banner -->
-            <div id="vibeBanner" class="bg-studio-900/90 border border-studio-800 rounded-2xl p-4 sm:p-5 shadow-xl">
+            <!-- Active Persona Vibe & Linguistic Family Mechanics Collapsible Telemetry Strip -->
+            <div id="vibeBanner" class="bg-studio-900/90 border border-studio-800 rounded-xl shadow-lg">
                 <!-- Populated dynamically via JS -->
             </div>
         </section>
@@ -2617,10 +2624,11 @@
             renderMainContent();
         }
 
-        // Select Active Persona
+        // Select Active Persona (accepts lowercase Lounge keys and uppercase PolyglotSyncBus register IDs)
         function selectPersona(personaKey, opts = {}) {
-            if (!PERSONAS[personaKey]) return;
-            state.activePersona = personaKey;
+            const resolvedKey = PERSONAS[personaKey] ? personaKey : String(personaKey || '').toLowerCase();
+            if (!PERSONAS[resolvedKey]) return;
+            state.activePersona = resolvedKey;
             document.getElementById('activeSlangSpotlight').classList.add('hidden');
             renderPersonaTabs();
             renderLanguageDial({ fromCarousel: Boolean(opts.fromCarousel), immediate: Boolean(opts.immediate) });
@@ -3017,56 +3025,66 @@
             }).join('');
         }
 
-        // Render Persona Cultural Vibe & Linguistic Family Mechanics Banner
+        // Render Persona Cultural Vibe & Linguistic Family Mechanics (Collapsible 1-Line Telemetry Strip)
         function renderVibeBanner() {
             const p = PERSONAS[state.activePersona];
             const banner = document.getElementById('vibeBanner');
             banner.innerHTML = `
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
-                    <!-- Left 6 Cols: Vibe & Setting -->
-                    <div class="lg:col-span-6 space-y-2.5 flex flex-col justify-between">
-                        <div class="space-y-2.5">
-                            <div class="flex flex-wrap items-center gap-2">
-                                <span class="px-2.5 py-0.5 rounded-md text-xs font-mono font-semibold bg-amber-500/15 text-amber-300 border border-amber-500/30">
-                                    ${p.flag} ${p.regionBadge}
-                                </span>
-                                <span class="px-2.5 py-0.5 rounded-md text-xs font-mono bg-studio-800 text-gray-300 flex items-center gap-1">
-                                    <i class="ph-fill ph-metronome text-amber-400"></i> ${p.tempo}
-                                </span>
-                                <span class="px-2.5 py-0.5 rounded-md text-xs font-mono bg-studio-800 text-gray-300 flex items-center gap-1">
+                <details class="group">
+                    <summary class="list-none cursor-pointer px-3.5 py-2 flex flex-wrap items-center justify-between gap-2 select-none hover:bg-studio-800/40 rounded-xl transition">
+                        <div class="flex flex-wrap items-center gap-2 min-w-0">
+                            <span class="px-2 py-0.5 rounded-md text-xs font-mono font-semibold bg-amber-500/15 text-amber-300 border border-amber-500/30 whitespace-nowrap">
+                                ${p.flag} ${p.regionBadge}
+                            </span>
+                            <span class="px-2 py-0.5 rounded-md text-[11px] font-mono bg-studio-800 text-gray-300 whitespace-nowrap">
+                                ${p.tempo}
+                            </span>
+                            <span class="text-xs text-gray-300 truncate max-w-md hidden sm:inline">
+                                ${p.familyMechanics.familyTitle}
+                            </span>
+                        </div>
+                        <span class="text-[11px] font-mono text-amber-300/90 flex items-center gap-1 whitespace-nowrap">
+                            <span>Vibe &amp; Mechanics</span>
+                            <span class="transition-transform group-open:rotate-180">▾</span>
+                        </span>
+                    </summary>
+                    <div class="px-4 pb-4 pt-2 border-t border-studio-800/80 grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
+                        <!-- Left 6 Cols: Vibe & Setting -->
+                        <div class="lg:col-span-6 space-y-2.5 flex flex-col justify-between">
+                            <div class="space-y-2">
+                                <span class="inline-flex px-2 py-0.5 rounded-md text-[11px] font-mono bg-studio-800 text-gray-300 items-center gap-1">
                                     <i class="ph-fill ph-sparkle text-rose-400"></i> ${p.setting}
                                 </span>
+                                <p class="text-xs sm:text-sm text-gray-200 leading-relaxed">${p.vibeSummary}</p>
                             </div>
-                            <p class="text-sm text-gray-200 leading-relaxed">${p.vibeSummary}</p>
+                            <div class="pt-2 border-t border-studio-800/80 flex items-start gap-2 text-xs text-gray-300">
+                                <i class="ph-fill ph-user-focus text-amber-400 text-sm mt-0.5 flex-shrink-0"></i>
+                                <span><strong class="text-amber-300">Posture &amp; Vocal Resonance:</strong> ${p.postureCue}</span>
+                            </div>
                         </div>
-                        <div class="pt-2 border-t border-studio-800/80 flex items-start gap-2 text-xs text-gray-300">
-                            <i class="ph-fill ph-user-focus text-amber-400 text-sm mt-0.5 flex-shrink-0"></i>
-                            <span><strong class="text-amber-300">Posture & Vocal Resonance:</strong> ${p.postureCue}</span>
-                        </div>
-                    </div>
 
-                    <!-- Right 6 Cols: Linguistic Family Mechanics Breakdown -->
-                    <div class="lg:col-span-6 bg-studio-950/90 border border-amber-500/30 rounded-xl p-4 space-y-2.5">
-                        <div class="flex items-center justify-between">
-                            <span class="text-[11px] font-mono uppercase tracking-wider text-amber-400 font-semibold flex items-center gap-1.5">
-                                <i class="ph-fill ph-git-branch"></i> Linguistic Family Mechanics Breakdown
-                            </span>
-                            <span class="text-[11px] font-mono text-gray-400">${p.flag} ${p.langName}</span>
-                        </div>
-                        <div class="font-display font-bold text-sm text-white">${p.familyMechanics.familyTitle}</div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
-                            <div class="p-2 rounded-lg bg-studio-900 border border-studio-800 text-xs">
-                                <span class="font-mono text-[10px] uppercase text-cyan-400 block mb-0.5">Phonetic Rhythm</span>
-                                <span class="text-gray-200">${p.familyMechanics.phoneticRhythm}</span>
+                        <!-- Right 6 Cols: Linguistic Family Mechanics Breakdown -->
+                        <div class="lg:col-span-6 bg-studio-950/90 border border-amber-500/30 rounded-xl p-3.5 space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[11px] font-mono uppercase tracking-wider text-amber-400 font-semibold flex items-center gap-1.5">
+                                    <i class="ph-fill ph-git-branch"></i> Linguistic Family Mechanics
+                                </span>
+                                <span class="text-[11px] font-mono text-gray-400">${p.flag} ${p.langName}</span>
                             </div>
-                            <div class="p-2 rounded-lg bg-studio-900 border border-studio-800 text-xs">
-                                <span class="font-mono text-[10px] uppercase text-emerald-400 block mb-0.5">Grammatical Intimacy Trick</span>
-                                <span class="text-gray-200">${p.familyMechanics.grammarTrick}</span>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                <div class="p-2 rounded-lg bg-studio-900 border border-studio-800 text-xs">
+                                    <span class="font-mono text-[10px] uppercase text-cyan-400 block mb-0.5">Phonetic Rhythm</span>
+                                    <span class="text-gray-200">${p.familyMechanics.phoneticRhythm}</span>
+                                </div>
+                                <div class="p-2 rounded-lg bg-studio-900 border border-studio-800 text-xs">
+                                    <span class="font-mono text-[10px] uppercase text-emerald-400 block mb-0.5">Grammatical Intimacy Trick</span>
+                                    <span class="text-gray-200">${p.familyMechanics.grammarTrick}</span>
+                                </div>
                             </div>
+                            <p class="text-xs text-gray-300 leading-relaxed">${p.familyMechanics.mechanics}</p>
                         </div>
-                        <p class="text-xs text-gray-300 leading-relaxed pt-0.5">${p.familyMechanics.mechanics}</p>
                     </div>
-                </div>
+                </details>
             `;
         }
 

@@ -128,12 +128,18 @@ def cmd_converse(
 
 
 @cli_app.command("shards")
+@cli_app.command("export-shards")
 def cmd_shards() -> None:
-    """Export offline db/*.db.json shards directly from the canonical seed corpus (no running DB required)."""
+    """Export deterministic db/*.db.json & split db/lyrics/*.lyrics.json shards (live DB first, seed fallback)."""
     from backend.services.sync_service import sync_service
 
-    written = sync_service.export_offline_db_json_from_seed()
-    console.print_json(json.dumps({"ok": True, "written_shards": written}, ensure_ascii=False))
+    source = "postgres"
+    try:
+        written = _run(sync_service.export_db_json_snapshots())
+    except Exception:
+        source = "seed_offline_fallback"
+        written = sync_service.export_offline_db_json_from_seed()
+    console.print_json(json.dumps({"ok": True, "source": source, "written_shards": written}, ensure_ascii=False))
 
 
 @cli_app.command("stylize")
@@ -166,6 +172,69 @@ def cmd_grade(edge_id: str, score: int) -> None:
     """Record an FSRS practice score (1-5) for a transition edge and sync to Neo4j."""
     res = _run(polyglot.grade(edge_id=edge_id, score=score))
     console.print_json(json.dumps(res, ensure_ascii=False, default=str))
+
+
+@cli_app.command("index-lyrics")
+def cmd_index_lyrics(
+    agent_reach: bool = typer.Option(True, "--agent-reach/--no-agent-reach", help="Probe Agent-Reach + Jina Reader channels"),
+) -> None:
+    """Index full song lyrics via Agent-Reach and sync :LyricToken frequency nodes/edges to Neo4j."""
+    res = _run(polyglot.index_lyrics(use_agent_reach=agent_reach))
+    idx = res["index"]
+    table = Table(title=f"Agent-Reach Lyric Frequency Index ({idx['total_lyric_tokens']} tokens)")
+    table.add_column("Song UID", style="cyan")
+    table.add_column("Title", style="white")
+    table.add_column("Register", style="magenta")
+    table.add_column("Stanzas", justify="right", style="green")
+    table.add_column("Words / Unique", justify="right", style="yellow")
+    table.add_column("Indexed :LyricToken", justify="right", style="bold green")
+    for row in idx["per_song"]:
+        table.add_row(
+            row["song_uid"],
+            row["title"],
+            row["register_id"],
+            str(row["stanza_count"]),
+            f"{row['total_words']} / {row['unique_words']}",
+            str(row["indexed_tokens"]),
+        )
+    console.print(table)
+    console.print_json(json.dumps({"sync": res["sync"], "agent_reach_probes": idx.get("agent_reach_probes", [])}, ensure_ascii=False, default=str))
+
+
+@cli_app.command("song-freq")
+def cmd_song_freq(
+    song: str = typer.Option("SONG_CZ_OVA_NOHAVICA", "--song", help="Song UID to inspect"),
+) -> None:
+    """Inspect a song's indexed :LyricToken frequency matrix and connected :Vocab/:Idiom/:Card nodes."""
+    res = _run(polyglot.song_frequency(song_uid=song))
+    s = res["song"]
+    table = Table(title=f"{s['title']} ({s['artist']}) — {s['register_id']} | Neo4j :LyricToken Frequency")
+    table.add_column("Token", style="bold amber3" if False else "bold yellow")
+    table.add_column("Tier", style="cyan")
+    table.add_column("Song#", justify="right", style="green")
+    table.add_column("Chorus#", justify="right", style="magenta")
+    table.add_column("Card#", justify="right", style="blue")
+    table.add_column("Score", justify="right", style="bold green")
+    table.add_column("Connected Graph Nodes", style="white")
+    for lt in res["lyric_tokens"]:
+        links = []
+        if lt.get("vocab_uid"):
+            links.append(f"Vocab:{lt['vocab_uid']}")
+        if lt.get("idiom_term"):
+            links.append(f"Idiom:{lt['idiom_term']}")
+        cards = lt.get("connected_card_uids") or []
+        if cards:
+            links.append(f"Cards({len(cards)}):{','.join(cards[:2])}")
+        table.add_row(
+            lt["token"],
+            lt["freq_tier"],
+            str(lt["song_count"]),
+            str(lt["chorus_count"]),
+            str(lt["card_count"]),
+            f"{lt['frequency_score']:.3f}",
+            " | ".join(links) or "-",
+        )
+    console.print(table)
 
 
 if __name__ == "__main__":

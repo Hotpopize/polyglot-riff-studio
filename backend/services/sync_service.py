@@ -47,6 +47,118 @@ def _atomic_write_json(target_path: Path, doc: dict[str, Any]) -> str:
     return _atomic_write_text(target_path, content)
 
 
+def _write_compact_lyric_shard(target_path: Path, doc: dict[str, Any]) -> str:
+    """Atomically write a compact, git-diff-friendly song lyric shard (1 line per verse line & token)."""
+    lines: list[str] = ["{"]
+    scalar_keys = [
+        "schema_version",
+        "uid",
+        "title",
+        "artist",
+        "city_region",
+        "register_id",
+        "original_lang",
+        "source_url",
+        "reach_channel",
+        "total_token_count",
+        "unique_token_count",
+    ]
+    for key in scalar_keys:
+        val_json = json.dumps(doc.get(key), ensure_ascii=False, default=str)
+        lines.append(f"  {json.dumps(key)}: {val_json},")
+
+    stanzas = doc.get("stanzas_lines") or []
+    if not stanzas:
+        lines.append('  "stanzas_lines": [],')
+    else:
+        lines.append('  "stanzas_lines": [')
+        for s_idx, stanza in enumerate(stanzas):
+            verse_lines = list(stanza) if isinstance(stanza, list) else str(stanza).splitlines()
+            if not verse_lines:
+                comma = "," if s_idx < len(stanzas) - 1 else ""
+                lines.append(f"    []{comma}")
+                continue
+            lines.append("    [")
+            for l_idx, verse_line in enumerate(verse_lines):
+                comma = "," if l_idx < len(verse_lines) - 1 else ""
+                lines.append(f"      {json.dumps(verse_line, ensure_ascii=False)}{comma}")
+            stanza_comma = "," if s_idx < len(stanzas) - 1 else ""
+            lines.append(f"    ]{stanza_comma}")
+        lines.append("  ],")
+
+    tokens = doc.get("lyric_tokens") or []
+    if not tokens:
+        lines.append('  "lyric_tokens": []')
+    else:
+        lines.append('  "lyric_tokens": [')
+        for t_idx, tok in enumerate(tokens):
+            comma = "," if t_idx < len(tokens) - 1 else ""
+            tok_json = json.dumps(tok, ensure_ascii=False, separators=(",", ":"), default=str)
+            lines.append(f"    {tok_json}{comma}")
+        lines.append("  ]")
+
+    lines.append("}")
+    content = "\n".join(lines) + "\n"
+    return _atomic_write_text(target_path, content)
+
+
+def _build_song_ref_dict(s: dict[str, Any]) -> dict[str, Any]:
+    """Build lightweight song metadata with external split lyric shard pointer (omits heavy lyric arrays)."""
+    return {
+        "uid": s["uid"],
+        "title": s["title"],
+        "artist": s["artist"],
+        "city_region": s["city_region"],
+        "genre": s["genre"],
+        "bpm": s["bpm"],
+        "register_id": s["register_id"],
+        "original_lang": s["original_lang"],
+        "original_lyric": s["original_lyric"],
+        "source_url": s.get("source_url") or "",
+        "reach_channel": s.get("reach_channel") or "agent-reach+jina",
+        "lyric_shard": f"db/lyrics/{s['uid'].lower()}.lyrics.json",
+        "total_token_count": int(s.get("total_token_count") or 0),
+        "unique_token_count": int(s.get("unique_token_count") or 0),
+        "translation_es": s["translation_es"],
+        "translation_en": s["translation_en"],
+        "translation_cz": s["translation_cz"],
+        "translation_de": s["translation_de"],
+        "translation_ru": s["translation_ru"],
+        "cultural_vibe": s["cultural_vibe"],
+        "pivot_line": s["pivot_line"],
+        "reinforces_card_uid": s["reinforces_card_uid"],
+        "slang_vocab_uids": list(s.get("slang_vocab_uids") or []),
+    }
+
+
+def _build_lyric_shard_doc(
+    s: dict[str, Any],
+    tokens: list[dict[str, Any]],
+    schema_version: str,
+) -> dict[str, Any]:
+    """Build per-song split lyric & token payload for db/lyrics/<uid>.lyrics.json."""
+    raw_stanzas = list(s.get("lyric_stanzas") or [])
+    stanzas_lines = s.get("stanzas_lines") or [
+        [ln for ln in (st if isinstance(st, list) else str(st).splitlines()) if ln != ""]
+        for st in raw_stanzas
+    ]
+    return {
+        "schema_version": schema_version,
+        "uid": s["uid"],
+        "title": s["title"],
+        "artist": s["artist"],
+        "city_region": s["city_region"],
+        "register_id": s["register_id"],
+        "original_lang": s["original_lang"],
+        "source_url": s.get("source_url") or "",
+        "reach_channel": s.get("reach_channel") or "agent-reach+jina",
+        "total_token_count": int(s.get("total_token_count") or 0),
+        "unique_token_count": int(s.get("unique_token_count") or 0),
+        "stanzas_lines": stanzas_lines,
+        "lyric_tokens": list(tokens or []),
+    }
+
+
 class SyncService:
     """Transactional outbox synchronizer, cross-store auditor & snapshot manager (PostgreSQL -> Neo4j + db/*.db.json)."""
 
@@ -243,9 +355,10 @@ class SyncService:
             song_rows = await pg_manager.fetch_all(
                 f"""
                 SELECT uid, title, artist, city_region, genre, bpm, register_id,
-                       original_lang, original_lyric, translation_es, translation_en,
-                       translation_cz, translation_de, translation_ru, cultural_vibe,
-                       pivot_line, reinforces_card_uid, slang_vocab_uids
+                       original_lang, original_lyric, full_lyrics, lyric_stanzas,
+                       source_url, reach_channel, total_token_count, unique_token_count,
+                       translation_es, translation_en, translation_cz, translation_de, translation_ru,
+                       cultural_vibe, pivot_line, reinforces_card_uid, slang_vocab_uids
                 FROM songs {where_clause}
                 """
             )
@@ -253,6 +366,9 @@ class SyncService:
                 song_payload = [
                     {
                         **s,
+                        "lyric_stanzas": list(s["lyric_stanzas"])
+                        if isinstance(s.get("lyric_stanzas"), list)
+                        else [],
                         "slang_vocab_uids": list(s["slang_vocab_uids"])
                         if isinstance(s.get("slang_vocab_uids"), list)
                         else [],
@@ -271,6 +387,12 @@ class SyncService:
                         s.register_id = row.register_id,
                         s.original_lang = row.original_lang,
                         s.original_lyric = row.original_lyric,
+                        s.full_lyrics = row.full_lyrics,
+                        s.lyric_stanzas = row.lyric_stanzas,
+                        s.source_url = row.source_url,
+                        s.reach_channel = row.reach_channel,
+                        s.total_token_count = row.total_token_count,
+                        s.unique_token_count = row.unique_token_count,
                         s.translation_es = row.translation_es,
                         s.translation_en = row.translation_en,
                         s.translation_cz = row.translation_cz,
@@ -352,6 +474,77 @@ class SyncService:
                     [c["uid"] for c in cards],
                 )
                 counts["cards"] = len(cards)
+
+            lyric_tokens = await pg_manager.fetch_all(
+                f"""
+                SELECT uid, song_uid, register_id, lang_code, token, lemma, meaning_gloss,
+                       is_chorus_hook, song_count, chorus_count, card_count, total_frequency,
+                       frequency_score, freq_tier, vocab_uid, idiom_term, connected_card_uids,
+                       sample_lyric_line
+                FROM song_lyric_tokens {where_clause}
+                """
+            )
+            if lyric_tokens:
+                lt_payload = [
+                    {
+                        **lt,
+                        "connected_card_uids": list(lt["connected_card_uids"])
+                        if isinstance(lt.get("connected_card_uids"), list)
+                        else [],
+                    }
+                    for lt in lyric_tokens
+                ]
+                await neo4j_manager.run_query(
+                    """
+                    UNWIND $rows AS row
+                    MERGE (lt:LyricToken {uid: row.uid})
+                    SET lt.song_uid = row.song_uid,
+                        lt.register_id = row.register_id,
+                        lt.lang_code = row.lang_code,
+                        lt.token = row.token,
+                        lt.lemma = row.lemma,
+                        lt.meaning_gloss = row.meaning_gloss,
+                        lt.is_chorus_hook = row.is_chorus_hook,
+                        lt.song_count = row.song_count,
+                        lt.chorus_count = row.chorus_count,
+                        lt.card_count = row.card_count,
+                        lt.total_frequency = row.total_frequency,
+                        lt.frequency_score = row.frequency_score,
+                        lt.freq_tier = row.freq_tier,
+                        lt.sample_lyric_line = row.sample_lyric_line
+                    WITH lt, row
+                    MATCH (s:Song {uid: row.song_uid})
+                    MERGE (s)-[ht:HAS_LYRIC_TOKEN]->(lt)
+                    SET ht.song_count = row.song_count,
+                        ht.chorus_count = row.chorus_count,
+                        ht.frequency_score = row.frequency_score,
+                        ht.freq_tier = row.freq_tier
+                    WITH lt, row
+                    OPTIONAL MATCH (v:Vocab {uid: row.vocab_uid})
+                    FOREACH (_ IN CASE WHEN v IS NOT NULL THEN [1] ELSE [] END |
+                        MERGE (lt)-[rv:REINFORCES_VOCAB]->(v)
+                        SET rv.frequency_score = row.frequency_score
+                    )
+                    WITH lt, row
+                    OPTIONAL MATCH (i:Idiom {term: row.idiom_term})
+                    FOREACH (_ IN CASE WHEN i IS NOT NULL THEN [1] ELSE [] END |
+                        MERGE (lt)-[ri:REINFORCES_IDIOM]->(i)
+                        SET ri.frequency_score = row.frequency_score
+                    )
+                    WITH lt, row
+                    UNWIND row.connected_card_uids AS cuid
+                    MATCH (c:Card {uid: cuid})
+                    MERGE (lt)-[bc:BOOSTS_CARD_FREQUENCY]->(c)
+                    SET bc.card_count = row.card_count,
+                        bc.frequency_score = row.frequency_score
+                    """,
+                    {"rows": lt_payload},
+                )
+                await pg_manager.execute(
+                    "UPDATE song_lyric_tokens SET sync_status = 'SYNCED', synced_at = NOW() WHERE uid = ANY($1::text[])",
+                    [lt["uid"] for lt in lyric_tokens],
+                )
+                counts["lyric_tokens"] = len(lyric_tokens)
 
             states = await pg_manager.fetch_all(
                 f"SELECT id, label, description, default_card_uid, effectiveness, cue FROM room_states {where_clause}"
@@ -521,6 +714,7 @@ class SyncService:
         idiom_terms = [r["term"] for r in await pg_manager.fetch_all("SELECT term FROM idioms")]
         vocab_uids = [r["uid"] for r in await pg_manager.fetch_all("SELECT uid FROM vocab_items")]
         song_uids = [r["uid"] for r in await pg_manager.fetch_all("SELECT uid FROM songs")]
+        lt_uids = [r["uid"] for r in await pg_manager.fetch_all("SELECT uid FROM song_lyric_tokens")]
         arena_ids = [r["id"] for r in await pg_manager.fetch_all("SELECT id FROM arenas")]
         edge_ids = [r["id"] for r in await pg_manager.fetch_all("SELECT id FROM graph_edges")]
 
@@ -539,6 +733,10 @@ class SyncService:
         s_res = await neo4j_manager.run_query(
             "MATCH (s:Song) WHERE NOT s.uid IN $uids WITH collect(s) AS obs FOREACH (n IN obs | DETACH DELETE n) RETURN size(obs) AS n",
             {"uids": song_uids},
+        )
+        lt_res = await neo4j_manager.run_query(
+            "MATCH (lt:LyricToken) WHERE NOT lt.uid IN $uids WITH collect(lt) AS obs FOREACH (n IN obs | DETACH DELETE n) RETURN size(obs) AS n",
+            {"uids": lt_uids},
         )
         a_res = await neo4j_manager.run_query(
             "MATCH (a:Arena) WHERE NOT a.id IN $ids WITH collect(a) AS obs FOREACH (n IN obs | DETACH DELETE n) RETURN size(obs) AS n",
@@ -559,6 +757,7 @@ class SyncService:
             "idioms": int(i_res[0]["n"]) if i_res else 0,
             "vocab": int(v_res[0]["n"]) if v_res else 0,
             "songs": int(s_res[0]["n"]) if s_res else 0,
+            "lyric_tokens": int(lt_res[0]["n"]) if lt_res else 0,
             "arenas": int(a_res[0]["n"]) if a_res else 0,
             "edges": int(e_res[0]["n"]) if e_res else 0,
         }
@@ -572,6 +771,20 @@ class SyncService:
         by_partition: dict[str, list[dict[str, Any]]] = {}
         for reg in registers:
             by_partition.setdefault(reg["partition_file"], []).append(reg)
+
+        all_lt_rows = await pg_manager.fetch_all(
+            """
+            SELECT uid, song_uid, register_id, lang_code, token, lemma, meaning_gloss,
+                   is_chorus_hook, song_count, chorus_count, card_count, total_frequency,
+                   frequency_score, freq_tier, vocab_uid, idiom_term, connected_card_uids,
+                   sample_lyric_line
+            FROM song_lyric_tokens
+            ORDER BY frequency_score DESC, total_frequency DESC, token ASC
+            """
+        )
+        lt_by_song: dict[str, list[dict[str, Any]]] = {}
+        for lt in all_lt_rows:
+            lt_by_song.setdefault(lt["song_uid"], []).append(lt)
 
         for partition_file, reg_rows in by_partition.items():
             reg_ids = [r["id"] for r in reg_rows]
@@ -591,9 +804,10 @@ class SyncService:
             song_rows = await pg_manager.fetch_all(
                 """
                 SELECT uid, title, artist, city_region, genre, bpm, register_id,
-                       original_lang, original_lyric, translation_es, translation_en,
-                       translation_cz, translation_de, translation_ru, cultural_vibe,
-                       pivot_line, reinforces_card_uid, slang_vocab_uids
+                       original_lang, original_lyric, full_lyrics, lyric_stanzas,
+                       source_url, reach_channel, total_token_count, unique_token_count,
+                       translation_es, translation_en, translation_cz, translation_de, translation_ru,
+                       cultural_vibe, pivot_line, reinforces_card_uid, slang_vocab_uids
                 FROM songs
                 WHERE register_id = ANY($1::text[])
                 ORDER BY uid
@@ -656,29 +870,7 @@ class SyncService:
                     }
                     for v in vocab_rows
                 ],
-                "songs": [
-                    {
-                        "uid": s["uid"],
-                        "title": s["title"],
-                        "artist": s["artist"],
-                        "city_region": s["city_region"],
-                        "genre": s["genre"],
-                        "bpm": s["bpm"],
-                        "register_id": s["register_id"],
-                        "original_lang": s["original_lang"],
-                        "original_lyric": s["original_lyric"],
-                        "translation_es": s["translation_es"],
-                        "translation_en": s["translation_en"],
-                        "translation_cz": s["translation_cz"],
-                        "translation_de": s["translation_de"],
-                        "translation_ru": s["translation_ru"],
-                        "cultural_vibe": s["cultural_vibe"],
-                        "pivot_line": s["pivot_line"],
-                        "reinforces_card_uid": s["reinforces_card_uid"],
-                        "slang_vocab_uids": list(s.get("slang_vocab_uids") or []),
-                    }
-                    for s in song_rows
-                ],
+                "songs": [_build_song_ref_dict(s) for s in song_rows],
                 "cards": [
                     {
                         "uid": c["uid"],
@@ -712,9 +904,10 @@ class SyncService:
         all_songs = await pg_manager.fetch_all(
             """
             SELECT uid, title, artist, city_region, genre, bpm, register_id,
-                   original_lang, original_lyric, translation_es, translation_en,
-                   translation_cz, translation_de, translation_ru, cultural_vibe,
-                   pivot_line, reinforces_card_uid, slang_vocab_uids
+                   original_lang, original_lyric, full_lyrics, lyric_stanzas,
+                   source_url, reach_channel, total_token_count, unique_token_count,
+                   translation_es, translation_en, translation_cz, translation_de, translation_ru,
+                   cultural_vibe, pivot_line, reinforces_card_uid, slang_vocab_uids
             FROM songs
             ORDER BY uid
             """
@@ -775,34 +968,21 @@ class SyncService:
             ],
             "vocab_alert_nodes": vocab_alert_nodes,
             "vocab_false_friend_alerts": vocab_alert_edges,
-            "songs": [
-                {
-                    "uid": s["uid"],
-                    "title": s["title"],
-                    "artist": s["artist"],
-                    "city_region": s["city_region"],
-                    "genre": s["genre"],
-                    "bpm": s["bpm"],
-                    "register_id": s["register_id"],
-                    "original_lang": s["original_lang"],
-                    "original_lyric": s["original_lyric"],
-                    "translation_es": s["translation_es"],
-                    "translation_en": s["translation_en"],
-                    "translation_cz": s["translation_cz"],
-                    "translation_de": s["translation_de"],
-                    "translation_ru": s["translation_ru"],
-                    "cultural_vibe": s["cultural_vibe"],
-                    "pivot_line": s["pivot_line"],
-                    "reinforces_card_uid": s["reinforces_card_uid"],
-                    "slang_vocab_uids": list(s.get("slang_vocab_uids") or []),
-                }
-                for s in all_songs
-            ],
+            "songs": [_build_song_ref_dict(s) for s in all_songs],
             "staged_webhooks": [w["payload_json"] for w in webhooks],
         }
         fabric_path = settings.db_json_dir / "polyglot_fabric.db.json"
         _atomic_write_json(fabric_path, fabric_doc)
         written_files.append("polyglot_fabric.db.json")
+
+        lyrics_dir = settings.db_json_dir / "lyrics"
+        lyrics_dir.mkdir(parents=True, exist_ok=True)
+        for s in all_songs:
+            lyric_filename = f"{s['uid'].lower()}.lyrics.json"
+            lyric_doc = _build_lyric_shard_doc(s, lt_by_song.get(s["uid"], []), SCHEMA_VERSION)
+            _write_compact_lyric_shard(lyrics_dir / lyric_filename, lyric_doc)
+            written_files.append(f"lyrics/{lyric_filename}")
+
         return written_files
 
     def export_offline_db_json_from_seed(self) -> list[str]:
@@ -823,7 +1003,28 @@ class SyncService:
         )
 
         settings.db_json_dir.mkdir(parents=True, exist_ok=True)
+        lyrics_dir = settings.db_json_dir / "lyrics"
+        lyrics_dir.mkdir(parents=True, exist_ok=True)
         written_files: list[str] = []
+
+        # Preserve indexed lyric_tokens and token counts from existing disk shards if seed lacks runtime tokens
+        enriched_songs: list[dict[str, Any]] = []
+        for s in SONGS:
+            song_copy = dict(s)
+            if not song_copy.get("lyric_tokens"):
+                existing_shard = lyrics_dir / f"{song_copy['uid'].lower()}.lyrics.json"
+                if existing_shard.exists():
+                    try:
+                        prev_doc = json.loads(existing_shard.read_text(encoding="utf-8"))
+                        if prev_doc.get("lyric_tokens"):
+                            song_copy["lyric_tokens"] = list(prev_doc["lyric_tokens"])
+                        if prev_doc.get("total_token_count") and not song_copy.get("total_token_count"):
+                            song_copy["total_token_count"] = int(prev_doc["total_token_count"])
+                        if prev_doc.get("unique_token_count") and not song_copy.get("unique_token_count"):
+                            song_copy["unique_token_count"] = int(prev_doc["unique_token_count"])
+                    except Exception:
+                        pass
+            enriched_songs.append(song_copy)
 
         by_partition: dict[str, list[dict[str, Any]]] = {}
         for reg in REGISTERS:
@@ -840,7 +1041,7 @@ class SyncService:
                 key=lambda x: (x.get("register_type", ""), x["uid"]),
             )
             song_rows = sorted(
-                [s for s in SONGS if s.get("register_id") in reg_ids],
+                [s for s in enriched_songs if s.get("register_id") in reg_ids],
                 key=lambda x: x["uid"],
             )
             cards = sorted(
@@ -894,29 +1095,7 @@ class SyncService:
                     }
                     for v in vocab_rows
                 ],
-                "songs": [
-                    {
-                        "uid": s["uid"],
-                        "title": s["title"],
-                        "artist": s["artist"],
-                        "city_region": s["city_region"],
-                        "genre": s["genre"],
-                        "bpm": s["bpm"],
-                        "register_id": s["register_id"],
-                        "original_lang": s["original_lang"],
-                        "original_lyric": s["original_lyric"],
-                        "translation_es": s["translation_es"],
-                        "translation_en": s["translation_en"],
-                        "translation_cz": s["translation_cz"],
-                        "translation_de": s["translation_de"],
-                        "translation_ru": s["translation_ru"],
-                        "cultural_vibe": s["cultural_vibe"],
-                        "pivot_line": s["pivot_line"],
-                        "reinforces_card_uid": s["reinforces_card_uid"],
-                        "slang_vocab_uids": s.get("slang_vocab_uids", []),
-                    }
-                    for s in song_rows
-                ],
+                "songs": [_build_song_ref_dict(s) for s in song_rows],
                 "cards": [
                     {
                         "uid": c["uid"],
@@ -992,12 +1171,19 @@ class SyncService:
                 if v.get("register_id") is None
             ],
             "vocab_false_friend_alerts": VOCAB_FALSE_FRIEND_ALERTS,
-            "songs": SONGS,
+            "songs": [_build_song_ref_dict(s) for s in enriched_songs],
             "staged_webhooks": STAGED_WEBHOOKS,
         }
         fabric_path = settings.db_json_dir / "polyglot_fabric.db.json"
         _atomic_write_json(fabric_path, fabric_doc)
         written_files.append("polyglot_fabric.db.json")
+
+        for s in enriched_songs:
+            lyric_filename = f"{s['uid'].lower()}.lyrics.json"
+            lyric_doc = _build_lyric_shard_doc(s, list(s.get("lyric_tokens") or []), SCHEMA_VERSION)
+            _write_compact_lyric_shard(lyrics_dir / lyric_filename, lyric_doc)
+            written_files.append(f"lyrics/{lyric_filename}")
+
         return written_files
 
     async def audit_data_integrity(self) -> dict[str, Any]:
@@ -1045,6 +1231,7 @@ class SyncService:
                 (SELECT COUNT(*) FROM idioms) AS idioms,
                 (SELECT COUNT(*) FROM vocab_items) AS vocab,
                 (SELECT COUNT(*) FROM songs) AS songs,
+                (SELECT COUNT(*) FROM song_lyric_tokens) AS lyric_tokens,
                 (SELECT COUNT(*) FROM bridges) AS bridges,
                 (SELECT COUNT(*) FROM room_states) AS room_states,
                 (SELECT COUNT(*) FROM false_friends) AS false_friends,
@@ -1057,6 +1244,7 @@ class SyncService:
                 + (SELECT COUNT(*) FROM idioms WHERE sync_status = 'PENDING')
                 + (SELECT COUNT(*) FROM vocab_items WHERE sync_status = 'PENDING')
                 + (SELECT COUNT(*) FROM songs WHERE sync_status = 'PENDING')
+                + (SELECT COUNT(*) FROM song_lyric_tokens WHERE sync_status = 'PENDING')
                 + (SELECT COUNT(*) FROM bridges WHERE sync_status = 'PENDING')
                 + (SELECT COUNT(*) FROM room_states WHERE sync_status = 'PENDING')
                 + (SELECT COUNT(*) FROM false_friends WHERE sync_status = 'PENDING')
@@ -1151,6 +1339,7 @@ class SyncService:
                      COUNT { (:Idiom) } AS idioms,
                      COUNT { (:Vocab) } AS vocab,
                      COUNT { (:Song) } AS songs,
+                     COUNT { (:LyricToken) } AS lyric_tokens,
                      COUNT { (:Bridge) } AS bridges,
                      COUNT { (:State) } AS room_states,
                      COUNT { (:FalseFriend) } AS false_friends,
@@ -1158,7 +1347,13 @@ class SyncService:
                      + COUNT { (:Card)-[r:PIVOTS_VIA]->(:Card) WHERE r.id IS NOT NULL }
                      + COUNT { (:Card)-[:COUNTERS_STATE]->(:State) } AS edges,
                      COUNT { (c:Card) WHERE NOT (:Register)-[:HAS_CARD]->(c) } AS orphan_cards,
-                     COUNT { (c:Card) WHERE NOT (c)-[:SET_IN_ARENA]->(:Arena) } AS cards_without_arena
+                     COUNT { (c:Card) WHERE NOT (c)-[:SET_IN_ARENA]->(:Arena) } AS cards_without_arena,
+                     COUNT { (:Song)-[:HAS_LYRIC_TOKEN]->(:LyricToken) } AS song_lyric_edges,
+                     COUNT { (lt:LyricToken) WHERE NOT (:Song)-[:HAS_LYRIC_TOKEN]->(lt) } AS orphan_lyric_tokens,
+                     COUNT { (:Register)-[:HAS_REGIONAL_ANTHEM]->(:Song) } AS register_anthem_edges,
+                     COUNT { (:LyricToken)-[:REINFORCES_VOCAB]->(:Vocab) } AS lyric_vocab_edges,
+                     COUNT { (:LyricToken)-[:REINFORCES_IDIOM]->(:Idiom) } AS lyric_idiom_edges,
+                     COUNT { (:LyricToken)-[:BOOSTS_CARD_FREQUENCY]->(:Card) } AS lyric_card_edges
                 """
             )
             neo_parity = dict(neo_rows[0]) if neo_rows else {}
@@ -1170,6 +1365,7 @@ class SyncService:
                 "idioms",
                 "vocab",
                 "songs",
+                "lyric_tokens",
                 "bridges",
                 "room_states",
                 "false_friends",
@@ -1184,7 +1380,7 @@ class SyncService:
                 {
                     "check": "postgres_neo4j_entity_parity",
                     "ok": len(mismatches) == 0,
-                    "detail": "100% count match across all 11 entity/edge classes" if not mismatches else mismatches,
+                    "detail": "100% count match across all 12 entity/edge classes" if not mismatches else mismatches,
                 }
             )
             checks.append(
@@ -1198,6 +1394,28 @@ class SyncService:
                     ),
                 }
             )
+            song_lyric_wiring_ok = (
+                int(neo_parity.get("song_lyric_edges", -1)) == int(pg_counts.get("lyric_tokens", -2))
+                and int(neo_parity.get("orphan_lyric_tokens", 1)) == 0
+                and int(neo_parity.get("register_anthem_edges", -1)) == int(pg_counts.get("songs", -2))
+                and int(neo_parity.get("lyric_vocab_edges", 0)) > 0
+                and int(neo_parity.get("lyric_idiom_edges", 0)) > 0
+                and int(neo_parity.get("lyric_card_edges", 0)) > 0
+            )
+            checks.append(
+                {
+                    "check": "song_lyric_frequency_graph_wiring",
+                    "ok": song_lyric_wiring_ok,
+                    "detail": (
+                        f"song_lyric_edges={neo_parity.get('song_lyric_edges', 0)}/{pg_counts.get('lyric_tokens', 0)}, "
+                        f"orphan_tokens={neo_parity.get('orphan_lyric_tokens', 0)}, "
+                        f"register_anthems={neo_parity.get('register_anthem_edges', 0)}/{pg_counts.get('songs', 0)}, "
+                        f"vocab_links={neo_parity.get('lyric_vocab_edges', 0)}, "
+                        f"idiom_links={neo_parity.get('lyric_idiom_edges', 0)}, "
+                        f"card_links={neo_parity.get('lyric_card_edges', 0)}"
+                    ),
+                }
+            )
 
         # Audit db/*.db.json offline shards
         expected_shards = ["cz_ova.db.json", "at_vie.db.json", "ru_ala.db.json", "en_yyc.db.json", "es_sot.db.json"]
@@ -1207,6 +1425,8 @@ class SyncService:
         shard_songs_total = 0
         shard_digests: dict[str, str] = {}
         missing_shards: list[str] = []
+        inline_lyric_bloat: list[str] = []
+        fabric_bytes = 0
         for sname in expected_shards + ["polyglot_fabric.db.json"]:
             spath = settings.db_json_dir / sname
             if not spath.exists():
@@ -1215,16 +1435,59 @@ class SyncService:
             raw = spath.read_bytes()
             shard_digests[sname] = hashlib.sha256(raw).hexdigest()
             parsed = json.loads(raw.decode("utf-8"))
+            for song_obj in parsed.get("songs", []):
+                if any(heavy_key in song_obj for heavy_key in ("full_lyrics", "lyric_stanzas", "lyric_tokens")):
+                    inline_lyric_bloat.append(f"{sname}:{song_obj.get('uid')}:heavy_inline_keys")
+                if not song_obj.get("lyric_shard"):
+                    inline_lyric_bloat.append(f"{sname}:{song_obj.get('uid')}:missing_lyric_shard_ref")
             if sname != "polyglot_fabric.db.json":
                 shard_cards_total += len(parsed.get("cards", []))
                 shard_idioms_total += len(parsed.get("idioms", {}))
                 shard_vocab_total += len(parsed.get("vocab", []))
             else:
+                fabric_bytes = len(raw)
                 fabric_arenas = len(parsed.get("arenas", []))
                 shard_vocab_total += len(parsed.get("vocab_alert_nodes", []))
                 shard_songs_total = len(parsed.get("songs", []))
                 if fabric_arenas != int(pg_counts.get("arenas", 0)):
                     missing_shards.append(f"polyglot_fabric.arenas={fabric_arenas}")
+
+        # Audit split db/lyrics/*.lyrics.json shards
+        pg_song_rows = await pg_manager.fetch_all("SELECT uid FROM songs ORDER BY uid")
+        expected_lyric_shards = [f"{r['uid'].lower()}.lyrics.json" for r in pg_song_rows]
+        lyric_shards_dir = settings.db_json_dir / "lyrics"
+        shard_lyric_tokens_total = 0
+        lyric_shards_ok_count = 0
+        lyric_shards_total_bytes = 0
+        weeknd_stanzas = 0
+        missing_lyric_shards: list[str] = []
+        for l_name in expected_lyric_shards:
+            l_path = lyric_shards_dir / l_name
+            if not l_path.exists():
+                missing_lyric_shards.append(l_name)
+                continue
+            try:
+                raw_bytes = l_path.read_bytes()
+                l_doc = json.loads(raw_bytes.decode("utf-8"))
+                shard_lyric_tokens_total += len(l_doc.get("lyric_tokens", []))
+                stanzas_list = l_doc.get("stanzas_lines") or l_doc.get("lyric_stanzas") or []
+                if l_name == "song_weeknd_ootg.lyrics.json":
+                    weeknd_stanzas = len(stanzas_list)
+                if not stanzas_list:
+                    missing_lyric_shards.append(f"{l_name}:empty_stanzas")
+                else:
+                    lyric_shards_ok_count += 1
+                    lyric_shards_total_bytes += len(raw_bytes)
+                    shard_digests[f"lyrics/{l_name}"] = hashlib.sha256(raw_bytes).hexdigest()
+            except Exception as exc:
+                missing_lyric_shards.append(f"{l_name}:{exc}")
+
+        lyric_shards_parity_ok = (
+            len(missing_lyric_shards) == 0
+            and lyric_shards_ok_count == len(expected_lyric_shards)
+            and lyric_shards_ok_count == int(pg_counts.get("songs", -1))
+            and shard_lyric_tokens_total == int(pg_counts.get("lyric_tokens", -1))
+        )
 
         shard_parity_ok = (
             len(missing_shards) == 0
@@ -1232,18 +1495,46 @@ class SyncService:
             and shard_idioms_total == int(pg_counts.get("idioms", -1))
             and shard_vocab_total == int(pg_counts.get("vocab", -1))
             and shard_songs_total == int(pg_counts.get("songs", -1))
+            and lyric_shards_parity_ok
         )
         checks.append(
             {
                 "check": "offline_db_json_shard_parity",
                 "ok": shard_parity_ok,
                 "detail": (
-                    f"shards=6/6, cards={shard_cards_total}/{pg_counts.get('cards')}, "
+                    f"shards=6/6, lyric_shards={lyric_shards_ok_count}/{len(expected_lyric_shards)}, "
+                    f"cards={shard_cards_total}/{pg_counts.get('cards')}, "
                     f"idioms={shard_idioms_total}/{pg_counts.get('idioms')}, "
                     f"vocab={shard_vocab_total}/{pg_counts.get('vocab')}, "
-                    f"songs={shard_songs_total}/{pg_counts.get('songs')}"
-                    if not missing_shards
-                    else f"issues={missing_shards}"
+                    f"songs={shard_songs_total}/{pg_counts.get('songs')}, "
+                    f"lyric_tokens={shard_lyric_tokens_total}/{pg_counts.get('lyric_tokens')}"
+                    if (not missing_shards and not missing_lyric_shards)
+                    else f"issues={missing_shards + missing_lyric_shards}"
+                ),
+            }
+        )
+
+        from backend.seed.song_lyrics_data import SONG_SPLIT_LYRICS
+
+        split_seed_count = len(SONG_SPLIT_LYRICS)
+        split_efficiency_ok = (
+            split_seed_count == int(pg_counts.get("songs", -1))
+            and len(inline_lyric_bloat) == 0
+            and lyric_shards_parity_ok
+            and weeknd_stanzas >= 9
+            and 0 < fabric_bytes < 50000
+        )
+        checks.append(
+            {
+                "check": "split_lyrics_git_memory_efficiency",
+                "ok": split_efficiency_ok,
+                "detail": (
+                    f"split_seed_songs={split_seed_count}/{pg_counts.get('songs', 0)}, "
+                    f"inline_lyric_bloat={len(inline_lyric_bloat)}, "
+                    f"lyric_shards={lyric_shards_ok_count}/{len(expected_lyric_shards)}, "
+                    f"weeknd_stanzas={weeknd_stanzas}, "
+                    f"fabric_bytes={fabric_bytes}, lyric_shards_bytes={lyric_shards_total_bytes}"
+                    + (f", bloat={inline_lyric_bloat}" if inline_lyric_bloat else "")
                 ),
             }
         )
@@ -1294,6 +1585,7 @@ class SyncService:
             "vocab_items": "SELECT * FROM vocab_items ORDER BY uid",
             "vocab_false_friend_alerts": "SELECT * FROM vocab_false_friend_alerts ORDER BY source_uid, target_uid",
             "songs": "SELECT * FROM songs ORDER BY uid",
+            "song_lyric_tokens": "SELECT * FROM song_lyric_tokens ORDER BY song_uid, frequency_score DESC",
         }
 
         tables_dump: dict[str, list[dict[str, Any]]] = {}
@@ -1329,6 +1621,7 @@ class SyncService:
             "CREATE CONSTRAINT idiom_term_unique IF NOT EXISTS FOR (i:Idiom) REQUIRE i.term IS UNIQUE;",
             "CREATE CONSTRAINT vocab_uid_unique IF NOT EXISTS FOR (v:Vocab) REQUIRE v.uid IS UNIQUE;",
             "CREATE CONSTRAINT song_uid_unique IF NOT EXISTS FOR (s:Song) REQUIRE s.uid IS UNIQUE;",
+            "CREATE CONSTRAINT lyric_token_uid_unique IF NOT EXISTS FOR (lt:LyricToken) REQUIRE lt.uid IS UNIQUE;",
             "CREATE CONSTRAINT state_id_unique IF NOT EXISTS FOR (s:State) REQUIRE s.id IS UNIQUE;",
             "CREATE CONSTRAINT ff_id_unique IF NOT EXISTS FOR (f:FalseFriend) REQUIRE f.id IS UNIQUE;",
             "CREATE CONSTRAINT bridge_uid_unique IF NOT EXISTS FOR (b:Bridge) REQUIRE b.uid IS UNIQUE;",

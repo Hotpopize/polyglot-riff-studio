@@ -17,6 +17,7 @@ from backend.seed.run_seed import seed_all
 from backend.services.bridge_service import bridge_service
 from backend.services.converse_service import converse_service
 from backend.services.fsrs_service import compute_retrievability, fsrs_service
+from backend.services.lyric_service import lyric_service
 from backend.services.ollama_client import ollama_client
 from backend.services.sync_service import sync_service
 
@@ -176,9 +177,10 @@ async def list_songs(
     rows = await pg_manager.fetch_all(
         """
         SELECT uid, title, artist, city_region, genre, bpm, register_id,
-               original_lang, original_lyric, translation_es, translation_en,
-               translation_cz, translation_de, translation_ru, cultural_vibe,
-               pivot_line, reinforces_card_uid, slang_vocab_uids
+               original_lang, original_lyric, full_lyrics, lyric_stanzas,
+               source_url, reach_channel, total_token_count, unique_token_count,
+               translation_es, translation_en, translation_cz, translation_de, translation_ru,
+               cultural_vibe, pivot_line, reinforces_card_uid, slang_vocab_uids
         FROM songs
         WHERE ($1::text IS NULL OR register_id = $1)
           AND ($2::text IS NULL OR LOWER(original_lang) LIKE '%' || $2 || '%')
@@ -187,6 +189,20 @@ async def list_songs(
         register_id,
         lang_code.lower() if lang_code else None,
     )
+    lt_rows = await pg_manager.fetch_all(
+        """
+        SELECT uid, song_uid, register_id, lang_code, token, lemma, meaning_gloss,
+               is_chorus_hook, song_count, chorus_count, card_count, total_frequency,
+               frequency_score, freq_tier, vocab_uid, idiom_term, connected_card_uids,
+               sample_lyric_line
+        FROM song_lyric_tokens
+        ORDER BY frequency_score DESC, total_frequency DESC, token ASC
+        """
+    )
+    lt_by_song: dict[str, list[dict[str, Any]]] = {}
+    for lt in lt_rows:
+        lt_by_song.setdefault(lt["song_uid"], []).append(lt)
+
     songs = [
         {
             "uid": s["uid"],
@@ -198,6 +214,13 @@ async def list_songs(
             "register_id": s["register_id"],
             "original_lang": s["original_lang"],
             "original_lyric": s["original_lyric"],
+            "full_lyrics": s.get("full_lyrics") or "",
+            "lyric_stanzas": list(s.get("lyric_stanzas") or []),
+            "source_url": s.get("source_url") or "",
+            "reach_channel": s.get("reach_channel") or "agent-reach+jina",
+            "total_token_count": int(s.get("total_token_count") or 0),
+            "unique_token_count": int(s.get("unique_token_count") or 0),
+            "lyric_tokens": lt_by_song.get(s["uid"], []),
             "translations": {
                 "ES": s["translation_es"],
                 "EN": s["translation_en"],
@@ -213,6 +236,29 @@ async def list_songs(
         for s in rows
     ]
     return {"songs": songs, "count": len(songs)}
+
+
+@app.get("/api/v1/songs/{song_uid}/frequency")
+async def get_song_frequency(song_uid: str) -> dict[str, Any]:
+    try:
+        return await lyric_service.get_song_frequency_profile(song_uid)
+    except LookupError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@app.get("/api/v1/frequency/leaderboard")
+async def get_frequency_leaderboard(
+    register_id: Optional[str] = None,
+    limit: int = Query(25, ge=1, le=200),
+) -> dict[str, Any]:
+    return await lyric_service.get_frequency_leaderboard(register_id=register_id, limit=limit)
+
+
+@app.post("/api/v1/songs/reach-index")
+async def reach_and_index_songs(use_agent_reach: bool = True) -> dict[str, Any]:
+    index_res = await lyric_service.index_all_songs(use_agent_reach=use_agent_reach)
+    sync_res = await sync_service.sync_pending_to_neo4j(force_all=False, prune_orphans=True)
+    return {"index": index_res, "sync": sync_res}
 
 
 @app.get("/api/v1/state/full")
@@ -242,13 +288,27 @@ async def get_full_studio_state(include_formal_personas: bool = False) -> dict[s
     song_rows = await pg_manager.fetch_all(
         """
         SELECT uid, title, artist, city_region, genre, bpm, register_id,
-               original_lang, original_lyric, translation_es, translation_en,
-               translation_cz, translation_de, translation_ru, cultural_vibe,
-               pivot_line, reinforces_card_uid, slang_vocab_uids
+               original_lang, original_lyric, full_lyrics, lyric_stanzas,
+               source_url, reach_channel, total_token_count, unique_token_count,
+               translation_es, translation_en, translation_cz, translation_de, translation_ru,
+               cultural_vibe, pivot_line, reinforces_card_uid, slang_vocab_uids
         FROM songs
         ORDER BY uid
         """
     )
+    lt_rows = await pg_manager.fetch_all(
+        """
+        SELECT uid, song_uid, register_id, lang_code, token, lemma, meaning_gloss,
+               is_chorus_hook, song_count, chorus_count, card_count, total_frequency,
+               frequency_score, freq_tier, vocab_uid, idiom_term, connected_card_uids,
+               sample_lyric_line
+        FROM song_lyric_tokens
+        ORDER BY frequency_score DESC, total_frequency DESC, token ASC
+        """
+    )
+    lt_by_song_full: dict[str, list[dict[str, Any]]] = {}
+    for lt in lt_rows:
+        lt_by_song_full.setdefault(lt["song_uid"], []).append(lt)
     lenses = await pg_manager.fetch_all("SELECT * FROM style_lenses ORDER BY id")
 
     # Core terrace 4-C cards for Studio Tab 1 + all cards accessible under allCards
@@ -381,6 +441,13 @@ async def get_full_studio_state(include_formal_personas: bool = False) -> dict[s
                 "register_id": s["register_id"],
                 "original_lang": s["original_lang"],
                 "original_lyric": s["original_lyric"],
+                "full_lyrics": s.get("full_lyrics") or "",
+                "lyric_stanzas": list(s.get("lyric_stanzas") or []),
+                "source_url": s.get("source_url") or "",
+                "reach_channel": s.get("reach_channel") or "agent-reach+jina",
+                "total_token_count": int(s.get("total_token_count") or 0),
+                "unique_token_count": int(s.get("unique_token_count") or 0),
+                "lyric_tokens": lt_by_song_full.get(s["uid"], []),
                 "translations": {
                     "ES": s["translation_es"],
                     "EN": s["translation_en"],

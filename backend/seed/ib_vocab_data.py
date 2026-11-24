@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from backend.seed.song_lyrics_data import attach_split_lyrics
+
 IB_REGISTER_ALIASES: dict[str, dict[str, str]] = {
     "CZ_STD": {"ib_alias": "CZ_FORMAL_IB", "register_type": "FORMAL_EXAM", "ib_title": "Spisovná Čeština (IB Academic & Executive B2B)"},
     "CZ_OVA": {"ib_alias": "CZ_REGIONAL_OVA", "register_type": "REGIONAL_RIFF", "ib_title": "Ostravská Pracovní Řeč"},
@@ -563,7 +565,7 @@ IB_EXEC_EDGES: list[dict] = [
     },
 ]
 
-SONGS: list[dict] = [
+SONGS: list[dict] = attach_split_lyrics([
     {
         "uid": "SONG_CZ_OVA_NOHAVICA",
         "title": "Ostrava",
@@ -582,7 +584,7 @@ SONGS: list[dict] = [
         "cultural_vibe": "Industrial pride, miner grit, uncompromising short-vowel pace",
         "pivot_line": "Sleduji vaše projekty a má to rozbor... ale upřímně, držet to teď při zemi je zbytečná šichta navíc. Když ten strach pustíš, máš čistý fajront, bo ten motor pojede sám.",
         "reinforces_card_uid": "CZ_OVA_COUNT",
-        "slang_vocab_uids": ["CZ_V_SICHTA", "CZ_V_FAJRONT", "CZ_V_BO"],
+        "slang_vocab_uids": ["CZ_V_FACHAT", "CZ_V_SICHTA", "CZ_V_FAJRONT", "CZ_V_BO"],
     },
     {
         "uid": "SONG_AT_VIE_FALCO",
@@ -602,7 +604,7 @@ SONGS: list[dict] = [
         "cultural_vibe": "Syncopated coffeehouse charm, theatrical detachment, status equalization",
         "pivot_line": "Ich sehe, wie professionell Sie das aufgestellt haben... aber geh bitte: jetzt auf Nummer sicher gehen? Da musst du die übertriebene Vorsicht mal an der Garderobe abgeben, Oida!",
         "reinforces_card_uid": "AT_VIE_CHAM",
-        "slang_vocab_uids": ["DE_V_SCHMAEH", "DE_V_PARTICLES"],
+        "slang_vocab_uids": ["DE_V_SCHMAEH", "DE_V_PARTICLES", "DE_V_GSCHICHTL"],
     },
     {
         "uid": "SONG_RU_ALA_ASTUDIO",
@@ -622,7 +624,7 @@ SONGS: list[dict] = [
         "cultural_vibe": "Terrace warmth, Kazakhstani hospitality, soul-driven execution",
         "pivot_line": "Слушай, родной, скажу как есть: то, что ты собрал — сделали по красоте. Базару нет, мы с тобой одной крови, давай поговорим по душам, как за широким дастарханом.",
         "reinforces_card_uid": "RU_ALA_COMP",
-        "slang_vocab_uids": ["RU_V_KRASOTA", "RU_V_BAZARU"],
+        "slang_vocab_uids": ["RU_V_KRASOTA", "RU_V_BAZARU", "RU_V_DASTARKHAN"],
     },
     {
         "uid": "SONG_EN_YYC_LOVERBOY",
@@ -684,6 +686,6 @@ SONGS: list[dict] = [
         "reinforces_card_uid": "EN_YYC_CHAM",
         "slang_vocab_uids": ["EN_V_TOUGH_LOVE"],
     },
-]
+])
 
 

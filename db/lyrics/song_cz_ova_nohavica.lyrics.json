@@ -1,0 +1,52 @@
+{
+  "schema_version": "3.5.0",
+  "uid": "SONG_CZ_OVA_NOHAVICA",
+  "title": "Ostrava",
+  "artist": "Jaromír Nohavica",
+  "city_region": "Ostrava (Moravian-Silesian Region)",
+  "register_id": "CZ_OVA",
+  "original_lang": "CZ_OVA",
+  "source_url": "https://www.karaoketexty.cz/texty-pisni/nohavica-jaromir/ostravo-19675",
+  "reach_channel": "agent-reach+jina",
+  "total_token_count": 81,
+  "unique_token_count": 63,
+  "stanzas_lines": [
+    [
+      "Ostravo, Ostravo,",
+      "město mezi městy, hořké moje štěstí,",
+      "Ostravo, Ostravo,",
+      "černá hvězdo nad hlavou."
+    ],
+    [
+      "Pánbůh rozdal jiným městům všecku krásu,",
+      "parníky na řekách a dámy všité do atlasu,",
+      "Ostravo, srdce rudé, zpečetěný osude."
+    ],
+    [
+      "Ostravo, Ostravo,",
+      "kde jsem oči nechal, když jsem k tobě spěchal,",
+      "Ostravo, Ostravo,",
+      "černá hvězdo nad hlavou."
+    ],
+    [
+      "Ať mě moje nohy nesly, kam mě nesly,",
+      "ptáci na obloze jenom jednu cestu kreslí —",
+      "kaj ľudzie fchytaju šichtu a po robotě maju čistý fajront,",
+      "bo ten motor musí fachat sám!"
+    ]
+  ],
+  "lyric_tokens": [
+    {"uid":"LT_SONG_CZ_OVA_NOHAVICA_BO","song_uid":"SONG_CZ_OVA_NOHAVICA","register_id":"CZ_OVA","lang_code":"cs","token":"bo","lemma":"bo","meaning_gloss":"Causal connector \"because\" (never \"or\")","is_chorus_hook":true,"song_count":6,"chorus_count":4,"card_count":12,"total_frequency":18,"frequency_score":1.0,"freq_tier":"CHORUS_EARWORM","vocab_uid":"CZ_V_BO","idiom_term":"bo","connected_card_uids":["CZ_OVA_COUNT","HOCH_CZ_OVA_BASE","CZ_OVA_ADVENTURE_COUNT","CZ_OVA_RUNWAY_COUNT","HAUTE_RUNWAY_CZ_ONEAL","CZ_OVA_HOCHKULTUR_COUNT","CZ_OVA_POLO_COUNT","CZ_OVA_WIEN_COMP","CZ_OVA_WIEN_COUNT","CZ_OVA_B2B_COUNT","CZ_OVA_SPARK_COUNT","CZ_OVA_COUNT_01"],"sample_lyric_line":"Ať mě moje nohy nesly, kam mě nesly,\nptáci na obloze jenom jednu cestu kreslí —\nkaj ľudzie fchytaju šichtu a po robotě maju čistý fajront,\nbo ten motor musí fachat sám!"},
+    {"uid":"LT_SONG_CZ_OVA_NOHAVICA_FAJRONT","song_uid":"SONG_CZ_OVA_NOHAVICA","register_id":"CZ_OVA","lang_code":"cs","token":"fajront","lemma":"fajront","meaning_gloss":"Quitting time / clean finish of work day","is_chorus_hook":true,"song_count":3,"chorus_count":2,"card_count":11,"total_frequency":14,"frequency_score":1.0,"freq_tier":"CHORUS_EARWORM","vocab_uid":"CZ_V_FAJRONT","idiom_term":"fajront","connected_card_uids":["CZ_OVA_COUNT","HAUTE_RUNWAY_CZ_WILL","HOCH_CZ_OVA_BASE","CZ_OVA_ADVENTURE_COUNT","CZ_OVA_RUNWAY_COUNT","CZ_OVA_HOCHKULTUR_COUNT","CZ_OVA_POLO_COUNT","CZ_OVA_WIEN_COUNT","CZ_OVA_B2B_COUNT","CZ_OVA_SPARK_COUNT","CZ_OVA_COUNT_01"],"sample_lyric_line":"Ať mě moje nohy nesly, kam mě nesly,\nptáci na obloze jenom jednu cestu kreslí —\nkaj ľudzie fchytaju šichtu a po robotě maju čistý fajront,\nbo ten motor musí fachat sám!"},
+    {"uid":"LT_SONG_CZ_OVA_NOHAVICA_FACHAT","song_uid":"SONG_CZ_OVA_NOHAVICA","register_id":"CZ_OVA","lang_code":"cs","token":"fachat","lemma":"fachat","meaning_gloss":"Work / function reliably without friction","is_chorus_hook":true,"song_count":1,"chorus_count":1,"card_count":12,"total_frequency":13,"frequency_score":1.0,"freq_tier":"CROSS_CORPUS_ANCHOR","vocab_uid":"CZ_V_FACHAT","idiom_term":"fachat","connected_card_uids":["CZ_OVA_CHAM","HAUTE_RUNWAY_CZ_FERG","CZ_OVA_ADVENTURE_COMP","RUNWAY_CZ_OVA_BASE","POLO_CZ_OVA_BASE","CZ_OVA_HOCHKULTUR_COMP","CZ_OVA_POLO_COMP","CZ_OVA_WIEN_CHAM","CZ_OVA_B2B_CHAM","CZ_OVA_RUNWAY_COMP","CZ_OVA_SPARK_CHAM","CZ_OVA_COUNT_01"],"sample_lyric_line":"Ať mě moje nohy nesly, kam mě nesly,\nptáci na obloze jenom jednu cestu kreslí —\nkaj ľudzie fchytaju šichtu a po robotě maju čistý fajront,\nbo ten motor musí fachat sám!"},
+    {"uid":"LT_SONG_CZ_OVA_NOHAVICA_SICHTA","song_uid":"SONG_CZ_OVA_NOHAVICA","register_id":"CZ_OVA","lang_code":"cs","token":"šichta","lemma":"šichta","meaning_gloss":"Heavy work shift / manual grind","is_chorus_hook":true,"song_count":3,"chorus_count":2,"card_count":10,"total_frequency":13,"frequency_score":1.0,"freq_tier":"CHORUS_EARWORM","vocab_uid":"CZ_V_SICHTA","idiom_term":"šichta","connected_card_uids":["CZ_OVA_COUNT","CZ_OVA_ADVENTURE_COUNT","CZ_OVA_RUNWAY_COUNT","HAUTE_RUNWAY_CZ_ONEAL","CZ_OVA_HOCHKULTUR_COUNT","CZ_OVA_POLO_COUNT","CZ_OVA_WIEN_COUNT","CZ_OVA_B2B_COUNT","CZ_OVA_SPARK_COUNT","CZ_OVA_COUNT_01"],"sample_lyric_line":"Ať mě moje nohy nesly, kam mě nesly,\nptáci na obloze jenom jednu cestu kreslí —\nkaj ľudzie fchytaju šichtu a po robotě maju čistý fajront,\nbo ten motor musí fachat sám!"},
+    {"uid":"LT_SONG_CZ_OVA_NOHAVICA_KAJ","song_uid":"SONG_CZ_OVA_NOHAVICA","register_id":"CZ_OVA","lang_code":"cs","token":"kaj","lemma":"kaj","meaning_gloss":"Where (kde).","is_chorus_hook":true,"song_count":2,"chorus_count":2,"card_count":9,"total_frequency":11,"frequency_score":1.0,"freq_tier":"CHORUS_EARWORM","vocab_uid":null,"idiom_term":"kaj","connected_card_uids":["CZ_OVA_CHAM","CZ_OVA_ADVENTURE_CHAM","POLO_CZ_OVA_BASE","CZ_OVA_RUNWAY_CHAM","CZ_OVA_HOCHKULTUR_CHAM","CZ_OVA_POLO_COMP","CZ_OVA_WIEN_CHAM","CZ_OVA_B2B_CHAM","CZ_OVA_SPARK_CHAM"],"sample_lyric_line":"Ať mě moje nohy nesly, kam mě nesly,\nptáci na obloze jenom jednu cestu kreslí —\nkaj ľudzie fchytaju šichtu a po robotě maju čistý fajront,\nbo ten motor musí fachat sám!"},
+    {"uid":"LT_SONG_CZ_OVA_NOHAVICA_OSTRAVA","song_uid":"SONG_CZ_OVA_NOHAVICA","register_id":"CZ_OVA","lang_code":"cs","token":"ostrava","lemma":"ostrava","meaning_gloss":"Industrial Moravian city anchor & identity core","is_chorus_hook":true,"song_count":11,"chorus_count":2,"card_count":0,"total_frequency":11,"frequency_score":1.0,"freq_tier":"CHORUS_EARWORM","vocab_uid":null,"idiom_term":null,"connected_card_uids":[],"sample_lyric_line":""},
+    {"uid":"LT_SONG_CZ_OVA_NOHAVICA_CISTY","song_uid":"SONG_CZ_OVA_NOHAVICA","register_id":"CZ_OVA","lang_code":"cs","token":"čistý","lemma":"čistý","meaning_gloss":"High-frequency motif in Ostrava","is_chorus_hook":true,"song_count":3,"chorus_count":2,"card_count":2,"total_frequency":5,"frequency_score":0.853,"freq_tier":"CHORUS_EARWORM","vocab_uid":null,"idiom_term":null,"connected_card_uids":["CZ_OVA_COUNT","CZ_OVA_RUNWAY_COUNT"],"sample_lyric_line":"Ať mě moje nohy nesly, kam mě nesly,\nptáci na obloze jenom jednu cestu kreslí —\nkaj ľudzie fchytaju šichtu a po robotě maju čistý fajront,\nbo ten motor musí fachat sám!"},
+    {"uid":"LT_SONG_CZ_OVA_NOHAVICA_MOTOR","song_uid":"SONG_CZ_OVA_NOHAVICA","register_id":"CZ_OVA","lang_code":"cs","token":"motor","lemma":"motor","meaning_gloss":"Self-running system engine after setup","is_chorus_hook":true,"song_count":3,"chorus_count":2,"card_count":2,"total_frequency":5,"frequency_score":0.853,"freq_tier":"CHORUS_EARWORM","vocab_uid":null,"idiom_term":null,"connected_card_uids":["CZ_OVA_COUNT","HAUTE_RUNWAY_CZ_FERG"],"sample_lyric_line":"Ať mě moje nohy nesly, kam mě nesly,\nptáci na obloze jenom jednu cestu kreslí —\nkaj ľudzie fchytaju šichtu a po robotě maju čistý fajront,\nbo ten motor musí fachat sám!"},
+    {"uid":"LT_SONG_CZ_OVA_NOHAVICA_SAM","song_uid":"SONG_CZ_OVA_NOHAVICA","register_id":"CZ_OVA","lang_code":"cs","token":"sám","lemma":"sám","meaning_gloss":"High-frequency motif in Ostrava","is_chorus_hook":true,"song_count":3,"chorus_count":2,"card_count":1,"total_frequency":4,"frequency_score":0.737,"freq_tier":"CHORUS_EARWORM","vocab_uid":null,"idiom_term":null,"connected_card_uids":["CZ_OVA_COUNT"],"sample_lyric_line":"Ať mě moje nohy nesly, kam mě nesly,\nptáci na obloze jenom jednu cestu kreslí —\nkaj ľudzie fchytaju šichtu a po robotě maju čistý fajront,\nbo ten motor musí fachat sám!"},
+    {"uid":"LT_SONG_CZ_OVA_NOHAVICA_NESLY","song_uid":"SONG_CZ_OVA_NOHAVICA","register_id":"CZ_OVA","lang_code":"cs","token":"nesly","lemma":"nesly","meaning_gloss":"High-frequency motif in Ostrava","is_chorus_hook":true,"song_count":2,"chorus_count":2,"card_count":0,"total_frequency":2,"frequency_score":0.463,"freq_tier":"CHORUS_EARWORM","vocab_uid":null,"idiom_term":null,"connected_card_uids":[],"sample_lyric_line":"Ať mě moje nohy nesly, kam mě nesly,\nptáci na obloze jenom jednu cestu kreslí —\nkaj ľudzie fchytaju šichtu a po robotě maju čistý fajront,\nbo ten motor musí fachat sám!"},
+    {"uid":"LT_SONG_CZ_OVA_NOHAVICA_MESTO","song_uid":"SONG_CZ_OVA_NOHAVICA","register_id":"CZ_OVA","lang_code":"cs","token":"město","lemma":"město","meaning_gloss":"High-frequency motif in Ostrava","is_chorus_hook":true,"song_count":2,"chorus_count":1,"card_count":0,"total_frequency":2,"frequency_score":0.389,"freq_tier":"CHORUS_EARWORM","vocab_uid":null,"idiom_term":null,"connected_card_uids":[],"sample_lyric_line":"Ostravo, Ostravo,\nměsto mezi městy, hořké moje štěstí,\nOstravo, Ostravo,\nčerná hvězdo nad hlavou."},
+    {"uid":"LT_SONG_CZ_OVA_NOHAVICA_MESTY","song_uid":"SONG_CZ_OVA_NOHAVICA","register_id":"CZ_OVA","lang_code":"cs","token":"městy","lemma":"městy","meaning_gloss":"High-frequency motif in Ostrava","is_chorus_hook":true,"song_count":2,"chorus_count":1,"card_count":0,"total_frequency":2,"frequency_score":0.389,"freq_tier":"CHORUS_EARWORM","vocab_uid":null,"idiom_term":null,"connected_card_uids":[],"sample_lyric_line":"Ostravo, Ostravo,\nměsto mezi městy, hořké moje štěstí,\nOstravo, Ostravo,\nčerná hvězdo nad hlavou."}
+  ]
+}

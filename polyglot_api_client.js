@@ -157,10 +157,47 @@
   // =========================================================================
   // OFFLINE .db.json SHARD ASSEMBLER (Instant on GitHub Pages or Offline)
   // =========================================================================
+  const lyricShardCache = new Map();
+  const frequencyResponseCache = new Map();
+
   async function fetchLocalShardJson(filename) {
     const resp = await fetch(`./db/${filename}`);
     if (!resp.ok) throw new Error(`Shard ${filename} HTTP ${resp.status}`);
     return await resp.json();
+  }
+
+  async function fetchLocalLyricShard(songUidOrPath) {
+    const raw = String(songUidOrPath || '').trim();
+    if (!raw) throw new Error('Missing songUid for lyric shard');
+    const cacheKey = raw.replace(/^(\.\/)?db\/lyrics\//i, '').replace(/\.lyrics\.json$/i, '').toLowerCase();
+    if (lyricShardCache.has(cacheKey)) {
+      return lyricShardCache.get(cacheKey);
+    }
+    const targetPath = raw.includes('/')
+      ? (raw.startsWith('.') ? raw : `./${raw}`)
+      : `./db/lyrics/${cacheKey}.lyrics.json`;
+    const resp = await fetch(targetPath);
+    if (!resp.ok) throw new Error(`Lyric shard ${targetPath} HTTP ${resp.status}`);
+    const data = await resp.json();
+    if (!Array.isArray(data.lyric_stanzas) && Array.isArray(data.stanzas_lines)) {
+      data.lyric_stanzas = data.stanzas_lines.map(lines => (Array.isArray(lines) ? lines.join('\n') : String(lines || '')));
+    }
+    if (!data.full_lyrics && Array.isArray(data.lyric_stanzas)) {
+      data.full_lyrics = data.lyric_stanzas.join('\n\n');
+    }
+    lyricShardCache.set(cacheKey, data);
+    return data;
+  }
+
+  function clearLyricShardCache(songUid = '') {
+    if (!songUid) {
+      lyricShardCache.clear();
+      frequencyResponseCache.clear();
+      return;
+    }
+    const key = String(songUid).trim().toLowerCase();
+    lyricShardCache.delete(key);
+    frequencyResponseCache.delete(key);
   }
 
   async function assembleOfflineStateFromShards(includeFormalPersonas = false) {
@@ -368,6 +405,26 @@
       return res && res.ok ? res : null;
     },
 
+    async fetchAudit() {
+      try {
+        return await requestJson('/api/v1/admin/audit', { method: 'GET' }, 10000);
+      } catch (_) {
+        const st = await assembleOfflineStateFromShards(false);
+        return {
+          ok: true,
+          offlineShardMode: true,
+          schema_version: '3.5.0',
+          checks: [
+            {
+              check: 'offline_db_json_shard_parity',
+              ok: (st.songs || []).length >= 6 && (st.cards || []).length >= 196,
+              detail: `Offline Shards Active (${(st.cards || []).length} cards, ${(st.songs || []).length} songs)`
+            }
+          ]
+        };
+      }
+    },
+
     async fetchNetworkInfo() {
       try {
         return await requestJson('/api/v1/network-info', { method: 'GET' }, 3500);
@@ -449,6 +506,95 @@
         if (langCode) songs = songs.filter(s => (s.original_lang || '').toLowerCase().includes(langCode.toLowerCase()));
         return { songs, count: songs.length, offlineShardMode: true };
       }
+    },
+
+    async fetchSongFrequency(songUid = 'SONG_CZ_OVA_NOHAVICA', forceRefresh = false) {
+      const cacheKey = String(songUid || '').trim().toLowerCase();
+      if (!forceRefresh && frequencyResponseCache.has(cacheKey)) {
+        return frequencyResponseCache.get(cacheKey);
+      }
+      try {
+        const res = await requestJson(`/api/v1/songs/${encodeURIComponent(songUid)}/frequency`, { method: 'GET' }, 5000);
+        if (res && Array.isArray(res.lyric_tokens)) {
+          frequencyResponseCache.set(cacheKey, res);
+        }
+        return res;
+      } catch (_) {
+        const st = await assembleOfflineStateFromShards(false);
+        const sMeta = (st.songs || []).find(item => item.uid === songUid) || (st.songs || [])[0] || {};
+        let shard = null;
+        try {
+          shard = await fetchLocalLyricShard(sMeta.lyric_shard || sMeta.uid || songUid);
+        } catch (__) {
+          shard = null;
+        }
+        const mergedSong = { ...sMeta, ...(shard || {}) };
+        const tokens = mergedSong.lyric_tokens || [];
+        const payload = {
+          song: mergedSong,
+          lyric_tokens: tokens,
+          graph_summary: {
+            connected_vocab_count: new Set(tokens.map(t => t.vocab_uid).filter(Boolean)).size,
+            connected_idiom_count: new Set(tokens.map(t => t.idiom_term).filter(Boolean)).size,
+            connected_card_count: new Set(tokens.flatMap(t => t.connected_card_uids || [])).size
+          },
+          offlineShardMode: true
+        };
+        frequencyResponseCache.set(cacheKey, payload);
+        return payload;
+      }
+    },
+
+    async fetchLocalLyricShard(songUidOrPath) {
+      return await fetchLocalLyricShard(songUidOrPath);
+    },
+
+    clearLyricShardCache(songUid = '') {
+      clearLyricShardCache(songUid);
+    },
+
+    async fetchFrequencyLeaderboard(registerId = '', limit = 25) {
+      try {
+        const qs = new URLSearchParams();
+        if (registerId) qs.set('register_id', registerId);
+        if (limit) qs.set('limit', String(limit));
+        const suffix = qs.toString() ? `?${qs.toString()}` : '';
+        return await requestJson(`/api/v1/frequency/leaderboard${suffix}`, { method: 'GET' }, 5000);
+      } catch (_) {
+        const st = await assembleOfflineStateFromShards(false);
+        const songList = st.songs || [];
+        const hydratedSongs = await Promise.all(
+          songList.map(async s => {
+            if (Array.isArray(s.lyric_tokens) && s.lyric_tokens.length > 0) return s;
+            try {
+              const shard = await fetchLocalLyricShard(s.lyric_shard || s.uid);
+              return { ...s, ...shard };
+            } catch (__) {
+              return s;
+            }
+          })
+        );
+        const tokens = [];
+        hydratedSongs.forEach(s => {
+          (s.lyric_tokens || []).forEach(lt => {
+            if (!registerId || lt.register_id === registerId) {
+              tokens.push({ ...lt, song_title: s.title, song_artist: s.artist });
+            }
+          });
+        });
+        tokens.sort((a, b) => (b.frequency_score - a.frequency_score) || (b.total_frequency - a.total_frequency));
+        return { register_id: registerId || 'ALL', count: tokens.slice(0, limit).length, tokens: tokens.slice(0, limit), offlineShardMode: true };
+      }
+    },
+
+    async reachAndIndexSongs(useAgentReach = true) {
+      const res = await requestJson(
+        `/api/v1/songs/reach-index?use_agent_reach=${useAgentReach ? 'true' : 'false'}`,
+        { method: 'POST' },
+        25000
+      );
+      clearLyricShardCache();
+      return res;
     },
 
     async scaffoldPhrase(arg1 = {}, targetRegisterArg = 'CZ_OVA', anchorLangsArg = ['DE', 'RU', 'EN']) {
@@ -614,10 +760,41 @@
   };
 
   // =========================================================================
-  // CROSS-APP GLOBAL CONTEXT SYNC BUS (PolyglotSyncBus)
-  // Keeps active Culture (CZ_OVA, AT_VIE, RU_ALA, EN_YYC, ES_SOT) and Arena
-  // synchronized across index.html and all 6 Studio iframes/tabs.
+  // ADAPTIVE EMBEDDED MODE DETECTION (Slim Chrome Inside index.html)
   // =========================================================================
+  const isEmbeddedFrame = (() => {
+    try {
+      return (global.self !== global.top) || /[?&]embed=1/.test(String(global.location?.search || ''));
+    } catch (_) {
+      return true;
+    }
+  })();
+
+  if (isEmbeddedFrame && global.document && global.document.documentElement) {
+    global.document.documentElement.classList.add('polyglot-embedded');
+    const injectEmbeddedCss = () => {
+      if (global.document.getElementById('polyglot-embedded-css')) return;
+      const st = global.document.createElement('style');
+      st.id = 'polyglot-embedded-css';
+      st.textContent = `
+        html.polyglot-embedded [data-embed-hide="true"] { display: none !important; }
+        html.polyglot-embedded .embed-compact-main { padding-top: 0.75rem !important; padding-bottom: 1rem !important; }
+        html.polyglot-embedded .embed-no-sticky-brand { padding-top: 0.35rem !important; padding-bottom: 0.35rem !important; }
+      `;
+      (global.document.head || global.document.documentElement).appendChild(st);
+    };
+    injectEmbeddedCss();
+    if (global.document.readyState === 'loading') {
+      global.document.addEventListener('DOMContentLoaded', injectEmbeddedCss, { once: true });
+    }
+  }
+
+  // =========================================================================
+  // CROSS-APP GLOBAL CONTEXT SYNC BUS (PolyglotSyncBus)
+  // Keeps active Culture (CZ_OVA, AT_VIE, RU_ALA, EN_YYC, ES_SOT), Arena, and
+  // deep-link handoffs synchronized across index.html and all 6 Studio views.
+  // =========================================================================
+  const LAST_APP_STORAGE_KEY = 'polyglot_suite_last_app_v36';
   let isApplyingRemoteContext = false;
   let bcChannel = null;
   try {
@@ -635,11 +812,12 @@
         return {
           ...c,
           arena: parsed.arena || 'terrace',
+          subview: parsed.subview || null,
           updatedAt: parsed.updatedAt || 0
         };
       }
     } catch (_) {}
-    return { ...CULTURE_META.CZ_OVA, arena: 'terrace', updatedAt: 0 };
+    return { ...CULTURE_META.CZ_OVA, arena: 'terrace', subview: null, updatedAt: 0 };
   }
 
   function broadcastContext(partial = {}) {
@@ -651,6 +829,7 @@
     const nextCtx = {
       ...culture,
       arena: partial.arena ? String(partial.arena).toLowerCase() : (prev.arena || 'terrace'),
+      subview: partial.subview !== undefined ? partial.subview : null,
       updatedAt: Date.now()
     };
 
@@ -682,6 +861,37 @@
     } catch (_) {}
 
     return nextCtx;
+  }
+
+  function navigateApp(appUrl, opts = {}) {
+    if (!appUrl) return;
+    const nextCtx = broadcastContext({
+      registerId: opts.registerId,
+      langCode: opts.langCode,
+      culture: opts.culture,
+      arena: opts.arena,
+      subview: opts.subview || null
+    });
+    try {
+      if (global.localStorage) {
+        global.localStorage.setItem(LAST_APP_STORAGE_KEY, appUrl);
+      }
+    } catch (_) {}
+    if (isEmbeddedFrame && global.parent && global.parent !== global) {
+      try {
+        global.parent.postMessage({
+          type: 'POLYGLOT_NAVIGATE_APP',
+          appUrl,
+          context: nextCtx
+        }, '*');
+        return;
+      } catch (_) {}
+    }
+    if (typeof global.loadApp === 'function') {
+      global.loadApp(appUrl, nextCtx);
+    } else if (global.location) {
+      global.location.href = appUrl;
+    }
   }
 
   function applyContextToCurrentPage(ctx) {
@@ -716,9 +926,27 @@
           scope.selectLang(c.langCode);
         }
       }
+      // 5. Sync active 8-Arena room when supported
+      if (ctx.arena) {
+        if (typeof global.changeArena === 'function') {
+          global.changeArena(ctx.arena);
+        } else if (typeof global.selectArena === 'function') {
+          global.selectArena(ctx.arena);
+        }
+      }
+      // 6. Optional cross-app subview deep-link (only when explicitly passed)
+      if (ctx.subview) {
+        if (typeof global.switchMode === 'function') {
+          global.switchMode(ctx.subview);
+        } else if (typeof global.switchView === 'function') {
+          global.switchView(ctx.subview);
+        } else if (typeof global.setStudioMode === 'function') {
+          global.setStudioMode(ctx.subview);
+        }
+      }
     } catch (_) {
     } finally {
-      setTimeout(() => { isApplyingRemoteContext = false; }, 50);
+      setTimeout(() => { isApplyingRemoteContext = false; }, 60);
     }
   }
 
@@ -766,6 +994,21 @@
       global.selectTrack = wrapped;
     }
 
+    // Hook selectV45Anthem (Audio-Rhythm Studio v4.5)
+    if (typeof global.selectV45Anthem === 'function' && !global.selectV45Anthem._polyglotHooked) {
+      const orig = global.selectV45Anthem;
+      const idxMap = ['CZ_OVA', 'AT_VIE', 'RU_ALA', 'EN_YYC', 'ES_SOT'];
+      const wrapped = function (idx, ...rest) {
+        const res = orig.apply(this, [idx, ...rest]);
+        if (idxMap[idx]) {
+          broadcastContext({ culture: idxMap[idx] });
+        }
+        return res;
+      };
+      wrapped._polyglotHooked = true;
+      global.selectV45Anthem = wrapped;
+    }
+
     // Hook Alpine selectLang (5-Lang Register Switcher)
     const alpineRoot = global.document.querySelector('[x-data]');
     if (alpineRoot && alpineRoot._x_dataStack && alpineRoot._x_dataStack[0]) {
@@ -780,6 +1023,28 @@
         wrapped._polyglotHooked = true;
         scope.selectLang = wrapped;
       }
+    }
+
+    // Hook changeArena / selectArena so 8-Arena room stays synced across Atelier & Lounge
+    if (typeof global.changeArena === 'function' && !global.changeArena._polyglotHooked) {
+      const orig = global.changeArena;
+      const wrapped = function (arenaId, ...rest) {
+        const res = orig.apply(this, [arenaId, ...rest]);
+        if (arenaId) broadcastContext({ arena: arenaId });
+        return res;
+      };
+      wrapped._polyglotHooked = true;
+      global.changeArena = wrapped;
+    }
+    if (typeof global.selectArena === 'function' && !global.selectArena._polyglotHooked) {
+      const orig = global.selectArena;
+      const wrapped = function (arenaId, ...rest) {
+        const res = orig.apply(this, [arenaId, ...rest]);
+        if (arenaId) broadcastContext({ arena: arenaId });
+        return res;
+      };
+      wrapped._polyglotHooked = true;
+      global.selectArena = wrapped;
     }
 
     // Apply initial context stored across tabs
@@ -877,9 +1142,12 @@
   global.PolyglotMobile = mobileHelper;
   global.PolyglotSyncBus = {
     CULTURE_META,
+    LAST_APP_STORAGE_KEY,
+    isEmbedded: isEmbeddedFrame,
     normalizeCulture,
     getContext: getSavedContext,
     setContext: broadcastContext,
-    applyContext: applyContextToCurrentPage
+    applyContext: applyContextToCurrentPage,
+    navigateApp
   };
 })(window);

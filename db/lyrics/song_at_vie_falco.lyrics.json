@@ -1,0 +1,48 @@
+{
+  "schema_version": "3.5.0",
+  "uid": "SONG_AT_VIE_FALCO",
+  "title": "Vienna Calling",
+  "artist": "Falco (Johann Hölzel)",
+  "city_region": "Vienna (Austro-Bavarian)",
+  "register_id": "AT_VIE",
+  "original_lang": "AT_VIE",
+  "source_url": "https://falco.at/discography/vienna-calling/",
+  "reach_channel": "agent-reach+jina",
+  "total_token_count": 91,
+  "unique_token_count": 65,
+  "stanzas_lines": [
+    [
+      "Hello, Vienna calling! Hello, oho, Vienna calling!",
+      "Stella sitzt in Rio, Stella liegt in Tokyo,",
+      "Männer fragen sie nach Feuer, nach dem andern sowieso."
+    ],
+    [
+      "Womit spielen kleine Mädchen heute, hier und dort und da,",
+      "ob in Tucson, Arizona, Toronto, Canada."
+    ],
+    [
+      "Wien, nur Wien, du kennst mich up, kennst mich down, du kennst mich!",
+      "Two, one, zero — der Alarm ist rot,",
+      "Wien in Not, Vienna calling!"
+    ],
+    [
+      "Vienna Calling, Oida! Kein Stress und kein G’schichtldrucken —",
+      "der Wiener Schmäh rennt eh von allein,",
+      "musst nur die Vorsicht an der Garderobe abgeben, schwer in Ordnung!"
+    ]
+  ],
+  "lyric_tokens": [
+    {"uid":"LT_SONG_AT_VIE_FALCO_AN_DER_GARDEROBE_ABGEBEN","song_uid":"SONG_AT_VIE_FALCO","register_id":"AT_VIE","lang_code":"de","token":"an der garderobe abgeben","lemma":"an der garderobe abgeben","meaning_gloss":"Check your stiff caution at the coat check before we talk.","is_chorus_hook":true,"song_count":6,"chorus_count":4,"card_count":11,"total_frequency":17,"frequency_score":1.0,"freq_tier":"CHORUS_EARWORM","vocab_uid":null,"idiom_term":"an der Garderobe abgeben","connected_card_uids":["AT_VIE_SPARK_COUNT","HOCH_AT_VIE_BASE","AT_VIE_ADVENTURE_COUNT","AT_VIE_RUNWAY_COUNT","AT_VIE_COUNT","AT_VIE_HOCHKULTUR_COUNT","AT_VIE_POLO_COUNT","AT_VIE_WIEN_COUNT","AT_VIE_B2B_COUNT","HAUTE_HOCH_AT_DEADPAN","AT_VIE_POLO_CUR"],"sample_lyric_line":"Vienna Calling, Oida! Kein Stress und kein G’schichtldrucken —\nder Wiener Schmäh rennt eh von allein,\nmusst nur die Vorsicht an der Garderobe abgeben, schwer in Ordnung!"},
+    {"uid":"LT_SONG_AT_VIE_FALCO_SCHWER_IN_ORDNUNG","song_uid":"SONG_AT_VIE_FALCO","register_id":"AT_VIE","lang_code":"de","token":"schwer in ordnung","lemma":"schwer in ordnung","meaning_gloss":"Genuinely impressive / solid character.","is_chorus_hook":true,"song_count":1,"chorus_count":1,"card_count":10,"total_frequency":11,"frequency_score":1.0,"freq_tier":"CROSS_CORPUS_ANCHOR","vocab_uid":null,"idiom_term":"schwer in Ordnung","connected_card_uids":["AT_VIE_COMP","AT_VIE_SPARK_COMP","RUNWAY_AT_VIE_BASE","AT_VIE_ADVENTURE_COMP","AT_VIE_HOCHKULTUR_COMP","AT_VIE_WIEN_COMP","POLO_AT_VIE_BASE","AT_VIE_RUNWAY_COMP","AT_VIE_POLO_COMP","AT_VIE_B2B_COMP"],"sample_lyric_line":"Vienna Calling, Oida! Kein Stress und kein G’schichtldrucken —\nder Wiener Schmäh rennt eh von allein,\nmusst nur die Vorsicht an der Garderobe abgeben, schwer in Ordnung!"},
+    {"uid":"LT_SONG_AT_VIE_FALCO_G_SCHICHTLDRUCKEN","song_uid":"SONG_AT_VIE_FALCO","register_id":"AT_VIE","lang_code":"de","token":"g’schichtldrucken","lemma":"g’schichtldrucken","meaning_gloss":"Tall-tale spinning / corporate puffery","is_chorus_hook":true,"song_count":1,"chorus_count":1,"card_count":8,"total_frequency":9,"frequency_score":1.0,"freq_tier":"CROSS_CORPUS_ANCHOR","vocab_uid":"DE_V_GSCHICHTL","idiom_term":"G’schichtldrucken","connected_card_uids":["AT_VIE_RUNWAY_CHAM","AT_VIE_CHAM","AT_VIE_HOCHKULTUR_CHAM","AT_VIE_POLO_CHAM","AT_VIE_WIEN_CHAM","AT_VIE_ADVENTURE_CHAM","AT_VIE_B2B_CHAM","AT_VIE_SPARK_CHAM"],"sample_lyric_line":"Vienna Calling, Oida! Kein Stress und kein G’schichtldrucken —\nder Wiener Schmäh rennt eh von allein,\nmusst nur die Vorsicht an der Garderobe abgeben, schwer in Ordnung!"},
+    {"uid":"LT_SONG_AT_VIE_FALCO_OIDA","song_uid":"SONG_AT_VIE_FALCO","register_id":"AT_VIE","lang_code":"de","token":"oida","lemma":"oida","meaning_gloss":"Iconic Viennese peer interjection (status equalizer)","is_chorus_hook":true,"song_count":3,"chorus_count":2,"card_count":5,"total_frequency":8,"frequency_score":1.0,"freq_tier":"CHORUS_EARWORM","vocab_uid":null,"idiom_term":null,"connected_card_uids":["AT_VIE_COMP","HOCH_AT_VIE_BASE","AT_VIE_ADVENTURE_COMP","AT_VIE_HOCHKULTUR_COMP","HAUTE_HOCH_AT_DEADPAN"],"sample_lyric_line":"Vienna Calling, Oida! Kein Stress und kein G’schichtldrucken —\nder Wiener Schmäh rennt eh von allein,\nmusst nur die Vorsicht an der Garderobe abgeben, schwer in Ordnung!"},
+    {"uid":"LT_SONG_AT_VIE_FALCO_EH","song_uid":"SONG_AT_VIE_FALCO","register_id":"AT_VIE","lang_code":"de","token":"eh","lemma":"eh","meaning_gloss":"Austrian modal particle (anyway / inherently)","is_chorus_hook":true,"song_count":2,"chorus_count":2,"card_count":5,"total_frequency":7,"frequency_score":1.0,"freq_tier":"CHORUS_EARWORM","vocab_uid":null,"idiom_term":null,"connected_card_uids":["RUNWAY_AT_VIE_BASE","AT_VIE_CHAM","AT_VIE_HOCHKULTUR_COUNT","HAUTE_HOCH_AT_DEADPAN","AT_VIE_POLO_CUR"],"sample_lyric_line":"Vienna Calling, Oida! Kein Stress und kein G’schichtldrucken —\nder Wiener Schmäh rennt eh von allein,\nmusst nur die Vorsicht an der Garderobe abgeben, schwer in Ordnung!"},
+    {"uid":"LT_SONG_AT_VIE_FALCO_CALLING","song_uid":"SONG_AT_VIE_FALCO","register_id":"AT_VIE","lang_code":"de","token":"calling","lemma":"calling","meaning_gloss":"Urgent direct reach-out hook","is_chorus_hook":true,"song_count":5,"chorus_count":2,"card_count":0,"total_frequency":5,"frequency_score":0.937,"freq_tier":"CHORUS_EARWORM","vocab_uid":null,"idiom_term":null,"connected_card_uids":[],"sample_lyric_line":"Hello, Vienna calling! Hello, oho, Vienna calling!\nStella sitzt in Rio, Stella liegt in Tokyo,\nMänner fragen sie nach Feuer, nach dem andern sowieso."},
+    {"uid":"LT_SONG_AT_VIE_FALCO_VIENNA","song_uid":"SONG_AT_VIE_FALCO","register_id":"AT_VIE","lang_code":"de","token":"vienna","lemma":"vienna","meaning_gloss":"Metropolitan Viennese pulse & hook refrain","is_chorus_hook":true,"song_count":5,"chorus_count":2,"card_count":0,"total_frequency":5,"frequency_score":0.937,"freq_tier":"CHORUS_EARWORM","vocab_uid":null,"idiom_term":null,"connected_card_uids":[],"sample_lyric_line":"Hello, Vienna calling! Hello, oho, Vienna calling!\nStella sitzt in Rio, Stella liegt in Tokyo,\nMänner fragen sie nach Feuer, nach dem andern sowieso."},
+    {"uid":"LT_SONG_AT_VIE_FALCO_VORSICHT","song_uid":"SONG_AT_VIE_FALCO","register_id":"AT_VIE","lang_code":"de","token":"vorsicht","lemma":"vorsicht","meaning_gloss":"High-frequency motif in Vienna Calling","is_chorus_hook":true,"song_count":3,"chorus_count":2,"card_count":1,"total_frequency":4,"frequency_score":0.737,"freq_tier":"CHORUS_EARWORM","vocab_uid":null,"idiom_term":null,"connected_card_uids":["AT_VIE_COUNT"],"sample_lyric_line":"Vienna Calling, Oida! Kein Stress und kein G’schichtldrucken —\nder Wiener Schmäh rennt eh von allein,\nmusst nur die Vorsicht an der Garderobe abgeben, schwer in Ordnung!"},
+    {"uid":"LT_SONG_AT_VIE_FALCO_SCHMAH","song_uid":"SONG_AT_VIE_FALCO","register_id":"AT_VIE","lang_code":"de","token":"schmäh","lemma":"schmäh","meaning_gloss":"Charming Viennese irony & velvet wit","is_chorus_hook":true,"song_count":2,"chorus_count":2,"card_count":2,"total_frequency":4,"frequency_score":0.695,"freq_tier":"CHORUS_EARWORM","vocab_uid":null,"idiom_term":null,"connected_card_uids":["AT_VIE_CHAM","AT_VIE_SPARK_CHAM"],"sample_lyric_line":"Vienna Calling, Oida! Kein Stress und kein G’schichtldrucken —\nder Wiener Schmäh rennt eh von allein,\nmusst nur die Vorsicht an der Garderobe abgeben, schwer in Ordnung!"},
+    {"uid":"LT_SONG_AT_VIE_FALCO_WIENER_SCHMAH","song_uid":"SONG_AT_VIE_FALCO","register_id":"AT_VIE","lang_code":"de","token":"wiener schmäh","lemma":"wiener schmäh","meaning_gloss":"Charming Viennese irony & status-equalizing wit","is_chorus_hook":true,"song_count":2,"chorus_count":2,"card_count":2,"total_frequency":4,"frequency_score":0.695,"freq_tier":"CHORUS_EARWORM","vocab_uid":"DE_V_SCHMAEH","idiom_term":null,"connected_card_uids":["AT_VIE_CHAM","AT_VIE_SPARK_CHAM"],"sample_lyric_line":"Vienna Calling, Oida! Kein Stress und kein G’schichtldrucken —\nder Wiener Schmäh rennt eh von allein,\nmusst nur die Vorsicht an der Garderobe abgeben, schwer in Ordnung!"},
+    {"uid":"LT_SONG_AT_VIE_FALCO_RENNT","song_uid":"SONG_AT_VIE_FALCO","register_id":"AT_VIE","lang_code":"de","token":"rennt","lemma":"rennt","meaning_gloss":"High-frequency motif in Vienna Calling","is_chorus_hook":true,"song_count":3,"chorus_count":3,"card_count":0,"total_frequency":3,"frequency_score":0.695,"freq_tier":"CHORUS_EARWORM","vocab_uid":null,"idiom_term":null,"connected_card_uids":[],"sample_lyric_line":"Vienna Calling, Oida! Kein Stress und kein G’schichtldrucken —\nder Wiener Schmäh rennt eh von allein,\nmusst nur die Vorsicht an der Garderobe abgeben, schwer in Ordnung!"},
+    {"uid":"LT_SONG_AT_VIE_FALCO_EH_HALT_JA_MAL","song_uid":"SONG_AT_VIE_FALCO","register_id":"AT_VIE","lang_code":"de","token":"eh / halt / ja / mal","lemma":"eh / halt / ja / mal","meaning_gloss":"Modal particles modulating speaker stance & rapport","is_chorus_hook":false,"song_count":1,"chorus_count":0,"card_count":0,"total_frequency":1,"frequency_score":0.158,"freq_tier":"REGIONAL_SLANG_HOOK","vocab_uid":"DE_V_PARTICLES","idiom_term":null,"connected_card_uids":[],"sample_lyric_line":""}
+  ]
+}

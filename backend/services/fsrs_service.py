@@ -124,6 +124,24 @@ class FSRSService:
             ORDER BY e.weight ASC, e.days_ago DESC
             """
         )
+        token_rows = await pg_manager.fetch_all(
+            """
+            SELECT token, song_uid, frequency_score, connected_card_uids
+            FROM song_lyric_tokens
+            ORDER BY frequency_score DESC
+            """
+        )
+        card_to_tokens: dict[str, list[dict[str, Any]]] = {}
+        for lt in token_rows:
+            for cuid in list(lt.get("connected_card_uids") or []):
+                card_to_tokens.setdefault(cuid, []).append(
+                    {
+                        "token": lt["token"],
+                        "song_uid": lt["song_uid"],
+                        "frequency_score": float(lt["frequency_score"]),
+                    }
+                )
+
         rusty_list = []
         for r in rows:
             if register_id and register_id != "ALL":
@@ -135,7 +153,17 @@ class FSRSService:
             drills = int(r["drills"] or 1)
             if is_edge_rusty(w, s, d, drills):
                 r["retrievability"] = compute_retrievability(s, d, drills)
+                shared = card_to_tokens.get(r["target_uid"], []) or card_to_tokens.get(r["source_uid"], [])
+                r["shared_song_tokens"] = [t["token"] for t in shared[:5]]
+                r["lyric_frequency_boost"] = round(max((t["frequency_score"] for t in shared), default=0.0), 3)
                 rusty_list.append(r)
+        rusty_list.sort(
+            key=lambda item: (
+                round(float(item["weight"]), 2),
+                -float(item.get("lyric_frequency_boost", 0.0)),
+                -int(item.get("days_ago", 0)),
+            )
+        )
         return rusty_list
 
 

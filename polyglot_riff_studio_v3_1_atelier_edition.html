@@ -354,9 +354,9 @@
 
   <!-- TOP NAVIGATION BAR -->
   <header class="border-b border-slate-800 bg-slate-950/95 backdrop-blur sticky top-0 z-30">
-    <div class="max-w-7xl mx-auto px-4 py-2 flex flex-col 2xl:flex-row 2xl:items-center 2xl:justify-between gap-2">
-      <!-- Brand + Shrunk 3D Rotating Carousel Dial + Mobile Quick Stats Row -->
-      <div class="flex flex-wrap sm:flex-nowrap items-center justify-between gap-2">
+    <div class="embed-no-sticky-brand max-w-7xl mx-auto px-4 py-2 flex flex-col 2xl:flex-row 2xl:items-center 2xl:justify-between gap-2">
+      <!-- Brand + Shrunk 3D Rotating Carousel Dial (Standalone only; hidden inside index.html) -->
+      <div data-embed-hide="true" class="flex flex-wrap sm:flex-nowrap items-center justify-between gap-2">
         <div class="flex items-center gap-2.5 min-w-0">
           <div
             class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 via-amber-500 to-emerald-500 flex items-center justify-center font-bold text-slate-950 shadow-lg shrink-0">
@@ -404,51 +404,61 @@
       </div>
 
       <!-- Mode Switcher + Desktop Quick Stats -->
-      <div class="flex flex-wrap items-center justify-between gap-2.5">
-        <div class="flex flex-wrap items-center gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800">
+      <div class="flex flex-wrap items-center justify-between gap-2 w-full">
+        <div class="flex items-center gap-1 bg-slate-900 p-0.5 rounded-xl border border-slate-800 overflow-x-auto no-scrollbar max-w-full">
           <button onclick="switchMode('studio')" id="btn-mode-studio"
-            class="px-2.5 py-1.5 rounded-lg text-xs font-semibold transition bg-indigo-600 text-white whitespace-nowrap">
-            1. 4-C Studio & Resolver
+            class="px-2.5 py-1 rounded-lg text-xs font-semibold transition bg-indigo-600 text-white whitespace-nowrap shrink-0">
+            1. 4-C Studio
           </button>
           <button onclick="switchMode('graph')" id="btn-mode-graph"
-            class="px-2.5 py-1.5 rounded-lg text-xs font-semibold transition text-slate-300 hover:text-white whitespace-nowrap">
-            2. Neo4j Force-Graph
+            class="px-2.5 py-1 rounded-lg text-xs font-semibold transition text-slate-300 hover:text-white whitespace-nowrap shrink-0">
+            2. Force-Graph
           </button>
           <button onclick="switchMode('haute')" id="btn-mode-haute"
-            class="px-2.5 py-1.5 rounded-lg text-xs font-semibold transition text-amber-300 hover:text-white whitespace-nowrap">
+            class="px-2.5 py-1 rounded-lg text-xs font-semibold transition text-amber-300 hover:text-white whitespace-nowrap shrink-0">
             3. Salons &amp; 8 Arenas
           </button>
           <button onclick="switchMode('shield')" id="btn-mode-shield"
-            class="px-2.5 py-1.5 rounded-lg text-xs font-semibold transition text-slate-300 hover:text-white whitespace-nowrap">
-            4. Interference Blitz
+            class="px-2.5 py-1 rounded-lg text-xs font-semibold transition text-slate-300 hover:text-white whitespace-nowrap shrink-0">
+            4. Blitz
           </button>
           <button onclick="switchMode('builder')" id="btn-mode-builder"
-            class="px-2.5 py-1.5 rounded-lg text-xs font-semibold transition text-emerald-300 hover:text-white whitespace-nowrap">
-            5. Lang DBs • Ollama • Webhooks
+            class="px-2.5 py-1 rounded-lg text-xs font-semibold transition text-emerald-300 hover:text-white whitespace-nowrap shrink-0">
+            5. DBs &amp; Ollama
           </button>
           <button onclick="switchMode('wetwork')" id="btn-mode-wetwork"
-            class="px-2.5 py-1.5 rounded-lg text-xs font-semibold transition text-rose-300 hover:text-white whitespace-nowrap">
-            6. Checkpoint • Wetwork • 9×9
+            class="px-2.5 py-1 rounded-lg text-xs font-semibold transition text-rose-300 hover:text-white whitespace-nowrap shrink-0">
+            6. 9×9 Lotus
           </button>
         </div>
 
         <div class="flex flex-wrap items-center gap-1.5 text-[11px] mono">
           <span id="backend-sync-pill" title="PostgreSQL (:5433) + Neo4j (:7687) Backend Status"
-            class="px-2 py-1 rounded bg-slate-900 border border-slate-800 text-slate-400 whitespace-nowrap">DB:
+            class="px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-slate-400 whitespace-nowrap">DB:
             Local</span>
           <span id="stat-nodes"
-            class="px-2 py-1 rounded bg-slate-900 border border-slate-800 text-slate-300 whitespace-nowrap">Nodes:
+            class="hidden sm:inline-block px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-slate-300 whitespace-nowrap">Nodes:
             0</span>
           <span id="stat-mastery"
-            class="px-2 py-1 rounded bg-emerald-950/60 border border-emerald-700/50 text-emerald-300 whitespace-nowrap">Mastery:
+            class="px-2 py-0.5 rounded bg-emerald-950/60 border border-emerald-700/50 text-emerald-300 whitespace-nowrap">Mastery:
             0%</span>
+          <button onclick="window.PolyglotSyncBus && window.PolyglotSyncBus.navigateApp('regional_lyric_flashcards.html', { registerId: state.activeLang, arena: state.activeArena })"
+            title="Jump to Regional Anthem &amp; :LyricToken Frequency for active culture"
+            class="px-2 py-0.5 rounded bg-amber-500/15 border border-amber-500/40 text-amber-300 hover:bg-amber-500/25 transition whitespace-nowrap">
+            🎵 Anthem →
+          </button>
+          <button onclick="window.PolyglotSyncBus && window.PolyglotSyncBus.navigateApp('czech_register_switcher_widget.html', { registerId: state.activeLang })"
+            title="Jump to Formal ↔ Regional 5-Lang Switcher for active culture"
+            class="px-2 py-0.5 rounded bg-cyan-500/15 border border-cyan-500/40 text-cyan-300 hover:bg-cyan-500/25 transition whitespace-nowrap">
+            ⇄ Switcher →
+          </button>
           <button onclick="simulateRust()" title="Simulate 10 days of decay on random edges"
-            class="px-2 py-1 rounded bg-amber-500/10 border border-amber-500/40 text-amber-300 hover:bg-amber-500/20 transition whitespace-nowrap">
-            ⚡ Sim Rust
+            class="px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/40 text-amber-300 hover:bg-amber-500/20 transition whitespace-nowrap">
+            ⚡ Rust
           </button>
           <button onclick="linkLocalGraphFile()" title="Sync state directly to a local JSON file on disk"
-            class="px-2 py-1 rounded bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/30 transition whitespace-nowrap">
-            💾 Link Disk
+            class="hidden lg:inline-block px-2 py-0.5 rounded bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/30 transition whitespace-nowrap">
+            💾 Disk
           </button>
         </div>
       </div>
@@ -456,11 +466,11 @@
   </header>
 
   <!-- MAIN WORKSPACE -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-6">
+  <main class="embed-compact-main flex-1 max-w-7xl w-full mx-auto px-4 py-4">
 
-    <!-- ATELIER PROGRESS RIBBON -->
-    <section
-      class="mb-5 bg-slate-900/60 border border-slate-800/90 rounded-xl px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 text-[11px]">
+    <!-- ATELIER PROGRESS RIBBON (Standalone only; hidden inside embedded mode) -->
+    <section data-embed-hide="true"
+      class="mb-4 bg-slate-900/60 border border-slate-800/90 rounded-xl px-4 py-2 flex flex-wrap items-center justify-between gap-2 text-[11px]">
       <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
         <span class="font-bold uppercase tracking-wider text-amber-400">Atelier Craft Stages:</span>
         <span class="text-slate-300">I. <em>L'Esquisse</em> (Topology)</span>
@@ -489,51 +499,41 @@
       </div>
     </section>
 
-    <!-- PERSONA BAR -->
-    <section class="mb-6">
+    <!-- PERSONA BAR (Standalone only; controlled by top 3D dial in embedded mode) -->
+    <section data-embed-hide="true" class="mb-4">
       <div id="persona-tabs" class="grid grid-cols-2 sm:grid-cols-5 gap-2.5"></div>
     </section>
 
     <!-- VIEW 1: 4-C STUDIO, ROOM-FRICTION RESOLVER & SRS TELEPROMPTER -->
-    <section id="view-studio" class="space-y-5">
+    <section id="view-studio" class="space-y-3">
 
-      <!-- LIVE ROOM-FRICTION OBJECTION RESOLVER (:COUNTERS_STATE) -->
+      <!-- COMPACT 1-ROW LIVE ROOM-FRICTION OBJECTION RESOLVER (:COUNTERS_STATE) -->
       <div
-        class="bg-gradient-to-r from-rose-950/40 via-slate-900 to-slate-900 border border-rose-500/30 rounded-2xl p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-        <div>
-          <div class="flex items-center gap-2">
-            <span class="text-xs font-bold uppercase tracking-wider text-rose-400">⚡ Live Room-Friction Resolver
-              (`:COUNTERS_STATE`)</span>
-            <span
-              class="text-[11px] mono px-2 py-0.5 rounded bg-rose-500/10 text-rose-300 border border-rose-500/20">1-Hop
-              Graph Query</span>
-          </div>
-          <p class="text-xs text-slate-300 mt-0.5">Counterpart hesitating mid-conversation? Trigger the room state below
-            to route directly to the highest-weighted `[COUNTERACT]` pattern interrupt:</p>
+        class="bg-gradient-to-r from-rose-950/35 via-slate-900 to-slate-900 border border-rose-500/30 rounded-xl px-3.5 py-2 flex flex-wrap items-center justify-between gap-2">
+        <div class="flex items-center gap-2">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-rose-400 whitespace-nowrap">⚡ Room Friction:</span>
+          <span data-embed-hide="true" class="text-[11px] text-slate-400 hidden lg:inline">1-Hop `:COUNTERS_STATE` pattern interrupt</span>
         </div>
-        <div id="friction-hotkeys" class="flex flex-wrap items-center gap-2"></div>
+        <div id="friction-hotkeys" class="flex flex-wrap items-center gap-1.5"></div>
       </div>
 
       <!-- Active Counteract Resolution Banner -->
       <div id="friction-resolution-banner"
-        class="hidden bg-rose-950/30 border border-rose-500/50 rounded-2xl p-4 flex items-center justify-between gap-4">
+        class="hidden bg-rose-950/30 border border-rose-500/50 rounded-xl px-3.5 py-2.5 flex items-center justify-between gap-3">
         <div id="friction-resolution-text" class="text-xs text-slate-200"></div>
         <button onclick="document.getElementById('friction-resolution-banner').classList.add('hidden')"
           class="text-xs text-slate-400 hover:text-white mono px-2 py-1">✕ Dismiss</button>
       </div>
 
-      <!-- Linguistic Mechanics Banner -->
+      <!-- Collapsible 1-Line Linguistic Mechanics Telemetry Strip -->
       <div id="mechanics-banner"
-        class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 grid grid-cols-1 md:grid-cols-3 gap-4"></div>
+        class="bg-slate-900/90 border border-slate-800 rounded-xl"></div>
 
-      <!-- Unified 8 Social Arenas Pill Switcher (Synced with Zero-Corporate v1 & Tab 3 Salons) -->
-      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl px-4 py-3 space-y-2">
-        <div class="flex flex-wrap items-center justify-between gap-2">
-          <span class="text-xs font-bold uppercase tracking-wider text-amber-400">✨ Social Arena (8 Unified
-            Rooms):</span>
-          <span id="studio-arena-desc" class="text-[11px] mono text-slate-400"></span>
-        </div>
-        <div id="studio-arena-pills" class="flex flex-wrap items-center gap-1.5"></div>
+      <!-- Unified 8 Social Arenas Single-Row Scrollable Pill Switcher -->
+      <div class="bg-slate-900/80 border border-slate-800 rounded-xl px-3 py-2 flex items-center gap-2 overflow-x-auto no-scrollbar">
+        <span class="text-[11px] font-bold uppercase tracking-wider text-amber-400 whitespace-nowrap shrink-0">✨ Arena:</span>
+        <div id="studio-arena-pills" class="flex items-center gap-1.5 shrink-0"></div>
+        <span id="studio-arena-desc" class="text-[11px] mono text-slate-400 hidden xl:inline ml-auto whitespace-nowrap"></span>
       </div>
 
       <!-- 4-C Cards Grid + Idiom Spotlight Sidebar -->
@@ -1999,19 +1999,34 @@
     function renderMechanicsBanner() {
       const p = state.personas[state.activeLang];
       document.getElementById('mechanics-banner').innerHTML = `
-        <div>
-          <div class="text-[11px] font-bold uppercase tracking-wider text-indigo-400">Linguistic Family</div>
-          <div class="text-xs font-semibold text-white mt-0.5">${p.family}</div>
-          <div class="text-xs text-slate-400 mt-1">${p.rhythm}</div>
-        </div>
-        <div>
-          <div class="text-[11px] font-bold uppercase tracking-wider text-amber-400">Grammatical & Lexical Intimacy Trick</div>
-          <div class="text-xs text-slate-200 mt-1">${p.trick}</div>
-        </div>
-        <div>
-          <div class="text-[11px] font-bold uppercase tracking-wider text-emerald-400">Posture & Acoustic Resonance</div>
-          <div class="text-xs text-slate-200 mt-1">${p.posture}</div>
-        </div>
+        <details class="group">
+          <summary class="list-none cursor-pointer px-3.5 py-2 flex flex-wrap items-center justify-between gap-2 select-none hover:bg-slate-800/40 rounded-xl transition">
+            <div class="flex flex-wrap items-center gap-2 min-w-0">
+              <span class="text-xs font-bold text-white whitespace-nowrap">${p.flag} ${p.name}</span>
+              <span class="text-[11px] mono px-2 py-0.5 rounded bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 whitespace-nowrap">${p.family}</span>
+              <span class="text-xs text-slate-400 truncate max-w-md hidden md:inline">${p.rhythm}</span>
+            </div>
+            <span class="text-[11px] mono text-amber-300 flex items-center gap-1 whitespace-nowrap">
+              <span>Linguistic Mechanics</span>
+              <span class="transition-transform group-open:rotate-180">▾</span>
+            </span>
+          </summary>
+          <div class="px-4 pb-3.5 pt-2.5 border-t border-slate-800/80 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <div class="text-[11px] font-bold uppercase tracking-wider text-indigo-400">Linguistic Family</div>
+              <div class="text-xs font-semibold text-white mt-0.5">${p.family}</div>
+              <div class="text-xs text-slate-400 mt-1">${p.rhythm}</div>
+            </div>
+            <div>
+              <div class="text-[11px] font-bold uppercase tracking-wider text-amber-400">Grammatical &amp; Lexical Intimacy Trick</div>
+              <div class="text-xs text-slate-200 mt-1">${p.trick}</div>
+            </div>
+            <div>
+              <div class="text-[11px] font-bold uppercase tracking-wider text-emerald-400">Posture &amp; Acoustic Resonance</div>
+              <div class="text-xs text-slate-200 mt-1">${p.posture}</div>
+            </div>
+          </div>
+        </details>
       `;
     }
 
@@ -2743,6 +2758,13 @@
       renderMechanicsBanner();
       renderCards();
       updateActiveEdgeBadge();
+      if (typeof renderHauteSection === 'function') renderHauteSection();
+      if (typeof renderLangDbPills === 'function') renderLangDbPills();
+      const wetworkView = document.getElementById('view-wetwork');
+      if (wetworkView && !wetworkView.classList.contains('hidden') && typeof PERSONA_TO_LOTUS_THEME !== 'undefined' && typeof selectLotusTheme === 'function') {
+        const themeNum = PERSONA_TO_LOTUS_THEME[langId];
+        if (themeNum) selectLotusTheme(themeNum);
+      }
     }
 
     function selectEdgeForCard(cardUid) {
@@ -4263,14 +4285,20 @@
           const item = arenaCorpus[langKey];
           const persona = state.personas[langKey];
           const isCzZero = langKey === 'CZ_OVA';
+          const isActiveLang = langKey === state.activeLang;
 
           return `
-            <div class="bg-slate-900 border ${isCzZero ? 'border-amber-500/70 ring-1 ring-amber-500/30 sm:col-span-2' : 'border-slate-800'} rounded-2xl p-5 flex flex-col justify-between space-y-3.5 shadow-xl">
+            <div class="bg-slate-900 border ${isActiveLang
+              ? 'border-emerald-400 ring-2 ring-emerald-400/50'
+              : isCzZero
+                ? 'border-amber-500/70 ring-1 ring-amber-500/30'
+                : 'border-slate-800'} ${isCzZero ? 'sm:col-span-2' : ''} rounded-2xl p-5 flex flex-col justify-between space-y-3.5 shadow-xl transition">
               <div class="space-y-2.5">
                 <div class="flex flex-wrap items-center justify-between gap-2">
                   <div class="flex items-center gap-2">
                     <span class="text-lg">${persona.flag}</span>
-                    <span class="text-xs font-bold ${isCzZero ? 'text-amber-300' : 'text-white'}">${persona.name} (${langKey})</span>
+                    <span class="text-xs font-bold ${isActiveLang ? 'text-emerald-300' : isCzZero ? 'text-amber-300' : 'text-white'}">${persona.name} (${langKey})</span>
+                    ${isActiveLang ? '<span class="text-[10px] mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 font-bold">★ Active Persona</span>' : ''}
                     ${isCzZero ? '<span class="text-[10px] mono px-2 py-0.5 rounded bg-amber-500/20 text-amber-200 border border-amber-500/30">Czech-from-Zero Guided Bridge</span>' : ''}
                   </div>
                   <span class="text-[10px] mono uppercase px-2 py-0.5 rounded bg-slate-950 border border-slate-800 text-emerald-300">${item.stage} • ${styleMod.prefix}</span>

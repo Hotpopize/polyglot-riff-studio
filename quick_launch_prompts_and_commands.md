@@ -35,7 +35,13 @@ cd C:\Assets\PolyglotSales; .\.venv\Scripts\python.exe -m backend.cli stylize "C
 # 8. Inspect 5-Language Formal <-> Bridge <-> Regional Switcher Deck
 cd C:\Assets\PolyglotSales; .\.venv\Scripts\python.exe -m backend.cli switcher --lang de
 
-# 9. Open Live Suite Hub (:8765) or Neo4j Browser (:7474, auth: neo4j / polyglot_atelier_dev)
+# 9. Agent-Reach Lyric Indexing, Song Frequency Graph, Split Shard Export & 11-Point Audit
+cd C:\Assets\PolyglotSales; .\.venv\Scripts\python.exe -m backend.cli index-lyrics
+cd C:\Assets\PolyglotSales; .\.venv\Scripts\python.exe -m backend.cli song-freq --song SONG_CZ_OVA_NOHAVICA
+cd C:\Assets\PolyglotSales; .\.venv\Scripts\python.exe -m backend.cli export-shards
+cd C:\Assets\PolyglotSales; .\.venv\Scripts\python.exe -m backend.cli audit
+
+# 10. Open Live Suite Hub (:8765) or Neo4j Browser (:7474, auth: neo4j / polyglot_atelier_dev)
 Start-Process "http://127.0.0.1:8765/index.html"
 Start-Process "http://127.0.0.1:7474"
 ```

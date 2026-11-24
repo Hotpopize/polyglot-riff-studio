@@ -8,6 +8,7 @@ from backend.seed.run_seed import seed_all
 from backend.services.bridge_service import bridge_service
 from backend.services.converse_service import converse_service
 from backend.services.fsrs_service import fsrs_service
+from backend.services.lyric_service import lyric_service
 from backend.services.ollama_client import ollama_client
 from backend.services.sync_service import sync_service
 
@@ -106,6 +107,17 @@ class PolyglotFacade:
 
     async def grade(self, edge_id: str, score: int) -> dict[str, Any]:
         return await fsrs_service.grade_transition(edge_id=edge_id, score=score)
+
+    async def index_lyrics(self, use_agent_reach: bool = True) -> dict[str, Any]:
+        index_res = await lyric_service.index_all_songs(use_agent_reach=use_agent_reach)
+        sync_res = await sync_service.sync_pending_to_neo4j(force_all=False, prune_orphans=True)
+        return {"index": index_res, "sync": sync_res}
+
+    async def song_frequency(self, song_uid: str) -> dict[str, Any]:
+        return await lyric_service.get_song_frequency_profile(song_uid)
+
+    async def frequency_leaderboard(self, register_id: Optional[str] = None, limit: int = 25) -> dict[str, Any]:
+        return await lyric_service.get_frequency_leaderboard(register_id=register_id, limit=limit)
 
     async def close(self) -> None:
         await pg_manager.close()
