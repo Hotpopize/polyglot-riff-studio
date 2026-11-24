@@ -22,11 +22,11 @@
 
   // Canonical 5-Culture Metadata Registry for Cross-Tab Sync
   const CULTURE_META = {
-    CZ_OVA: { registerId: 'CZ_OVA', formalId: 'CZ_STD', lowerKey: 'cz_ova', langCode: 'cs', shortCode: 'CZ', flag: '🇨🇿', city: 'Ostrava', anthemIdx: 0 },
-    AT_VIE: { registerId: 'AT_VIE', formalId: 'DE_STD', lowerKey: 'at_vie', langCode: 'de', shortCode: 'AT', flag: '🇦🇹', city: 'Vienna', anthemIdx: 1 },
-    RU_ALA: { registerId: 'RU_ALA', formalId: 'RU_STD', lowerKey: 'ru_ala', langCode: 'ru', shortCode: 'KZ', flag: '🇰🇿', city: 'Almaty', anthemIdx: 2 },
-    EN_YYC: { registerId: 'EN_YYC', formalId: 'EN_STD', lowerKey: 'en_yyc', langCode: 'en', shortCode: 'CA', flag: '🇨🇦', city: 'Calgary', anthemIdx: 3 },
-    ES_SOT: { registerId: 'ES_SOT', formalId: 'ES_STD', lowerKey: 'es_sot', langCode: 'es', shortCode: 'ES', flag: '🇪🇸', city: 'Sotogrande', anthemIdx: 4 }
+    CZ_OVA: { registerId: 'CZ_OVA', formalId: 'CZ_STD', lowerKey: 'cz_ova', langCode: 'cs', langName: 'Czech', shortCode: 'CZ', flag: '🇨🇿', city: 'Ostrava', anthemIdx: 0 },
+    AT_VIE: { registerId: 'AT_VIE', formalId: 'DE_STD', lowerKey: 'at_vie', langCode: 'de', langName: 'German', shortCode: 'AT', flag: '🇦🇹', city: 'Vienna', anthemIdx: 1 },
+    RU_ALA: { registerId: 'RU_ALA', formalId: 'RU_STD', lowerKey: 'ru_ala', langCode: 'ru', langName: 'Russian', shortCode: 'KZ', flag: '🇰🇿', city: 'Almaty', anthemIdx: 2 },
+    EN_YYC: { registerId: 'EN_YYC', formalId: 'EN_STD', lowerKey: 'en_yyc', langCode: 'en', langName: 'English', shortCode: 'CA', flag: '🇨🇦', city: 'Calgary', anthemIdx: 3 },
+    ES_SOT: { registerId: 'ES_SOT', formalId: 'ES_STD', lowerKey: 'es_sot', langCode: 'es', langName: 'Spanish', shortCode: 'ES', flag: '🇪🇸', city: 'Sotogrande', anthemIdx: 4 }
   };
 
   function normalizeCulture(input) {
@@ -258,6 +258,7 @@
 
     const assembled = {
       offlineShardMode: true,
+      schema_version: fabric.schema_version || '3.5.0',
       arenas: fabric.arenas || [],
       personas,
       allRegisters,
@@ -283,40 +284,137 @@
   async function assembleRegisterSwitcherFromShards(langCode = 'cs') {
     const meta = normalizeCulture(langCode);
     const st = await assembleOfflineStateFromShards(true);
-    const formalRegister = st.allRegisters[meta.formalId] || {};
+    // Notice: English formal register in shards is EN_EXEC (while CULTURE_META.formalId uses EN_STD as alias)
+    const formalKey = st.allRegisters[meta.formalId]
+      ? meta.formalId
+      : (meta.langCode === 'en' && st.allRegisters.EN_EXEC ? 'EN_EXEC' : meta.formalId);
+    const formalRegister = st.allRegisters[formalKey] || {};
     const regionalRegister = st.allRegisters[meta.registerId] || {};
+
+    const stageOrder = { COMPLIMENT: 1, CHAMELEON: 2, COUNTERACT: 3, CURIOSITY: 4 };
+    const stripHtml = (s) => String(s || '').replace(/<[^>]+>/g, '');
+    const mapCard = (c) => ({
+      uid: c.uid,
+      register_id: c.lang,
+      stage: c.stage,
+      arena: c.arena,
+      title: c.title || c.stage,
+      text_plain: stripHtml(c.text),
+      text_html: c.text,
+      phonetics: c.phonetics || '',
+      english_gloss: c.english || '',
+      delivery_cue: c.delivery || '',
+      idiom_terms: c.idioms || []
+    });
+
     const formalCards = st.allCards
-      .filter(c => c.lang === meta.formalId && c.arena === 'terrace')
-      .map(c => ({
-        uid: c.uid,
-        stage: c.stage,
-        title: c.title || c.stage,
-        text_html: c.text,
-        phonetics: c.phonetics,
-        english_gloss: c.english,
-        idiom_terms: c.idioms
-      }));
-    const regionalCards = st.allCards
-      .filter(c => c.lang === meta.registerId && c.arena === 'terrace' && !c.lens_id)
-      .map(c => ({
-        uid: c.uid,
-        stage: c.stage,
-        title: c.title || c.stage,
-        text_html: c.text,
-        phonetics: c.phonetics,
-        english_gloss: c.english,
-        idiom_terms: c.idioms
-      }));
-    const bridges = (st.bridges || []).filter(
-      b => b.from_register === meta.formalId || b.to_register === meta.registerId
-    );
+      .filter(c => c.lang === formalKey && !c.lens_id)
+      .sort((a, b) => {
+        const sa = stageOrder[a.stage] || 99;
+        const sb = stageOrder[b.stage] || 99;
+        if (sa !== sb) return sa - sb;
+        const aPref = a.uid.startsWith(formalKey) ? 0 : 1;
+        const bPref = b.uid.startsWith(formalKey) ? 0 : 1;
+        return aPref - bPref;
+      })
+      .map(mapCard);
+
+    const regionalCandidates = st.allCards
+      .filter(c => c.lang === meta.registerId && !c.lens_id && (c.arena === 'b2b' || c.arena === 'terrace'))
+      .sort((a, b) => {
+        const aa = a.arena === 'b2b' ? 0 : 1;
+        const ab = b.arena === 'b2b' ? 0 : 1;
+        if (aa !== ab) return aa - ab;
+        return (stageOrder[a.stage] || 99) - (stageOrder[b.stage] || 99);
+      });
+
+    const byStage = {};
+    regionalCandidates.forEach(rc => {
+      if (!byStage[rc.stage]) {
+        byStage[rc.stage] = mapCard(rc);
+      }
+    });
+    const regionalCards = ['COMPLIMENT', 'CHAMELEON', 'COUNTERACT', 'CURIOSITY']
+      .map(stage => byStage[stage])
+      .filter(Boolean);
+
+    const dropBridge = (st.bridges || [])
+      .filter(b => b.from_register === formalKey && b.to_register === meta.registerId)
+      .sort((a, b) => Number(b.weight || 0) - Number(a.weight || 0))[0] || null;
+
+    const sequence = [];
+    ['COMPLIMENT', 'CHAMELEON'].forEach(stage => {
+      const fc = formalCards.find(c => c.stage === stage);
+      if (fc && formalRegister.id) {
+        sequence.push({
+          uid: fc.uid,
+          reg: formalRegister.id,
+          tier: 'FORMAL',
+          stage: fc.stage,
+          lang: `${formalRegister.name} (${formalRegister.address_form || ''})`,
+          vibe: formalRegister.subtitle || '',
+          text: fc.text_plain,
+          text_html: fc.text_html,
+          phonetics: fc.phonetics,
+          english: fc.english_gloss,
+          mechanics: formalRegister.trick || formalRegister.intimacy_trick || '',
+          delivery: fc.delivery_cue || formalRegister.posture || ''
+        });
+      }
+    });
+
+    if (dropBridge && formalRegister.id && regionalRegister.id) {
+      sequence.push({
+        uid: dropBridge.uid,
+        reg: 'BRIDGE',
+        tier: 'BRIDGE',
+        stage: 'REGISTER_DROP_BRIDGE',
+        lang: `Code-Switch Pivot (${formalRegister.id} → ${regionalRegister.id})`,
+        vibe: `PIVOTS_VIA (Weight: ${Number(dropBridge.weight || 0).toFixed(2)})`,
+        text: stripHtml(dropBridge.text),
+        text_html: dropBridge.text,
+        phonetics: '',
+        english: dropBridge.mlf_boundary_note || '',
+        mechanics: dropBridge.mlf_boundary_note || 'Mid-sentence matrix shift from formal to insider peer',
+        delivery: dropBridge.vocal_cue || ''
+      });
+    }
+
+    ['COUNTERACT', 'CURIOSITY'].forEach(stage => {
+      const rc = byStage[stage];
+      if (rc && regionalRegister.id) {
+        sequence.push({
+          uid: rc.uid,
+          reg: regionalRegister.id,
+          tier: 'REGIONAL',
+          stage: rc.stage,
+          lang: `${regionalRegister.name} (${regionalRegister.address_form || ''})`,
+          vibe: regionalRegister.subtitle || '',
+          text: rc.text_plain,
+          text_html: rc.text_html,
+          phonetics: rc.phonetics,
+          english: rc.english_gloss,
+          mechanics: regionalRegister.trick || regionalRegister.intimacy_trick || '',
+          delivery: rc.delivery_cue || regionalRegister.posture || ''
+        });
+      }
+    });
+
+    const language = {
+      code: meta.langCode,
+      name: meta.langName || meta.city,
+      flag: meta.flag,
+      family: regionalRegister.family || ''
+    };
+
     return {
-      lang_code: meta.langCode,
+      language,
       formal_register: formalRegister,
       regional_register: regionalRegister,
-      formal_cards: formalCards,
-      regional_cards: regionalCards,
-      bridges,
+      bridge: dropBridge,
+      sequence,
+      all_formal_cards: formalCards,
+      all_regional_cards: regionalCards,
       false_friends: st.falseFriends || [],
       offlineShardMode: true
     };
@@ -410,15 +508,18 @@
         return await requestJson('/api/v1/admin/audit', { method: 'GET' }, 10000);
       } catch (_) {
         const st = await assembleOfflineStateFromShards(false);
+        const totalCards = (st.allCards || st.cards || []).length;
+        const totalSongs = (st.songs || []).length;
+        const shardOk = totalSongs >= 6 && totalCards >= 196;
         return {
-          ok: true,
+          ok: shardOk,
           offlineShardMode: true,
-          schema_version: '3.5.0',
+          schema_version: st.schema_version || '3.5.0',
           checks: [
             {
               check: 'offline_db_json_shard_parity',
-              ok: (st.songs || []).length >= 6 && (st.cards || []).length >= 196,
-              detail: `Offline Shards Active (${(st.cards || []).length} cards, ${(st.songs || []).length} songs)`
+              ok: shardOk,
+              detail: `Offline Shards Active (${totalCards} cards, ${totalSongs} songs)`
             }
           ]
         };
@@ -769,6 +870,27 @@
       return true;
     }
   })();
+
+  const injectGlobalMobileCleanCss = () => {
+    if (!global.document || global.document.getElementById('polyglot-mobile-clean-css')) return;
+    const st = global.document.createElement('style');
+    st.id = 'polyglot-mobile-clean-css';
+    st.textContent = `
+      html, body { overflow-x: clip; max-width: 100%; -webkit-overflow-scrolling: touch; }
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      @media (max-width: 640px) {
+        html.polyglot-embedded .embed-compact-main { padding-left: 0.65rem !important; padding-right: 0.65rem !important; padding-bottom: 1.5rem !important; }
+      }
+    `;
+    (global.document.head || global.document.documentElement).appendChild(st);
+  };
+  if (global.document) {
+    injectGlobalMobileCleanCss();
+    if (global.document.readyState === 'loading') {
+      global.document.addEventListener('DOMContentLoaded', injectGlobalMobileCleanCss, { once: true });
+    }
+  }
 
   if (isEmbeddedFrame && global.document && global.document.documentElement) {
     global.document.documentElement.classList.add('polyglot-embedded');

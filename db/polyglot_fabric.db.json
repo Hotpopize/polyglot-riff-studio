@@ -70,6 +70,28 @@
   ],
   "bridges": [
     {
+      "uid": "BRIDGE_CZ_FORMAL_TO_OVA",
+      "from_register": "CZ_STD",
+      "to_register": "CZ_OVA",
+      "from": "CZ_EXEC_CHAM",
+      "to": "CZ_OVA_COUNT",
+      "bridge_type": "REGISTER_DROP",
+      "text": "Ale když se na to podíváme pod kapotou...",
+      "vocal_cue": "Drop half an octave, lean in as an engineering peer.",
+      "weight": 0.82
+    },
+    {
+      "uid": "BRIDGE_DE_FORMAL_TO_VIE",
+      "from_register": "DE_STD",
+      "to_register": "AT_VIE",
+      "from": "DE_STD_CHAM_01",
+      "to": "AT_VIE_B2B_COUNT",
+      "bridge_type": "REGISTER_DROP",
+      "text": "Wenn wir aber ehrlich sind...",
+      "vocal_cue": "Slight crooked grin, stretch vowels into velvet Viennese candor.",
+      "weight": 0.86
+    },
+    {
       "uid": "BR_ALA_OVA",
       "from_register": "RU_ALA",
       "to_register": "CZ_OVA",
@@ -123,28 +145,6 @@
       "text": "Y si dejamos ahora el protocolo de sala de juntas y hablamos en confianza como a pie de cancha—",
       "vocal_cue": "Lean forward warmly, sun-soaked pause before the Andaluz exclamation.",
       "weight": 0.93
-    },
-    {
-      "uid": "BRIDGE_CZ_FORMAL_TO_OVA",
-      "from_register": "CZ_STD",
-      "to_register": "CZ_OVA",
-      "from": "CZ_EXEC_CHAM",
-      "to": "CZ_OVA_COUNT",
-      "bridge_type": "REGISTER_DROP",
-      "text": "Ale když se na to podíváme pod kapotou...",
-      "vocal_cue": "Drop half an octave, lean in as an engineering peer.",
-      "weight": 0.82
-    },
-    {
-      "uid": "BRIDGE_DE_FORMAL_TO_VIE",
-      "from_register": "DE_STD",
-      "to_register": "AT_VIE",
-      "from": "DE_STD_CHAM_01",
-      "to": "AT_VIE_COUNT",
-      "bridge_type": "REGISTER_DROP",
-      "text": "Wenn wir aber ehrlich sind...",
-      "vocal_cue": "Slight crooked grin, stretch vowels into velvet Viennese candor.",
-      "weight": 0.86
     },
     {
       "uid": "BR_OVA_VIE",
@@ -420,11 +420,11 @@
       "register_id": "AT_VIE",
       "original_lang": "AT_VIE",
       "original_lyric": "Vienna Calling! Oida, die Zeit rennt davon. Kein Stress, der Schmäh rennt eh von allein, musst nur die Vorsicht an der Garderobe abgeben.",
-      "source_url": "https://falco.at/discography/vienna-calling/",
+      "source_url": "https://www.letras.com/falco/vienna-calling/",
       "reach_channel": "agent-reach+jina",
       "lyric_shard": "db/lyrics/song_at_vie_falco.lyrics.json",
-      "total_token_count": 91,
-      "unique_token_count": 65,
+      "total_token_count": 297,
+      "unique_token_count": 138,
       "translation_es": "¡Llamada desde Viena! Oida, el tiempo se nos va. Cero estrés, el encanto vienés fluye solo de todos modos, solo debes dejar la cautela en el ropero.",
       "translation_en": "Vienna Calling! Oida, time is running out. No stress, the Schmäh runs by itself anyway, you just have to check your caution at the coat rack.",
       "translation_cz": "Vídeň volá! Oida, čas utíká. Žádný stres, ten Schmäh stejně běží sám od sebe, jen musíš nechat opatrnost v šatně.",
@@ -449,11 +449,11 @@
       "register_id": "CZ_OVA",
       "original_lang": "CZ_OVA",
       "original_lyric": "Ostrava, Ostrava, město mezi městy, kaj ľudzie fchytaju šichtu a po robotě maju čistý fajront, bo ten motor pojede sám.",
-      "source_url": "https://www.karaoketexty.cz/texty-pisni/nohavica-jaromir/ostravo-19675",
+      "source_url": "https://www.letras.com/jaromir-nohavica/ostravo/",
       "reach_channel": "agent-reach+jina",
       "lyric_shard": "db/lyrics/song_cz_ova_nohavica.lyrics.json",
-      "total_token_count": 81,
-      "unique_token_count": 63,
+      "total_token_count": 106,
+      "unique_token_count": 80,
       "translation_es": "Ostrava, Ostrava, ciudad entre ciudades, donde la gente agarra el turno de trabajo y tras la labor tiene el fajront limpio, porque el motor funcionará solo.",
       "translation_en": "Ostrava, Ostrava, city among cities, where people catch their shift and after work enjoy clean quitting time, because the engine will run by itself.",
       "translation_cz": "Ostrava, Ostrava, město mezi městy, kde lidé chytají směnu a po práci mají čistý fajront, protože ten motor pojede sám.",
@@ -479,11 +479,11 @@
       "register_id": "EN_YYC",
       "original_lang": "EN_YYC",
       "original_lyric": "Everybody is working for the weekend, bud! Stop being all hat and no cattle, kick the garage door open and just give ’er!",
-      "source_url": "https://www.stlyrics.com/lyrics/footloose/workingfortheweekend.htm",
+      "source_url": "https://www.letras.com/loverboy/working-for-the-weekend/",
       "reach_channel": "agent-reach+jina",
       "lyric_shard": "db/lyrics/song_en_yyc_loverboy.lyrics.json",
-      "total_token_count": 99,
-      "unique_token_count": 73,
+      "total_token_count": 222,
+      "unique_token_count": 95,
       "translation_es": "¡Todo el mundo trabaja para el fin de semana, viejo! Déjate de postureo sin sustancia, abre la puerta del garaje y ¡dale a todo trapo!",
       "translation_en": "Everybody is working for the weekend, bud! Stop being all hat and no cattle, kick the garage door open and just give ’er!",
       "translation_cz": "Všichni makají na víkend, kámo! Přestaň dělat ramena bez výsledků, otevři vrata garáže a prostě to roztaj na plný plyn!",
@@ -510,8 +510,8 @@
       "source_url": "https://www.letras.com/camaron-de-la-isla/volando-voy/",
       "reach_channel": "agent-reach+jina",
       "lyric_shard": "db/lyrics/song_es_sot_camaron.lyrics.json",
-      "total_token_count": 108,
-      "unique_token_count": 62,
+      "total_token_count": 150,
+      "unique_token_count": 84,
       "translation_es": "Volando voy, volando vengo, por el camino yo me entretengo. Enamorao de la vida, porque esto tiene duende y no hay que mirar los toros desde la barrera.",
       "translation_en": "Flying I go, flying I come, along the way I enjoy myself. In love with life, because this has true duende and you shouldn't watch the bulls from the sidelines.",
       "translation_cz": "Létám sem a tam, cestou se bavím. Zamilovaný do života, bo to má skutočný duende a nemá smysl koukat na býky jen z bariéry.",
@@ -535,11 +535,11 @@
       "register_id": "RU_ALA",
       "original_lang": "RU_ALA",
       "original_lyric": "Девочка моя Джулия, под тёплыми звёздами Алматы мы всё сделаем по красоте, базару нет, как за широким дастарханом.",
-      "source_url": "https://lyricsworld.ru/A-Studio/Dzhuliya-26451.html",
+      "source_url": "https://www.musixmatch.com/lyrics/A-Studio/%D0%94%D0%B6%D1%83%D0%BB%D0%B8%D1%8F",
       "reach_channel": "agent-reach+jina",
       "lyric_shard": "db/lyrics/song_ru_ala_astudio.lyrics.json",
-      "total_token_count": 87,
-      "unique_token_count": 72,
+      "total_token_count": 197,
+      "unique_token_count": 133,
       "translation_es": "Mi chica Julia, bajo las cálidas estrellas de Almaty lo haremos todo con pura belleza, sin duda alguna, como en un gran dastarhan.",
       "translation_en": "My girl Julia, under the warm stars of Almaty we will do everything with absolute beauty, zero doubt, like at a wide dastarhan.",
       "translation_cz": "Moje holka Julie, pod teplými hvězdami Almaty všechno uděláme po kráse, žádné pochyby, jako u širokého dastarhanu.",
@@ -584,134 +584,84 @@
   ],
   "staged_webhooks": [
     {
-      "id": "WH_OVA_01",
       "card": {
-        "text": "Lepit to záplatama je <span class=\"slang-token\" data-term=\"šichta\">šichta</span> pro vraha. Pojďme to postavit <span class=\"slang-token\" data-term=\"na první dobrou\">na první dobrou</span>, ať má tým čistý <span class=\"slang-token\" data-term=\"fajront\">fajront</span>.",
-        "stage": "COUNTERACT",
-        "counters_state": "MANUAL_GRIND"
-      },
-      "idiom": {
-        "lang": "CZ_OVA",
-        "term": "na první dobrou",
-        "cousin": "сделали по красоте",
-        "origin": "Czech / Ostravian workshop & stage idiom",
-        "meaning": "Right on the first take / first deployment without endless rework.",
-        "delivery": "Crisp punch on \"první\", confident nod."
-      },
-      "paper": "Patriot Magazín / Moravskoslezský deník (Ostrava)",
-      "headline": "V Dolních Vítkovicích rozjeli novou linku bez papírování: „Když to nefachá na první dobrou, je to jen drahá hračka.“",
-      "published": "2026-11-04 08:15 CET",
-      "target_db": "CZ_OVA"
-    },
-    {
-      "id": "WH_VIE_02",
-      "card": {
-        "text": "Geh bitte, das Hochglanz-PDF ist doch eine nette <span class=\"slang-token\" data-term=\"Pflanzerei\">Pflanzerei</span>. Schauen wir uns lieber an, was wirklich unter der Haube rennt.",
-        "stage": "COUNTERACT",
-        "counters_state": "CORPORATE_SHIELD"
-      },
-      "idiom": {
-        "lang": "AT_VIE",
-        "term": "Pflanzerei",
-        "cousin": "navoněná bída",
-        "origin": "Viennese dialect (jemanden pflanzen)",
-        "meaning": "Good-natured teasing, bluffing, or ornate corporate window-dressing.",
-        "delivery": "Unbothered deadpan eyebrow raise, slow vowel drawl."
-      },
-      "paper": "Falter Wien / Der Standard (Hochkultur & Beisl)",
-      "headline": "Vernissage im Kunsthistorischen: Zwischen Hochkultur und trockenem Schmäh am Stehtisch",
-      "published": "2026-11-04 09:30 CET",
-      "target_db": "AT_VIE"
-    },
-    {
-      "id": "WH_SOT_03",
-      "card": {
-        "text": "En el último chukker es donde se ve quién <span class=\"slang-token\" data-term=\"tener buena muñeca\">tiene buena muñeca</span>, tío—lo habéis llevado con una limpieza brutal.",
-        "stage": "COMPLIMENT",
-        "counters_state": null
-      },
-      "idiom": {
-        "lang": "ES_SOT",
-        "term": "tener buena muñeca",
-        "cousin": "fachat",
-        "origin": "Polo & equestrian dexterity idiom",
-        "meaning": "Having the subtle wrist touch and finesse to steer a high-speed situation effortlessly.",
-        "delivery": "Subtle flick of the wrist, low conspiratorial Andaluz cadence."
-      },
-      "paper": "Europa Sur / Sotogrande Digital (Polo & Puerto)",
-      "headline": "Final de alto hándicap en Santa María Polo Club: templanza, muñeca y caballos que cambian el ritmo en el último chukker",
-      "published": "2026-11-04 10:05 CET",
-      "target_db": "ES_SOT"
-    },
-    {
-      "id": "WH_ALA_04",
-      "card": {
-        "text": "Мне близко, что вы работаете <span class=\"slang-token\" data-term=\"без лишних понтов\">без лишних понтов</span> — тихо, крепко и <span class=\"slang-token\" data-term=\"сделали по красоте\">сделали по красоте</span>.",
+        "counters_state": null,
         "stage": "CHAMELEON",
-        "counters_state": null
+        "text": "Мне близко, что вы работаете <span class=\"slang-token\" data-term=\"без лишних понтов\">без лишних понтов</span> — тихо, крепко и <span class=\"slang-token\" data-term=\"сделали по красоте\">сделали по красоте</span>."
       },
+      "headline": "Алматинский тех-хаб выше Аль-Фараби: меньше громких понтов, больше живого результата",
+      "id": "WH_ALA_04",
       "idiom": {
-        "lang": "RU_ALA",
-        "term": "без лишних понтов",
         "cousin": "navoněná bída",
-        "origin": "Almaty urban candor",
+        "delivery": "Calm chest voice, slight dismissive hand wave on \"понтов\".",
+        "lang": "RU_ALA",
         "meaning": "Zero hollow flexing or status posturing—pure substance.",
-        "delivery": "Calm chest voice, slight dismissive hand wave on \"понтов\"."
+        "origin": "Almaty urban candor",
+        "term": "без лишних понтов"
       },
       "paper": "Vlast.kz / Tengrinews (Almaty)",
-      "headline": "Алматинский тех-хаб выше Аль-Фараби: меньше громких понтов, больше живого результата",
       "published": "2026-11-04 11:20 ALMT",
       "target_db": "RU_ALA"
     },
     {
-      "id": "STYL_CZ_OVA_2306",
       "card": {
-        "uid": "CZ_OVA_COUN_2306_20",
-        "text": "Hele, nechceme tu s tímhle systémem fakt šahat, jasný? Chceme, aby to <span class=\"slang-token\" data-term=\"fachat\">fachat</span>ovalo, bez kecání.",
-        "arena": "fashion",
+        "counters_state": "MANUAL_GRIND",
         "stage": "COUNTERACT",
-        "lens_id": "FERGUSON",
-        "phonetics": "ˈhɛlə, ˈnɛtʃməmː tuː sː tímːhɛlː sːýstɛmːɛmː fʌkt ˈʃaːt, jɑsːnɪ? ˈxʊmɛmː tɑj ˈfɑt͡ʃɑtʊləʊ, bɛz kɛtsænɪ.",
-        "english_gloss": "Listen, we don't want to fuss over this system, you know? We want it to run smoothly, without any fuss.",
-        "counters_state": null
+        "text": "Lepit to záplatama je <span class=\"slang-token\" data-term=\"šichta\">šichta</span> pro vraha. Pojďme to postavit <span class=\"slang-token\" data-term=\"na první dobrou\">na první dobrou</span>, ať má tým čistý <span class=\"slang-token\" data-term=\"fajront\">fajront</span>."
       },
+      "headline": "V Dolních Vítkovicích rozjeli novou linku bez papírování: „Když to nefachá na první dobrou, je to jen drahá hračka.“",
+      "id": "WH_OVA_01",
       "idiom": {
-        "term": "fachat",
-        "cousin": "Operational efficiency",
-        "origin": "Austrian industrial loan",
-        "meaning": "To run smoothly, fire on all cylinders without babysitting",
-        "delivery": "Short, sharp, delivered with a slight shrug of the shoulders",
-        "register_id": "CZ_OVA"
+        "cousin": "сделали по красоте",
+        "delivery": "Crisp punch on \"první\", confident nod.",
+        "lang": "CZ_OVA",
+        "meaning": "Right on the first take / first deployment without endless rework.",
+        "origin": "Czech / Ostravian workshop & stage idiom",
+        "term": "na první dobrou"
       },
-      "paper": "Live Stylizer (ollama:gemma3:4b • FERGUSON)",
-      "headline": "Thought Stylizer [fashion]: Skip the VIP slide deck theatre and let's test the real pipeline on steel.",
-      "published": "2026-11-04 15:25 CET",
+      "paper": "Patriot Magazín / Moravskoslezský deník (Ostrava)",
+      "published": "2026-11-04 08:15 CET",
       "target_db": "CZ_OVA"
     },
     {
-      "id": "STYL_CZ_OVA_2418",
       "card": {
-        "uid": "CZ_OVA_COUN_2418_65",
-        "text": "Hele, nechť to fachá, jasný? Žádnej šichty, žádnej fajront, nechceme, aby to zlobilo, že jo?",
-        "arena": "fashion",
-        "stage": "COUNTERACT",
-        "lens_id": "FERGUSON",
-        "phonetics": "ˈhɛlə, ˈnɛt͡ʃt ˈto ˈfaːxa, ˈjæsːn? ˈʒaːdnej ˈʃixta, ˈʒaːdnej ˈfaːjron, ˈnɛxːnmy, ˈaːby ˈto ˈzloːbilɔ, ˈžeːjo?",
-        "english_gloss": "Let it run smoothly, clear? No grueling shifts, no messy finishes, we don't want it to malfunction, you know?",
-        "counters_state": null
+        "counters_state": null,
+        "stage": "COMPLIMENT",
+        "text": "En el último chukker es donde se ve quién <span class=\"slang-token\" data-term=\"tener buena muñeca\">tiene buena muñeca</span>, tío—lo habéis llevado con una limpieza brutal."
       },
+      "headline": "Final de alto hándicap en Santa María Polo Club: templanza, muñeca y caballos que cambian el ritmo en el último chukker",
+      "id": "WH_SOT_03",
       "idiom": {
-        "term": "fachat",
-        "cousin": "None",
-        "origin": "Austrian industrial loan",
-        "meaning": "To run smoothly, fire on all cylinders without babysitting.",
-        "delivery": "Short, declarative, with a slight shrug.",
-        "register_id": "CZ_OVA"
+        "cousin": "fachat",
+        "delivery": "Subtle flick of the wrist, low conspiratorial Andaluz cadence.",
+        "lang": "ES_SOT",
+        "meaning": "Having the subtle wrist touch and finesse to steer a high-speed situation effortlessly.",
+        "origin": "Polo & equestrian dexterity idiom",
+        "term": "tener buena muñeca"
       },
-      "paper": "Live Stylizer (ollama:gemma3:4b • FERGUSON)",
-      "headline": "Thought Stylizer [fashion]: Skip the VIP slide deck theatre and let's test the real pipeline on steel.",
-      "published": "2026-11-04 15:26 CET",
-      "target_db": "CZ_OVA"
+      "paper": "Europa Sur / Sotogrande Digital (Polo & Puerto)",
+      "published": "2026-11-04 10:05 CET",
+      "target_db": "ES_SOT"
+    },
+    {
+      "card": {
+        "counters_state": "CORPORATE_SHIELD",
+        "stage": "COUNTERACT",
+        "text": "Geh bitte, das Hochglanz-PDF ist doch eine nette <span class=\"slang-token\" data-term=\"Pflanzerei\">Pflanzerei</span>. Schauen wir uns lieber an, was wirklich unter der Haube rennt."
+      },
+      "headline": "Vernissage im Kunsthistorischen: Zwischen Hochkultur und trockenem Schmäh am Stehtisch",
+      "id": "WH_VIE_02",
+      "idiom": {
+        "cousin": "navoněná bída",
+        "delivery": "Unbothered deadpan eyebrow raise, slow vowel drawl.",
+        "lang": "AT_VIE",
+        "meaning": "Good-natured teasing, bluffing, or ornate corporate window-dressing.",
+        "origin": "Viennese dialect (jemanden pflanzen)",
+        "term": "Pflanzerei"
+      },
+      "paper": "Falter Wien / Der Standard (Hochkultur & Beisl)",
+      "published": "2026-11-04 09:30 CET",
+      "target_db": "AT_VIE"
     }
   ]
 }

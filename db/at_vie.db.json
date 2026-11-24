@@ -34,14 +34,6 @@
     }
   },
   "idioms": {
-    "an der Garderobe abgeben": {
-      "term": "an der Garderobe abgeben",
-      "lang": "AT_VIE",
-      "origin": "Viennese Theater/Opera coat-check trope",
-      "meaning": "Check your stiff caution at the coat check before we talk.",
-      "delivery": "Wry smile, casual wave of the hand.",
-      "cousin": "fajront"
-    },
     "G’schichtldrucken": {
       "term": "G’schichtldrucken",
       "lang": "AT_VIE",
@@ -58,14 +50,6 @@
       "delivery": "Unbothered deadpan eyebrow raise, slow vowel drawl.",
       "cousin": "navoněná bída"
     },
-    "schwer in Ordnung": {
-      "term": "schwer in Ordnung",
-      "lang": "AT_VIE",
-      "origin": "Viennese understatement",
-      "meaning": "Genuinely impressive / solid character.",
-      "delivery": "Slow, appreciative nod.",
-      "cousin": "сделали по красоте"
-    },
     "Substanz vor Show": {
       "term": "Substanz vor Show",
       "lang": "DE_STD",
@@ -73,6 +57,22 @@
       "meaning": "Architectural substance prioritized over slide-deck theater.",
       "delivery": "Measured crisp articulation.",
       "cousin": "без лишних понтов"
+    },
+    "an der Garderobe abgeben": {
+      "term": "an der Garderobe abgeben",
+      "lang": "AT_VIE",
+      "origin": "Viennese Theater/Opera coat-check trope",
+      "meaning": "Check your stiff caution at the coat check before we talk.",
+      "delivery": "Wry smile, casual wave of the hand.",
+      "cousin": "fajront"
+    },
+    "schwer in Ordnung": {
+      "term": "schwer in Ordnung",
+      "lang": "AT_VIE",
+      "origin": "Viennese understatement",
+      "meaning": "Genuinely impressive / solid character.",
+      "delivery": "Slow, appreciative nod.",
+      "cousin": "сделали по красоте"
     }
   },
   "vocab": [
@@ -172,11 +172,11 @@
       "register_id": "AT_VIE",
       "original_lang": "AT_VIE",
       "original_lyric": "Vienna Calling! Oida, die Zeit rennt davon. Kein Stress, der Schmäh rennt eh von allein, musst nur die Vorsicht an der Garderobe abgeben.",
-      "source_url": "https://falco.at/discography/vienna-calling/",
+      "source_url": "https://www.letras.com/falco/vienna-calling/",
       "reach_channel": "agent-reach+jina",
       "lyric_shard": "db/lyrics/song_at_vie_falco.lyrics.json",
-      "total_token_count": 91,
-      "unique_token_count": 65,
+      "total_token_count": 297,
+      "unique_token_count": 138,
       "translation_es": "¡Llamada desde Viena! Oida, el tiempo se nos va. Cero estrés, el encanto vienés fluye solo de todos modos, solo debes dejar la cautela en el ropero.",
       "translation_en": "Vienna Calling! Oida, time is running out. No stress, the Schmäh runs by itself anyway, you just have to check your caution at the coat rack.",
       "translation_cz": "Vídeň volá! Oida, čas utíká. Žádný stres, ten Schmäh stejně běží sám od sebe, jen musíš nechat opatrnost v šatně.",
@@ -377,7 +377,7 @@
       "lens": "DEADPAN",
       "text": "In der Loge klingen große Worte immer herrlich, Oida—aber die heilige Ehrfurcht vor dem Legacy-System sollten wir jetzt mal <span class=\"slang-token\" data-term=\"an der Garderobe abgeben\">an der Garderobe abgeben</span>.",
       "phonetics": "",
-      "english": "",
+      "english": "In the opera box, grand words always sound glorious, Oida—but we should check our sacred reverence for the legacy system at the coat rack now.",
       "idioms": [
         "an der Garderobe abgeben"
       ]

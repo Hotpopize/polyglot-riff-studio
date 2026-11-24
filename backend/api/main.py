@@ -3,12 +3,16 @@ from __future__ import annotations
 import json
 import socket
 from contextlib import asynccontextmanager
+from pathlib import Path, PurePosixPath
 from typing import Any, Optional
+from urllib.parse import unquote
 
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
+from starlette.responses import PlainTextResponse, Response
+from starlette.types import Scope
 
 from backend.config import settings
 from backend.db.neo4j_client import neo4j_manager
@@ -36,7 +40,7 @@ async def lifespan(_: FastAPI):
 
 app = FastAPI(
     title="Polyglot Riff Atelier — Neo4j + PostgreSQL (pgvector) API",
-    version="3.3.0",
+    version="3.6.0",
     lifespan=lifespan,
 )
 
@@ -796,5 +800,74 @@ async def api_run_seed(compute_embeddings: bool = True) -> dict[str, Any]:
     return await seed_all(compute_embeddings=compute_embeddings)
 
 
+_BLOCKED_STATIC_SEGMENTS = frozenset({
+    "backend",
+    "backups",
+    "tests",
+    "__pycache__",
+    "node_modules",
+})
+_BLOCKED_STATIC_EXTENSIONS = frozenset({
+    ".db",
+    ".sqlite",
+    ".sqlite3",
+    ".py",
+    ".pyc",
+    ".pyo",
+    ".ps1",
+    ".cmd",
+    ".bat",
+    ".sh",
+    ".yml",
+    ".yaml",
+    ".toml",
+    ".ini",
+    ".cfg",
+    ".env",
+    ".log",
+    ".rpm",
+    ".txt",
+})
+_ALLOWED_PUBLIC_EXTENSIONS = frozenset({
+    ".html",
+    ".js",
+    ".json",
+    ".webmanifest",
+    ".cypher",
+    ".css",
+    ".svg",
+    ".png",
+    ".jpg",
+    ".jpeg",
+    ".webp",
+    ".ico",
+    ".woff2",
+})
+
+
+class SafeStudioStaticFiles(StaticFiles):
+    """StaticFiles guard blocking dotfiles, backend/backups/tests dirs, and non-web files."""
+
+    async def get_response(self, path: str, scope: Scope) -> Response:
+        normalized = unquote(path or "").replace("\\", "/").lstrip("/")
+        if normalized in ("", "."):
+            return await super().get_response(path, scope)
+        parts = PurePosixPath(normalized).parts
+        for seg in parts:
+            if seg.startswith(".") or seg in ("", "..") or seg.lower() in _BLOCKED_STATIC_SEGMENTS:
+                return PlainTextResponse("Not Found", status_code=404)
+        suffix = PurePosixPath(normalized).suffix.lower()
+        if suffix in _BLOCKED_STATIC_EXTENSIONS or suffix not in _ALLOWED_PUBLIC_EXTENSIONS:
+            return PlainTextResponse("Not Found", status_code=404)
+        root_dir = Path(self.directory or ".").resolve()
+        try:
+            resolved = (root_dir / normalized).resolve()
+        except OSError:
+            return PlainTextResponse("Not Found", status_code=404)
+        if not resolved.is_relative_to(root_dir):
+            return PlainTextResponse("Not Found", status_code=404)
+        return await super().get_response(path, scope)
+
+
 # Mount workspace static files last so http://127.0.0.1:8765/ serves index.html & Studio HTMLs directly
-app.mount("/", StaticFiles(directory=str(settings.root_dir), html=True), name="studio_static")
+app.mount("/", SafeStudioStaticFiles(directory=str(settings.root_dir), html=True), name="studio_static")

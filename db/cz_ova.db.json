@@ -90,14 +90,6 @@
       "delivery": "Warm open-palm gesture, drop pitch slightly into peer candor.",
       "cousin": "an der Garderobe abgeben"
     },
-    "šichta": {
-      "term": "šichta",
-      "lang": "CZ_OVA",
-      "origin": "German: Schicht (mining/industrial shift)",
-      "meaning": "Heavy, grueling manual shift or pointless grind.",
-      "delivery": "Heavy consonant weight, shake head slightly.",
-      "cousin": "G’schichtldrucken"
-    },
     "zaměřit se na": {
       "term": "zaměřit se na",
       "lang": "CZ_STD",
@@ -105,6 +97,14 @@
       "meaning": "To focus squarely on strategic execution.",
       "delivery": "Clean C-Suite vowel length, calm emphasis.",
       "cousin": "Substanz vor Show"
+    },
+    "šichta": {
+      "term": "šichta",
+      "lang": "CZ_OVA",
+      "origin": "German: Schicht (mining/industrial shift)",
+      "meaning": "Heavy, grueling manual shift or pointless grind.",
+      "delivery": "Heavy consonant weight, shake head slightly.",
+      "cousin": "G’schichtldrucken"
     }
   },
   "vocab": [
@@ -216,11 +216,11 @@
       "register_id": "CZ_OVA",
       "original_lang": "CZ_OVA",
       "original_lyric": "Ostrava, Ostrava, město mezi městy, kaj ľudzie fchytaju šichtu a po robotě maju čistý fajront, bo ten motor pojede sám.",
-      "source_url": "https://www.karaoketexty.cz/texty-pisni/nohavica-jaromir/ostravo-19675",
+      "source_url": "https://www.letras.com/jaromir-nohavica/ostravo/",
       "reach_channel": "agent-reach+jina",
       "lyric_shard": "db/lyrics/song_cz_ova_nohavica.lyrics.json",
-      "total_token_count": 81,
-      "unique_token_count": 63,
+      "total_token_count": 106,
+      "unique_token_count": 80,
       "translation_es": "Ostrava, Ostrava, ciudad entre ciudades, donde la gente agarra el turno de trabajo y tras la labor tiene el fajront limpio, porque el motor funcionará solo.",
       "translation_en": "Ostrava, Ostrava, city among cities, where people catch their shift and after work enjoy clean quitting time, because the engine will run by itself.",
       "translation_cz": "Ostrava, Ostrava, město mezi městy, kde lidé chytají směnu a po práci mají čistý fajront, protože ten motor pojede sám.",
@@ -634,7 +634,7 @@
       "lens": "FERGUSON",
       "text": "Hele, tuhle oficiální prezentaci můžeme rovnou roztrhat – v první řadě u mola to vypadá světově, ale v zákulisí víme své: pokud ten podvozek nedrží, je to jen <span class=\"slang-token\" data-term=\"navoněná bída\">navoněná bída</span>. Pojďme radši udělat motor, co bude <span class=\"slang-token\" data-term=\"fachat\">fachat</span> i bez reflektorů.",
       "phonetics": "",
-      "english": "",
+      "english": "Hey, we can tear up this official deck right now—front row at the runway it looks world-class, but backstage we know the truth: if the chassis doesn't hold, it's just perfumed flash. Let's build an engine that runs smoothly even without spotlights.",
       "idioms": [
         "navoněná bída",
         "fachat"
@@ -648,7 +648,7 @@
       "lens": "ONEAL",
       "text": "Pojďme si přestat lhát do kapsy: nahoře na mole máte pařížský týden módy, ale dole vaši kluci jedou třetí <span class=\"slang-token\" data-term=\"šichta\">šichtu</span> ručně u žehličky, <span class=\"slang-token\" data-term=\"bo\">bo</span> automatizace zůstala jen na papíře.",
       "phonetics": "",
-      "english": "",
+      "english": "Let's stop kidding ourselves: up on the runway you've got Paris Fashion Week, while downstairs your crew is pulling a third shift by hand at the pressing iron because automation stayed on paper.",
       "idioms": [
         "šichta",
         "bo"
@@ -662,7 +662,7 @@
       "lens": "WILLIAMS",
       "text": "„Ó, magnifique, jaká silueta!“ — a teď vážně, až tady zhasnou blesky a modelky shodí podpatky: pojďme to v zákulisí sfouknout tak čistě, ať máme v pátek v klidu <span class=\"slang-token\" data-term=\"fajront\">fajront</span>!",
       "phonetics": "",
-      "english": "",
+      "english": "\"Oh, magnifique, what a silhouette!\" — and seriously now, once the flashes go dark and the models kick off their heels: let's wrap everything backstage so cleanly that we enjoy an easy Friday quitting time!",
       "idioms": [
         "fajront"
       ]

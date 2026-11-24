@@ -1,7 +1,9 @@
 const CACHE_NAME = 'polyglot-riff-studio-v3.6';
 const PRECACHE_URLS = [
   './index.html',
+  './manifest.webmanifest',
   './polyglot_api_client.js',
+  './polyglot-srs-cypher-migration.cypher',
   './regional_lyric_flashcards.html',
   './polyglot_audio_rhythm_studio_v4_5.html',
   './polyglot_riff_studio_v3_1_atelier_edition.html',

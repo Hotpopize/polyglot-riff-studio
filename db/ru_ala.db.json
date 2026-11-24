@@ -160,11 +160,11 @@
       "register_id": "RU_ALA",
       "original_lang": "RU_ALA",
       "original_lyric": "Девочка моя Джулия, под тёплыми звёздами Алматы мы всё сделаем по красоте, базару нет, как за широким дастарханом.",
-      "source_url": "https://lyricsworld.ru/A-Studio/Dzhuliya-26451.html",
+      "source_url": "https://www.musixmatch.com/lyrics/A-Studio/%D0%94%D0%B6%D1%83%D0%BB%D0%B8%D1%8F",
       "reach_channel": "agent-reach+jina",
       "lyric_shard": "db/lyrics/song_ru_ala_astudio.lyrics.json",
-      "total_token_count": 87,
-      "unique_token_count": 72,
+      "total_token_count": 197,
+      "unique_token_count": 133,
       "translation_es": "Mi chica Julia, bajo las cálidas estrellas de Almaty lo haremos todo con pura belleza, sin duda alguna, como en un gran dastarhan.",
       "translation_en": "My girl Julia, under the warm stars of Almaty we will do everything with absolute beauty, zero doubt, like at a wide dastarhan.",
       "translation_cz": "Moje holka Julie, pod teplými hvězdami Almaty všechno uděláme po kráse, žádné pochyby, jako u širokého dastarhanu.",
@@ -435,6 +435,19 @@
       "idioms": []
     },
     {
+      "uid": "RUNWAY_RU_ALA_BASE",
+      "lang": "RU_ALA",
+      "stage": "COMPLIMENT",
+      "arena": "runway",
+      "lens": null,
+      "text": "За кулисами сразу видно руку мастера, родной: без лишнего шума, каждый шов на месте — <span class=\"slang-token\" data-term=\"сделали по красоте\">сделали по красоте</span>.",
+      "phonetics": "",
+      "english": "Backstage you immediately see the master’s hand, brother: zero extra noise, every seam in place—built with real beauty.",
+      "idioms": [
+        "сделали по красоте"
+      ]
+    },
+    {
       "uid": "RU_ALA_RUNWAY_CHAM",
       "lang": "RU_ALA",
       "stage": "CHAMELEON",
@@ -484,19 +497,6 @@
       "phonetics": "",
       "english": "Tell me backstage: what flagship walk is going to turn the whole hall upside down tonight?",
       "idioms": []
-    },
-    {
-      "uid": "RUNWAY_RU_ALA_BASE",
-      "lang": "RU_ALA",
-      "stage": "COMPLIMENT",
-      "arena": "runway",
-      "lens": null,
-      "text": "За кулисами сразу видно руку мастера, родной: без лишнего шума, каждый шов на месте — <span class=\"slang-token\" data-term=\"сделали по красоте\">сделали по красоте</span>.",
-      "phonetics": "",
-      "english": "Backstage you immediately see the master’s hand, brother: zero extra noise, every seam in place—built with real beauty.",
-      "idioms": [
-        "сделали по красоте"
-      ]
     },
     {
       "uid": "RU_ALA_SPARK_CHAM",

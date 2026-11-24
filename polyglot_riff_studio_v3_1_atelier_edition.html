@@ -640,7 +640,7 @@
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
-        <div class="lg:col-span-3 bg-slate-950 border border-slate-800 rounded-2xl relative overflow-hidden h-[620px]"
+        <div class="lg:col-span-3 bg-slate-950 border border-slate-800 rounded-2xl relative overflow-hidden h-[340px] sm:h-[480px] lg:h-[620px]"
           id="graph-canvas-wrapper">
           <svg id="neo4j-svg" class="w-full h-full cursor-grab active:cursor-grabbing"></svg>
           <div
@@ -650,7 +650,7 @@
         </div>
 
         <div
-          class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between h-[620px] overflow-y-auto">
+          class="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 flex flex-col justify-between h-auto lg:h-[620px] overflow-y-auto">
           <div id="graph-inspector" class="space-y-4">
             <div class="text-xs font-bold uppercase tracking-wider text-indigo-400">Graph Inspector</div>
             <p class="text-xs text-slate-400">Click any `:Persona`, `:Card`, `:State`, `:Idiom`, or relationship edge in
@@ -2818,7 +2818,7 @@
       renderCards();
       updateActiveEdgeBadge();
 
-      if (window.PolyglotAPI && window.PolyglotAPI.isOnline) {
+      if (window.PolyglotAPI) {
         window.PolyglotAPI.gradeEdge(edge.id, score, edge.source, edge.target).then(res => {
           if (res && typeof res.weight === 'number') {
             edge.weight = res.weight;
@@ -3314,7 +3314,7 @@
       }
 
       saveState();
-      if (window.PolyglotAPI && window.PolyglotAPI.isOnline) {
+      if (window.PolyglotAPI) {
         window.PolyglotAPI.commitNode({
           uid,
           register_id: lang,
@@ -4401,7 +4401,7 @@
       }
 
       saveState();
-      if (window.PolyglotAPI && window.PolyglotAPI.isOnline) {
+      if (window.PolyglotAPI) {
         const idmMeta = r.idiom && state.idioms[r.idiom] ? state.idioms[r.idiom] : null;
         window.PolyglotAPI.commitNode({
           uid,
@@ -4437,14 +4437,23 @@
     function renderLangDbPills() {
       const el = document.getElementById('lang-db-pills');
       if (!el) return;
+      const partitionCards = (state.allCards && state.allCards.length) ? state.allCards : state.cards;
+      const pairedRegs = {
+        CZ_OVA: ['CZ_OVA', 'CZ_STD'],
+        AT_VIE: ['AT_VIE', 'DE_STD'],
+        RU_ALA: ['RU_ALA', 'RU_STD'],
+        EN_YYC: ['EN_YYC', 'EN_EXEC'],
+        ES_SOT: ['ES_SOT', 'ES_STD']
+      };
       el.innerHTML = LANG_DB_PARTITIONS.map(db => {
         const active = activeDbPartition === db.id;
+        const regs = pairedRegs[db.id] || [db.id];
         const cardCount = db.id === 'ALL'
-          ? state.cards.length
-          : state.cards.filter(c => c.lang === db.id).length;
+          ? partitionCards.length
+          : partitionCards.filter(c => regs.includes(c.lang)).length;
         const idiomCount = db.id === 'ALL'
           ? Object.keys(state.idioms).length
-          : Object.values(state.idioms).filter(i => i.lang === db.id).length;
+          : Object.values(state.idioms).filter(i => regs.includes(i.lang)).length;
 
         return `
           <button onclick="selectLangDbPartition('${db.id}')" class="text-left p-3 rounded-xl border transition ${active
@@ -4534,7 +4543,7 @@
           const apiRes = await window.PolyglotAPI.stylizeThought({
             raw_thought: promptText,
             register_id: lang,
-            arena: state.activeArena || 'general',
+            arena: state.activeArena || 'terrace',
             stage: 'COUNTERACT',
             lens_id: style,
             model
@@ -4721,12 +4730,12 @@
         });
       }
       saveState();
-      if (window.PolyglotAPI && window.PolyglotAPI.isOnline) {
+      if (window.PolyglotAPI) {
         window.PolyglotAPI.commitNode({
           uid,
           register_id: c.lang,
           stage: c.stage,
-          arena: state.activeArena || 'general',
+          arena: state.activeArena || 'terrace',
           text_html: c.text,
           idiom_term: c.idiom.term,
           idiom_origin: c.idiom.origin,
@@ -4803,8 +4812,23 @@
       }
 
       wh.approved = true;
-      if (window.PolyglotAPI && window.PolyglotAPI.isOnline && wh.id) {
-        window.PolyglotAPI.approveWebhook(wh.id).catch(() => { });
+      if (window.PolyglotAPI && wh.id) {
+        window.PolyglotAPI.approveWebhook(wh.id).catch(() => {
+          return window.PolyglotAPI.commitNode({
+            uid,
+            register_id: wh.target_db,
+            stage: wh.card.stage,
+            arena: wh.card.arena || state.activeArena || 'terrace',
+            text_html: wh.card.text,
+            idiom_term: wh.idiom.term,
+            idiom_origin: wh.idiom.origin,
+            idiom_meaning: wh.idiom.meaning,
+            delivery_cue: wh.idiom.delivery,
+            cousin_term: wh.idiom.cousin || null,
+            counters_state: wh.card.counters_state || null,
+            connect_from_uid: prev ? prev.uid : null
+          });
+        }).catch(() => { });
       }
       saveState();
       renderWebhookQueue();
@@ -6625,7 +6649,13 @@
         } catch (_) { }
       }
       const lens = COMIC_STYLES[lensId] || COMIC_STYLES.FERGUSON;
-      const card = state.cards.find(c => c.lang === regId && c.stage === stage) || state.cards.find(c => c.lang === regId);
+      const cardPool = (state.allCards && state.allCards.length) ? state.allCards : state.cards;
+      const activeArenaId = state.activeArena || 'terrace';
+      const card =
+        cardPool.find(c => c.lang === regId && c.stage === stage && c.arena === activeArenaId && c.lens_id === lensId) ||
+        cardPool.find(c => c.lang === regId && c.stage === stage && c.arena === activeArenaId) ||
+        cardPool.find(c => c.lang === regId && c.stage === stage) ||
+        cardPool.find(c => c.lang === regId);
       out.innerHTML = `
         <div class="text-amber-300 font-semibold">⚡ Offline Lens: ${escHtml(lens.name)}</div>
         <div>🎙️ ${escHtml(lens.prosody)}</div>
@@ -6639,35 +6669,124 @@
       const engineBadge = document.getElementById('live-bridge-engine-badge');
       try {
         const health = await window.PolyglotAPI.checkHealth();
-        if (!health) return;
-        const pgOk = health.postgres && health.postgres.ok;
-        const neoOk = health.neo4j && health.neo4j.ok;
-        const pgCounts = health.postgres?.counts || {};
-        const neoCounts = health.neo4j?.counts || {};
-        if (pill) {
-          pill.textContent = `DB: PG${pgOk ? '✓' : '·'} Neo4j${neoOk ? '✓' : '·'}`;
-          pill.className = 'px-2 py-1 rounded bg-emerald-950/70 border border-emerald-500/40 text-emerald-300 whitespace-nowrap';
-        }
-        if (engineBadge) {
-          engineBadge.textContent = `✓ Live PG:5433 (${pgCounts.cards || health.postgres?.cards || 0} cards) + Neo4j:7687 (${neoCounts.relationships || health.neo4j?.relationships || 0} rels)`;
-          engineBadge.className = 'text-[10px] mono px-2.5 py-1 rounded bg-emerald-950/70 border border-emerald-500/40 text-emerald-300';
+        if (health) {
+          const pgOk = health.postgres && health.postgres.ok;
+          const neoOk = health.neo4j && health.neo4j.ok;
+          const pgCounts = health.postgres?.counts || {};
+          const neoCounts = health.neo4j?.counts || {};
+          if (pill) {
+            pill.textContent = `DB: PG${pgOk ? '✓' : '·'} Neo4j${neoOk ? '✓' : '·'}`;
+            pill.className = 'px-2 py-1 rounded bg-emerald-950/70 border border-emerald-500/40 text-emerald-300 whitespace-nowrap';
+          }
+          if (engineBadge) {
+            engineBadge.textContent = `✓ Live PG:5433 (${pgCounts.cards || health.postgres?.cards || 0} cards) + Neo4j:7687 (${neoCounts.relationships || health.neo4j?.relationships || 0} rels)`;
+            engineBadge.className = 'text-[10px] mono px-2.5 py-1 rounded bg-emerald-950/70 border border-emerald-500/40 text-emerald-300';
+          }
         }
 
         const full = await window.PolyglotAPI.fetchFullState();
         if (!full) return;
 
-        // Merge backend idioms, regional cards, SRS edges, and webhooks without clobbering local arena/wetwork state
-        if (full.idioms && typeof full.idioms === 'object') {
-          Object.entries(full.idioms).forEach(([term, idm]) => {
-            if (!state.idioms[term]) state.idioms[term] = idm;
+        if (!health || full.offlineShardMode) {
+          const shardCards = (full.allCards || full.cards || []).length;
+          const shardSongs = (full.songs || []).length;
+          if (pill) {
+            pill.textContent = `Shards: ${shardCards}✓`;
+            pill.className = 'px-2 py-1 rounded bg-amber-950/70 border border-amber-500/40 text-amber-300 whitespace-nowrap';
+          }
+          if (engineBadge) {
+            engineBadge.textContent = `⚡ Offline .db.json Shards (${shardCards} cards, ${shardSongs} songs)`;
+            engineBadge.className = 'text-[10px] mono px-2.5 py-1 rounded bg-amber-950/60 border border-amber-500/35 text-amber-300';
+          }
+        }
+
+        if (Array.isArray(full.arenas) && full.arenas.length) {
+          full.arenas.forEach(a => {
+            if (!a || !a.id) return;
+            const prev = UNIFIED_ARENAS[a.id] || {};
+            UNIFIED_ARENAS[a.id] = {
+              id: a.id,
+              icon: a.icon || prev.icon || '🎯',
+              label: a.label || prev.label || a.id,
+              shortLabel: a.short_label || a.shortLabel || prev.shortLabel || a.label || a.id,
+              group: a.arena_group || a.group || prev.group || 'Unified Arena',
+              desc: a.description || a.desc || prev.desc || ''
+            };
           });
         }
+
+        if (Array.isArray(full.roomStates) && full.roomStates.length) {
+          const rsMap = new Map((state.roomStates || []).map(rs => [rs.id, rs]));
+          full.roomStates.forEach(rs => {
+            if (!rs || !rs.id) return;
+            if (rsMap.has(rs.id)) {
+              Object.assign(rsMap.get(rs.id), rs);
+            } else {
+              state.roomStates.push(rs);
+              rsMap.set(rs.id, rs);
+            }
+          });
+        }
+
+        if (Array.isArray(full.falseFriends) && full.falseFriends.length) {
+          const ffMap = new Map((state.falseFriends || []).map(ff => [ff.cz, ff]));
+          full.falseFriends.forEach(ff => {
+            if (!ff || !ff.cz) return;
+            if (ffMap.has(ff.cz)) {
+              Object.assign(ffMap.get(ff.cz), ff);
+            } else {
+              state.falseFriends.push(ff);
+              ffMap.set(ff.cz, ff);
+            }
+          });
+        }
+
+        if (Array.isArray(full.bridges) && full.bridges.length) {
+          const brMap = new Map((state.bridges || []).map(b => [b.uid, b]));
+          full.bridges.forEach(b => {
+            if (!b || !b.uid) return;
+            if (brMap.has(b.uid)) {
+              Object.assign(brMap.get(b.uid), b);
+            } else {
+              state.bridges.push(b);
+              brMap.set(b.uid, b);
+            }
+          });
+        }
+
+        // Merge backend idioms, full 196-card catalog (allCards), terrace cards, SRS edges, and webhooks
+        if (full.idioms && typeof full.idioms === 'object') {
+          Object.entries(full.idioms).forEach(([term, idm]) => {
+            if (!state.idioms[term]) {
+              state.idioms[term] = idm;
+            } else {
+              Object.assign(state.idioms[term], idm);
+            }
+          });
+        }
+
+        if (Array.isArray(full.allCards) && full.allCards.length) {
+          const allMap = new Map((Array.isArray(state.allCards) ? state.allCards : []).map(c => [c.uid, c]));
+          full.allCards.forEach(c => {
+            if (!c || !c.uid) return;
+            if (allMap.has(c.uid)) {
+              Object.assign(allMap.get(c.uid), c);
+            } else {
+              allMap.set(c.uid, c);
+            }
+          });
+          state.allCards = Array.from(allMap.values());
+        }
+
         if (Array.isArray(full.cards)) {
-          const existingUids = new Set(state.cards.map(c => c.uid));
+          const cardMap = new Map(state.cards.map(c => [c.uid, c]));
           full.cards.forEach(c => {
-            if (state.personas[c.lang] && !existingUids.has(c.uid)) {
+            if (!state.personas[c.lang]) return;
+            if (cardMap.has(c.uid)) {
+              Object.assign(cardMap.get(c.uid), c);
+            } else {
               state.cards.push(c);
-              existingUids.add(c.uid);
+              cardMap.set(c.uid, c);
             }
           });
         }
@@ -6701,8 +6820,11 @@
         }
         saveState();
         updateHeaderStats();
+        renderFrictionHotkeys();
+        renderStudioArenaPills();
         renderCards();
         updateActiveEdgeBadge();
+        renderFalseFriendsTable();
         renderLangDbPills();
         renderWebhookQueue();
       } catch (_) { }

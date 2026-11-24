@@ -122,7 +122,7 @@ CREATE TABLE IF NOT EXISTS lexical_scaffolds (
     scaffold_type TEXT NOT NULL CHECK (scaffold_type IN ('COGNATE', 'STRUCTURAL_CALQUE', 'LOANWORD', 'PHONETIC_BRIDGE')),
     anchor_expression TEXT NOT NULL,
     explanation TEXT NOT NULL DEFAULT '',
-    UNIQUE (card_uid, idiom_term, anchor_lang, anchor_expression)
+    UNIQUE NULLS NOT DISTINCT (card_uid, idiom_term, anchor_lang, anchor_expression)
 );
 
 CREATE TABLE IF NOT EXISTS false_friends (
@@ -364,6 +364,7 @@ class PostgresManager:
         pool = await self.get_pool()
         async with pool.acquire() as conn:
             await conn.execute(SCHEMA_DDL)
+            await self._migrate_lexical_scaffolds_unique_conn(conn)
             await conn.execute(
                 """
                 INSERT INTO schema_meta (key, value, updated_at)
@@ -375,6 +376,49 @@ class PostgresManager:
             has_arenas = await conn.fetchval("SELECT EXISTS(SELECT 1 FROM arenas LIMIT 1);")
             if has_arenas:
                 await self._apply_domain_constraints_conn(conn)
+
+    @staticmethod
+    async def _migrate_lexical_scaffolds_unique_conn(conn: asyncpg.Connection) -> None:
+        """Deduplicate NULL-containing lexical_scaffolds rows and enforce UNIQUE NULLS NOT DISTINCT."""
+        await conn.execute(
+            """
+            DELETE FROM lexical_scaffolds a
+            USING lexical_scaffolds b
+            WHERE a.id > b.id
+              AND a.card_uid IS NOT DISTINCT FROM b.card_uid
+              AND a.idiom_term IS NOT DISTINCT FROM b.idiom_term
+              AND a.anchor_lang = b.anchor_lang
+              AND a.anchor_expression = b.anchor_expression;
+            """
+        )
+        await conn.execute(
+            """
+            DO $$
+            DECLARE
+                existing_conname TEXT;
+                is_nnd BOOLEAN := FALSE;
+            BEGIN
+                SELECT c.conname, COALESCE(ix.indnullsnotdistinct, FALSE)
+                INTO existing_conname, is_nnd
+                FROM pg_constraint c
+                JOIN pg_index ix ON ix.indexrelid = c.conindid
+                WHERE c.conrelid = 'lexical_scaffolds'::regclass
+                  AND c.contype = 'u'
+                LIMIT 1;
+
+                IF existing_conname IS NOT NULL AND NOT is_nnd THEN
+                    EXECUTE format('ALTER TABLE lexical_scaffolds DROP CONSTRAINT %I', existing_conname);
+                    existing_conname := NULL;
+                END IF;
+
+                IF existing_conname IS NULL THEN
+                    ALTER TABLE lexical_scaffolds
+                        ADD CONSTRAINT lexical_scaffolds_card_uid_idiom_term_anchor_lang_anchor_ex_key
+                        UNIQUE NULLS NOT DISTINCT (card_uid, idiom_term, anchor_lang, anchor_expression);
+                END IF;
+            END $$;
+            """
+        )
 
     async def enforce_domain_constraints(self) -> None:
         """Normalize legacy arena aliases and idempotently attach fk_cards_arena once arenas exist."""
@@ -440,17 +484,21 @@ class PostgresManager:
                         + (SELECT COUNT(*) FROM registers WHERE sync_status = 'PENDING')
                         + (SELECT COUNT(*) FROM cards WHERE sync_status = 'PENDING')
                         + (SELECT COUNT(*) FROM idioms WHERE sync_status = 'PENDING')
+                        + (SELECT COUNT(*) FROM idiom_vibe_links WHERE sync_status = 'PENDING')
                         + (SELECT COUNT(*) FROM vocab_items WHERE sync_status = 'PENDING')
+                        + (SELECT COUNT(*) FROM vocab_false_friend_alerts WHERE sync_status = 'PENDING')
                         + (SELECT COUNT(*) FROM songs WHERE sync_status = 'PENDING')
                         + (SELECT COUNT(*) FROM song_lyric_tokens WHERE sync_status = 'PENDING')
                         + (SELECT COUNT(*) FROM bridges WHERE sync_status = 'PENDING')
+                        + (SELECT COUNT(*) FROM room_states WHERE sync_status = 'PENDING')
+                        + (SELECT COUNT(*) FROM false_friends WHERE sync_status = 'PENDING')
                         + (SELECT COUNT(*) FROM graph_edges WHERE sync_status = 'PENDING') AS pending_sync
                     """
                 )
                 return {
                     "ok": True,
                     "pgvector": bool(has_vector),
-                    "schema_version": schema_ver or SCHEMA_VERSION,
+                    "schema_version": schema_ver,
                     "version": version.split(",")[0] if version else "PostgreSQL",
                     "counts": dict(counts) if counts else {},
                 }

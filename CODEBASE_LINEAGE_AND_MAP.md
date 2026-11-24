@@ -1,4 +1,4 @@
-# Polyglot Interpersonal Riff Studio — Codebase Lineage, Single Source of Truth (SSOT) & File Map (`v3.4.0`)
+# Polyglot Interpersonal Riff Studio — Codebase Lineage, Single Source of Truth (SSOT) & File Map (`v3.6.0`)
 
 > [!IMPORTANT]
 > **Read This First in Any Future Session**
@@ -57,7 +57,7 @@ flowchart LR
 | [index.html](file:///C:/Assets/PolyglotSales/index.html) | **Master Suite Hub Launcher**: Top desktop tab bar, mobile bottom thumb dock (`<768px`), Global Culture Sync Bar (`🇨🇿 🇦🇹 🇰🇿 🇨🇦 🇪🇸`), and 🌐 Mobile/Offline Outbox Sync modal. | **CANONICAL ENTRYPOINT** |
 | [polyglot_api_client.js](file:///C:/Assets/PolyglotSales/polyglot_api_client.js) | **Unified Browser SDK (`v3.4`)**: Provides `window.PolyglotAPI` (REST + instant GitHub Pages `.db.json` shard assembler + `localStorage` outbox queue), `window.PolyglotSyncBus` (cross-tab culture sync), and `window.PolyglotMobile` (Tone.js unlock + swipe + haptics). | **CANONICAL SDK** |
 | [manifest.webmanifest](file:///C:/Assets/PolyglotSales/manifest.webmanifest) | Web App Manifest for standalone mobile/desktop browser installation. | **CANONICAL PWA** |
-| [sw.js](file:///C:/Assets/PolyglotSales/sw.js) | Offline-first Service Worker (`v3.5`) caching all 6 HTML studio views, `polyglot_api_client.js`, all 6 `db/*.db.json` shards, and all 6 split `db/lyrics/*.lyrics.json` shards. | **CANONICAL PWA** |
+| [sw.js](file:///C:/Assets/PolyglotSales/sw.js) | Offline-first Service Worker (`v3.6`) caching all 6 HTML studio views, `polyglot_api_client.js`, all 6 `db/*.db.json` shards, and all 6 split `db/lyrics/*.lyrics.json` shards. | **CANONICAL PWA** |
 | [start_polyglot_stack.ps1](file:///C:/Assets/PolyglotSales/start_polyglot_stack.ps1) | 1-click local full-stack launcher (starts WSL2/Windows Docker Postgres `:5433` + Neo4j `:7687`, seeds DB, starts FastAPI on `0.0.0.0:8765`, and prints the Wi-Fi LAN URL). | **CANONICAL SCRIPT** |
 | [launch_studio.cmd](file:///C:/Assets/PolyglotSales/launch_studio.cmd) | Double-click Windows wrapper that invokes `start_polyglot_stack.ps1`. | **CANONICAL SCRIPT** |
 | [publish_github_pages.ps1](file:///C:/Assets/PolyglotSales/publish_github_pages.ps1) | Exports deterministic `db/*.db.json` shards, commits changes, and pushes to `origin/main` to trigger GitHub Pages deployment. | **CANONICAL SCRIPT** |
@@ -86,9 +86,9 @@ All 6 HTML views load [polyglot_api_client.js](file:///C:/Assets/PolyglotSales/p
 | [backend/cli.py](file:///C:/Assets/PolyglotSales/backend/cli.py) | Typer CLI (`python -m backend.cli {status,seed,sync,audit,backup,export-shards,scaffold,stylize}`). |
 | [backend/sdk.py](file:///C:/Assets/PolyglotSales/backend/sdk.py) | High-level async Python SDK (`PolyglotAtelierSDK`) wrapping all backend services. |
 | [backend/mcp_server.py](file:///C:/Assets/PolyglotSales/backend/mcp_server.py) | Model Context Protocol (MCP) server exposing Polyglot Riff Studio tools to external AI agents. |
-| [backend/api/main.py](file:///C:/Assets/PolyglotSales/backend/api/main.py) | FastAPI application (`v3.3.0`/`v3.4.0`) serving 21 REST endpoints (`/api/v1/*`) + static files. |
-| [backend/db/postgres.py](file:///C:/Assets/PolyglotSales/backend/db/postgres.py) | AsyncPG connection pool + idempotent DDL for all **14 PostgreSQL 17 tables** (`languages`, `arenas`, `registers`, `style_lenses`, `idioms`, `idiom_vibe_links`, `cards`, `lexical_scaffolds`, `false_friends`, `room_states`, `bridges`, `graph_edges`, `fsrs_review_events`, `staged_webhooks`, `vocab_items`, `vocab_false_friend_alerts`, `songs`, `song_lyric_tokens`). |
-| [backend/db/neo4j_client.py](file:///C:/Assets/PolyglotSales/backend/db/neo4j_client.py) | Async Neo4j 5 Bolt driver + 11 uniqueness constraints (`:Language`, `:Arena`, `:Register`, `:Persona`, `:Card`, `:Idiom`, `:Vocab`, `:Song`, `:LyricToken`, `:State`, `:FalseFriend`, `:Bridge`). |
+| [backend/api/main.py](file:///C:/Assets/PolyglotSales/backend/api/main.py) | FastAPI application (`v3.6.0`) serving 27 REST endpoints (`/api/v1/*`) + guarded public static files. |
+| [backend/db/postgres.py](file:///C:/Assets/PolyglotSales/backend/db/postgres.py) | AsyncPG connection pool + idempotent DDL (`SCHEMA_VERSION = "3.5.0"`) for all **19 PostgreSQL 17 tables** (`schema_meta`, `languages`, `arenas`, `registers`, `style_lenses`, `idioms`, `idiom_vibe_links`, `cards`, `lexical_scaffolds`, `false_friends`, `room_states`, `bridges`, `graph_edges`, `fsrs_review_events`, `staged_webhooks`, `vocab_items`, `vocab_false_friend_alerts`, `songs`, `song_lyric_tokens`). |
+| [backend/db/neo4j_client.py](file:///C:/Assets/PolyglotSales/backend/db/neo4j_client.py) | Async Neo4j 5 Bolt driver + 12 uniqueness constraints (`:Language`, `:Arena`, `:Register`, `:Persona`, `:Card`, `:Idiom`, `:Vocab`, `:Song`, `:LyricToken`, `:State`, `:FalseFriend`, `:Bridge`) + 2 Card property indexes. |
 | [backend/services/lyric_service.py](file:///C:/Assets/PolyglotSales/backend/services/lyric_service.py) | **Agent-Reach Lyric Fetcher & Frequency Indexer**: Fetches song pages via `agent-reach` / Jina Reader + canonical stanzas, tokenizes across 5 languages, scores cross-corpus frequency (`song_count`, `chorus_count`, `card_count`), and wires `:HAS_LYRIC_TOKEN`, `:REINFORCES_VOCAB`, `:REINFORCES_IDIOM`, and `:BOOSTS_CARD_FREQUENCY` edges. |
 | [backend/seed/corpus_data.py](file:///C:/Assets/PolyglotSales/backend/seed/corpus_data.py) | **SSOT Seed 1**: 5 languages, 10 registers, 6 style lenses, 26 idioms, core terrace cards, bridges, room states, false friends, and staged webhooks. |
 | [backend/seed/arena_decks_8.py](file:///C:/Assets/PolyglotSales/backend/seed/arena_decks_8.py) | **SSOT Seed 2**: Full 8-arena × 5-culture × 4-C conversational card decks (bringing total `:Card` count to `196`). |
@@ -107,7 +107,7 @@ All 6 HTML views load [polyglot_api_client.js](file:///C:/Assets/PolyglotSales/p
 | File | Status & Lineage |
 | :--- | :--- |
 | `db/{cz_ova,at_vie,ru_ala,en_yyc,es_sot}.db.json` & `db/polyglot_fabric.db.json` | **DERIVED ARTIFACTS (Tracked in Git for GitHub Pages)**: Auto-generated by `sync_service.py` with lightweight `lyric_shard` pointers (heavy lyric arrays stripped). Never edit manually; run `python -m backend.cli export-shards` or `seed --no-embed`. |
-| `db/lyrics/song_*.lyrics.json` (6 per-song shards) | **DERIVED SPLIT LYRIC SHARDS (Tracked in Git)**: Compact line-oriented per-song `stanzas_lines` & `:LyricToken` shards lazy-loaded via `PolyglotAPI.fetchSongFrequency()` (`CACHE_NAME = polyglot-riff-studio-v3.5`). Never edit manually. |
+| `db/lyrics/song_*.lyrics.json` (6 per-song shards) | **DERIVED SPLIT LYRIC SHARDS (Tracked in Git)**: Compact line-oriented per-song `stanzas_lines` & `:LyricToken` shards lazy-loaded via `PolyglotAPI.fetchSongFrequency()` (`CACHE_NAME = polyglot-riff-studio-v3.6`). Never edit manually. |
 | [polyglot-srs-cypher-migration.cypher](file:///C:/Assets/PolyglotSales/polyglot-srs-cypher-migration.cypher) | **Canonical Standalone Cypher Script (`v3.3`)**: Self-contained Neo4j Browser / AuraDB script for users running Neo4j without Python/Postgres. |
 | `neo4j_seed_*.cypher`, `neo4j_czech_graph_engine.ts`, `fsrs_edge_retrievability_engine.js` | **Historical / Standalone Reference Modules (`v2.0–v3.0`)**: Preserved for NotebookLM Studio reference; superseded at runtime by `backend/services/*` and `polyglot-srs-cypher-migration.cypher`. |
 
@@ -127,5 +127,5 @@ All 6 HTML views load [polyglot_api_client.js](file:///C:/Assets/PolyglotSales/p
      .\.venv\Scripts\python.exe -m backend.cli seed --no-embed
      .\.venv\Scripts\python.exe -m backend.cli audit
      ```
-     Ensure all 9 audit checks return `"ok": true` before running `.\publish_github_pages.ps1`.
+     Ensure all 11 audit checks return `"ok": true` before running `.\publish_github_pages.ps1`.
 

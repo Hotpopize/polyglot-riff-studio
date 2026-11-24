@@ -59,6 +59,18 @@ REGIONAL_ANCHOR_TOKENS = {
     "candela",
     "tough",
     "loyal",
+    "rovinu",
+    "parou",
+    "bledsinn",
+    "anreißen",
+    "pflanzerei",
+    "беркут",
+    "понтов",
+    "garage",
+    "muñeca",
+    "mójate",
+    "jugada",
+    "postureo",
 }
 
 STOP_WORDS = {
@@ -167,6 +179,18 @@ LEMMA_CONSOLIDATION = {
     "girls": ("girls", "one of your girls", "Iconic chorus hook of One of the Girls"),
     "tonight": ("tonight", "tonight", "Nocturnal high-stakes immediacy"),
     "secret": ("secret", "secret", "Shared nocturnal confidence & unspoken bond"),
+    "rovinu": ("na rovinu", "na rovinu", "Straight talk without corporate spin (CZ_OVA Curiosity hook)"),
+    "parou": ("s plnou parou", "s plnou parou", "Full steam ahead once brakes come off (CZ_OVA Curiosity)"),
+    "bledsinn": ("bledsinn", "bledsinn", "Playful Viennese mischief / bold next adventure (AT_VIE Curiosity)"),
+    "anreißen": ("anreißen", "anreißen", "Kick off / spark something bold together (AT_VIE Curiosity)"),
+    "pflanzerei": ("pflanzerei", "pflanzerei", "Viennese teasing / hollow posturing (AT_VIE Chameleon)"),
+    "беркут": ("горный беркут в золотой клетке", "горный беркут в золотой клетке", "Golden eagle caged by hesitation (RU_ALA Counteract)"),
+    "понтов": ("без лишних понтов", "без лишних понтов", "Zero show-off posture, pure substance (RU_ALA Chameleon)"),
+    "garage": ("garage", "garage", "Kick the garage doors open & ship (EN_YYC Counteract/Curiosity)"),
+    "muñeca": ("tener buena muñeca", "tener buena muñeca", "Effortless wrist finesse & polo poise (ES_SOT Chameleon)"),
+    "mójate": ("mójate un poco", "mójate un poco", "Get some skin in the game with me (ES_SOT Curiosity)"),
+    "jugada": ("jugada", "jugada", "The bold play your gut actually wants (ES_SOT Curiosity)"),
+    "postureo": ("postureo", "sin postureo", "Zero social pretense or artificial posing (ES_SOT Chameleon)"),
 }
 
 
@@ -425,7 +449,20 @@ class LyricFrequencyService:
                         canon_key = cons[1].lower() if cons else w
                         chorus_word_counts[canon_key] += 1
 
-                    for canon_key, cnt in word_counts.most_common(14):
+                    # Include top 28 frequent tokens PLUS any regional dialect anchor present in the song
+                    seen_scan_keys: set[str] = set()
+                    scan_pairs: list[tuple[str, int]] = []
+                    for canon_key, cnt in word_counts.most_common(28):
+                        seen_scan_keys.add(canon_key)
+                        scan_pairs.append((canon_key, cnt))
+                    for canon_key, cnt in word_counts.items():
+                        if canon_key not in seen_scan_keys and (
+                            canon_key in REGIONAL_ANCHOR_TOKENS or canon_key in LEMMA_CONSOLIDATION
+                        ):
+                            seen_scan_keys.add(canon_key)
+                            scan_pairs.append((canon_key, cnt))
+
+                    for canon_key, cnt in scan_pairs:
                         if canon_key in candidates:
                             # Boost counts if word scan found more occurrences
                             candidates[canon_key]["song_count"] = max(candidates[canon_key]["song_count"], cnt)
@@ -529,10 +566,10 @@ class LyricFrequencyService:
                             }
                         )
 
-                    # Prioritize idioms/vocab & high frequency tokens (keep top 12 unique UIDs per song)
+                    # Prioritize idioms/vocab & 4-C card-connected dialect hooks (keep top 12 unique UIDs per song)
                     ranked_items.sort(
                         key=lambda r: (
-                            1 if (r["vocab_uid"] or r["idiom_term"]) else 0,
+                            2 if (r["vocab_uid"] or r["idiom_term"]) else (1 if r["card_count"] > 0 else 0),
                             r["frequency_score"],
                             r["total_frequency"],
                         ),

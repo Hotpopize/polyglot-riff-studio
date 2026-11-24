@@ -367,9 +367,9 @@
           <span id="label-rhythm-play">PLAY BEAT</span>
         </button>
 
-        <div class="flex items-center gap-1.5 bg-[#111118] border border-[#302840] rounded px-2 py-1">
+        <div class="flex items-center gap-1.5 bg-[#111118] border border-[#302840] rounded px-2 py-1 max-w-[175px] sm:max-w-none">
           <label for="select-groove-track" class="hud-label text-[10px] text-[#a098b0] uppercase hidden sm:inline">Groove:</label>
-          <select id="select-groove-track" onchange="changeGrooveTrack(this.value)" class="bg-transparent text-xs text-[#e8e0f0] font-medium outline-none cursor-pointer">
+          <select id="select-groove-track" onchange="changeGrooveTrack(this.value)" class="bg-transparent text-xs text-[#e8e0f0] font-medium outline-none cursor-pointer w-full truncate">
             <option value="CZ_OVA" class="bg-[#141422]">🇨🇿 Ostravian Industrial (130 BPM)</option>
             <option value="AT_VIE" class="bg-[#141422]">🇦🇹 Viennese Kaffeehaus Waltz (92 BPM)</option>
             <option value="RU_ALA" class="bg-[#141422]">🇰🇿 Almaty Terrace Chillhop (88 BPM)</option>
@@ -852,7 +852,7 @@
       <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
         
         <!-- Graph SVG Canvas -->
-        <div class="lg:col-span-3 neon-panel relative overflow-hidden min-h-[560px] h-[560px]" id="d3-graph-wrapper">
+        <div class="lg:col-span-3 neon-panel relative overflow-hidden h-[340px] sm:h-[460px] lg:h-[560px]" id="d3-graph-wrapper">
           <svg id="svg-force-graph" class="w-full h-full cursor-grab active:cursor-grabbing"></svg>
           <div class="absolute bottom-3 left-3 bg-[#111118]/90 backdrop-blur border border-[#302840] px-3 py-2 rounded text-[11px] hud-label text-[#a098b0] pointer-events-none">
             Drag nodes • Scroll to Zoom • Click any node/edge to inspect &amp; drill
@@ -860,7 +860,7 @@
         </div>
 
         <!-- Right Side: Node/Edge Property Inspector & Rusty Queue -->
-        <div class="neon-panel-subtle p-5 flex flex-col justify-between min-h-[560px] h-[560px] overflow-y-auto space-y-4">
+        <div class="neon-panel-subtle p-4 sm:p-5 flex flex-col justify-between h-auto lg:h-[560px] overflow-y-auto space-y-4">
           <div id="graph-inspector-pane" class="space-y-4">
             <div class="hud-label text-xs font-bold uppercase text-[#00ffcc] flex items-center justify-between">
               <span>Graph Node Inspector</span>

@@ -143,8 +143,8 @@
       "source_url": "https://www.letras.com/camaron-de-la-isla/volando-voy/",
       "reach_channel": "agent-reach+jina",
       "lyric_shard": "db/lyrics/song_es_sot_camaron.lyrics.json",
-      "total_token_count": 108,
-      "unique_token_count": 62,
+      "total_token_count": 150,
+      "unique_token_count": 84,
       "translation_es": "Volando voy, volando vengo, por el camino yo me entretengo. Enamorao de la vida, porque esto tiene duende y no hay que mirar los toros desde la barrera.",
       "translation_en": "Flying I go, flying I come, along the way I enjoy myself. In love with life, because this has true duende and you shouldn't watch the bulls from the sidelines.",
       "translation_cz": "Létám sem a tam, cestou se bavím. Zamilovaný do života, bo to má skutočný duende a nemá smysl koukat na býky jen z bariéry.",
@@ -402,7 +402,7 @@
       "lens": "RACONTEUR",
       "text": "¡Con ese purasangre no te puedes quedar <span class=\"slang-token\" data-term=\"mirar los toros desde la barrera\">mirando los toros desde la barrera</span>, tío—mójate y salimos a ganar el partido ahora mismo!",
       "phonetics": "",
-      "english": "",
+      "english": "With a thoroughbred like that you can't stay watching the bulls from behind the barrier, my friend—jump in and let's go out to win the match right now!",
       "idioms": [
         "mirar los toros desde la barrera"
       ]

@@ -275,6 +275,11 @@ async def seed_all(compute_embeddings: bool = True, force_neo4j: bool = True) ->
                         bridge_type, text, mlf_boundary_note, vocal_cue, weight, sync_status
                     ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,'PENDING')
                     ON CONFLICT (uid) DO UPDATE SET
+                        from_register_id = EXCLUDED.from_register_id,
+                        to_register_id = EXCLUDED.to_register_id,
+                        from_card_uid = EXCLUDED.from_card_uid,
+                        to_card_uid = EXCLUDED.to_card_uid,
+                        bridge_type = EXCLUDED.bridge_type,
                         text = EXCLUDED.text,
                         mlf_boundary_note = EXCLUDED.mlf_boundary_note,
                         vocal_cue = EXCLUDED.vocal_cue,

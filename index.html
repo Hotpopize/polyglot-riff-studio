@@ -179,7 +179,7 @@
 
       <a id="open-direct-link" href="polyglot_riff_studio_v3_1_atelier_edition.html" target="_blank"
         title="Open active view standalone in a new tab"
-        class="px-2 py-1 rounded-md bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-white transition whitespace-nowrap">
+        class="hidden sm:inline-block px-2 py-1 rounded-md bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-white transition whitespace-nowrap">
         ↗
       </a>
     </div>
@@ -189,7 +189,7 @@
   <iframe id="suite-frame" src="polyglot_riff_studio_v3_1_atelier_edition.html?embed=1" class="flex-1 w-full border-0 bg-slate-950"></iframe>
 
   <!-- MOBILE-FRIENDLY BOTTOM THUMB NAVIGATION DOCK (< 768px) -->
-  <nav class="md:hidden bg-slate-950/95 backdrop-blur border-t border-slate-800 px-1.5 pt-1 safe-bottom grid grid-cols-6 gap-1 shrink-0 z-40">
+  <nav class="md:hidden min-h-[54px] bg-slate-950/95 backdrop-blur border-t border-slate-800 px-1.5 pt-1.5 safe-bottom grid grid-cols-6 gap-1 shrink-0 z-40">
     <button data-app-url="polyglot_riff_studio_v3_1_atelier_edition.html" onclick="loadApp('polyglot_riff_studio_v3_1_atelier_edition.html')"
       class="app-tab-mobile flex flex-col items-center justify-center py-1 rounded-lg text-[10px] font-semibold bg-emerald-600/20 text-emerald-300 border border-emerald-500/40">
       <span class="text-sm leading-none mb-0.5">★</span>
@@ -561,12 +561,12 @@
         const neoNodes = health.neo4j?.counts?.nodes ?? '?';
         dot.className = 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0';
         pill.className = 'text-[10px] mono px-1.5 py-0.5 rounded bg-emerald-950/60 hover:bg-emerald-900/60 border border-emerald-500/40 text-emerald-300 whitespace-nowrap transition';
-        pill.textContent = `Live · ${pgCards}c/${pgTokens}t`;
+        pill.innerHTML = `Live<span class="hidden sm:inline"> · ${pgCards}c/${pgTokens}t</span>`;
         pill.title = `PG (${pgCards} cards • ${pgTokens} tokens) • Neo4j (${neoNodes} nodes) — click to audit`;
       } else {
         dot.className = 'w-2 h-2 rounded-full bg-amber-400 shrink-0';
         pill.className = 'text-[10px] mono px-1.5 py-0.5 rounded bg-slate-900 hover:bg-slate-800 border border-slate-800 text-amber-300 whitespace-nowrap transition';
-        pill.textContent = 'Offline Shards';
+        pill.innerHTML = `Offline<span class="hidden sm:inline"> Shards</span>`;
         pill.title = 'Offline Shard Mode (db/*.db.json + split db/lyrics/*.lyrics.json) — click to sync or audit';
       }
       updateOutboxBadge();

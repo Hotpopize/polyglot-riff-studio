@@ -220,35 +220,35 @@
         </div>
         <h1 class="text-lg font-bold tracking-wide" x-text="currentMeta.flag + ' ' + currentMeta.title"></h1>
       </div>
-      <div class="flex flex-wrap items-center gap-1.5 bg-slate-950 p-1 rounded-xl border border-slate-800">
-        <button @click="setTier('FORMAL')" :class="activeTier === 'FORMAL' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-white'" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition">
+      <div class="grid grid-cols-3 sm:flex sm:flex-wrap items-center gap-1 sm:gap-1.5 bg-slate-950 p-1 rounded-xl border border-slate-800 w-full sm:w-auto">
+        <button @click="setTier('FORMAL')" :class="activeTier === 'FORMAL' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-white'" class="px-2 sm:px-3 py-1.5 rounded-lg text-[11px] sm:text-xs font-semibold transition truncate">
           1. <span x-text="currentMeta.formalLabel"></span>
         </button>
-        <button @click="setTier('BRIDGE')" :class="activeTier === 'BRIDGE' ? 'bg-fuchsia-600 text-white shadow' : 'text-slate-400 hover:text-white'" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition">
-          ↳ Pivot Bridge
+        <button @click="setTier('BRIDGE')" :class="activeTier === 'BRIDGE' ? 'bg-fuchsia-600 text-white shadow' : 'text-slate-400 hover:text-white'" class="px-2 sm:px-3 py-1.5 rounded-lg text-[11px] sm:text-xs font-semibold transition truncate">
+          ↳ Bridge
         </button>
-        <button @click="setTier('REGIONAL')" :class="activeTier === 'REGIONAL' ? 'bg-amber-600 text-white shadow' : 'text-slate-400 hover:text-white'" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition">
+        <button @click="setTier('REGIONAL')" :class="activeTier === 'REGIONAL' ? 'bg-amber-600 text-white shadow' : 'text-slate-400 hover:text-white'" class="px-2 sm:px-3 py-1.5 rounded-lg text-[11px] sm:text-xs font-semibold transition truncate">
           2. <span x-text="currentMeta.regionalLabel"></span>
         </button>
       </div>
     </div>
 
     <!-- Optional Czech Executive Deck Toggle (C-Suite Scale vs IB Architect V3DV Outreach) -->
-    <div x-show="activeLang === 'cs'" class="flex flex-wrap items-center justify-between gap-2 bg-slate-950/80 border border-indigo-500/30 rounded-xl px-3.5 py-2 text-xs">
-      <div class="flex items-center gap-2">
-        <span class="mono text-[10px] uppercase tracking-wider text-indigo-300 font-semibold">Czech Formal Track:</span>
+    <div x-show="activeLang === 'cs'" class="flex flex-wrap items-center justify-between gap-2 bg-slate-950/80 border border-indigo-500/30 rounded-xl px-3 py-2 text-xs">
+      <div class="flex flex-wrap items-center gap-1.5">
+        <span class="mono text-[10px] uppercase tracking-wider text-indigo-300 font-semibold">CZ Track:</span>
         <button @click="setCzechTrack('std')"
           :class="czechTrack === 'std' ? 'bg-indigo-600 text-white' : 'bg-slate-900 text-slate-400 hover:text-white'"
           class="px-2.5 py-1 rounded-lg font-medium transition">
-          C-Suite Scale (`CZ_STD_*` → `BR_CZ_STD_TO_OVA`)
+          C-Suite Scale<span class="hidden md:inline"> (`CZ_STD_*` → `BR_CZ_STD_TO_OVA`)</span>
         </button>
         <button @click="setCzechTrack('exec')"
           :class="czechTrack === 'exec' ? 'bg-emerald-600 text-white' : 'bg-slate-900 text-slate-400 hover:text-white'"
           class="px-2.5 py-1 rounded-lg font-medium transition">
-          IB Past Paper Architect (`CZ_EXEC_*` → `BRIDGE_CZ_FORMAL_TO_OVA`)
+          IB Architect<span class="hidden md:inline"> (`CZ_EXEC_*` → `BRIDGE_CZ_FORMAL_TO_OVA`)</span>
         </button>
       </div>
-      <span class="mono text-[11px] text-amber-300">5th-Case Vocative + Accusative Governance</span>
+      <span class="mono text-[10px] sm:text-[11px] text-amber-300">5th-Case Vocative + Accusative</span>
     </div>
 
     <!-- Stage Selector Pills -->
@@ -445,6 +445,7 @@
       { uid: 'EN_V_RECONCILE', term: 'reconcile tension', lang_code: 'en', register_id: 'EN_EXEC', register_type: 'FORMAL_EXAM', meaning: 'Synthesize competing strategic propositions cleanly', ib_source: 'English A Language & Literature Paper 1 SL', grammar_note: '', etymology: '', warning: '' },
       { uid: 'EN_V_CATTLE', term: 'all hat and no cattle', lang_code: 'en', register_id: 'EN_YYC', register_type: 'REGIONAL_RIFF', meaning: 'All talk and posture without underlying substance', ib_source: 'Calgary Foothills Register', grammar_note: '', etymology: 'Western ranching idiom', warning: '' },
       { uid: 'EN_V_GIVE_ER', term: 'give ’er', lang_code: 'en', register_id: 'EN_YYC', register_type: 'REGIONAL_RIFF', meaning: 'Go all out / execute at full throttle', ib_source: 'Calgary Foothills Register', grammar_note: '', etymology: 'Western Canadian vernacular', warning: '' },
+      { uid: 'EN_V_TOUGH_LOVE', term: 'tough love & high-stakes surrender', lang_code: 'en', register_id: 'EN_YYC', register_type: 'REGIONAL_RIFF', meaning: 'Uncompromising emotional intensity and velvet submission to the flow', ib_source: 'The Weeknd - One of the Girls', grammar_note: '', etymology: 'Global Nightlife Chameleon Register', warning: '' },
 
       { uid: 'ES_V_ANALISIS', term: 'análisis de recursos estilísticos', lang_code: 'es', register_id: 'ES_STD', register_type: 'FORMAL_EXAM', meaning: 'Analysis of literary and stylistic resources', ib_source: 'Spanish A1 Paper 1 HL', grammar_note: '', etymology: '', warning: '' },
       { uid: 'ES_V_MANIFIESTO', term: 'poner de manifiesto', lang_code: 'es', register_id: 'ES_STD', register_type: 'FORMAL_EXAM', meaning: 'Highlight / demonstrate explicitly', ib_source: 'Spanish ab initio Paper 1 SL', grammar_note: '', etymology: '', warning: '' },
@@ -814,10 +815,10 @@
           try {
             const res = await window.PolyglotAPI.fetchRegisterSwitcher(code);
             if (res && Array.isArray(res.sequence) && res.sequence.length > 0) {
-              this.backendLive = true;
+              this.backendLive = !res.offlineShardMode;
               this.decks[code] = {
-                flag: res.language.flag || OFFLINE_DECKS[code].flag,
-                title: `${res.language.name} Switcher: ${res.formal_register.name} → ${res.regional_register.name}`,
+                flag: (res.language && res.language.flag) || OFFLINE_DECKS[code].flag,
+                title: `${(res.language && res.language.name) || code} Switcher: ${res.formal_register.name} → ${res.regional_register.name}`,
                 formalLabel: `${res.formal_register.id} (${res.formal_register.name})`,
                 regionalLabel: `${res.regional_register.id} (${res.regional_register.name})`,
                 sequence: res.sequence
@@ -833,7 +834,7 @@
           try {
             const res = await window.PolyglotAPI.fetchVocab();
             if (res && Array.isArray(res.vocab) && res.vocab.length > 0) {
-              this.backendLive = true;
+              this.backendLive = !res.offlineShardMode;
               this.vocabItems = res.vocab;
               if (Array.isArray(res.false_friend_alerts) && res.false_friend_alerts.length > 0) {
                 this.vocabAlerts = res.false_friend_alerts;

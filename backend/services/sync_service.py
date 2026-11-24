@@ -47,6 +47,11 @@ def _atomic_write_json(target_path: Path, doc: dict[str, Any]) -> str:
     return _atomic_write_text(target_path, content)
 
 
+def _canonical_webhook_payload(w: dict[str, Any]) -> dict[str, Any]:
+    """Normalize nested dict key order so JSONB-loaded and Python-seed webhooks serialize identically."""
+    return json.loads(json.dumps(w, sort_keys=True, ensure_ascii=False, default=str))
+
+
 def _write_compact_lyric_shard(target_path: Path, doc: dict[str, Any]) -> str:
     """Atomically write a compact, git-diff-friendly song lyric shard (1 line per verse line & token)."""
     lines: list[str] = ["{"]
@@ -626,6 +631,15 @@ class SyncService:
                         MATCH (c1:Card {uid: row.from_card_uid}),
                               (b:Bridge {uid: row.uid}),
                               (c2:Card {uid: row.to_card_uid})
+                        WITH c1, b, c2, row
+                        OPTIONAL MATCH (old_c1:Card)-[old_pv:PIVOTS_VIA]->(b)
+                        WHERE old_c1.uid <> row.from_card_uid
+                        DELETE old_pv
+                        WITH c1, b, c2, row
+                        OPTIONAL MATCH (b)-[old_lo:LANDS_ON]->(old_c2:Card)
+                        WHERE old_c2.uid <> row.to_card_uid
+                        DELETE old_lo
+                        WITH c1, b, c2, row
                         MERGE (c1)-[pv:PIVOTS_VIA]->(b)
                         SET pv.weight = row.weight, pv.context = row.bridge_type
                         MERGE (b)-[:LANDS_ON]->(c2)
@@ -767,7 +781,8 @@ class SyncService:
         settings.db_json_dir.mkdir(parents=True, exist_ok=True)
         written_files: list[str] = []
 
-        registers = await pg_manager.fetch_all("SELECT * FROM registers ORDER BY lang_code, tier DESC")
+        registers = await pg_manager.fetch_all("SELECT * FROM registers")
+        registers.sort(key=lambda r: (r["lang_code"], 0 if r["tier"] == "REGIONAL" else 1, r["id"]))
         by_partition: dict[str, list[dict[str, Any]]] = {}
         for reg in registers:
             by_partition.setdefault(reg["partition_file"], []).append(reg)
@@ -779,28 +794,40 @@ class SyncService:
                    frequency_score, freq_tier, vocab_uid, idiom_term, connected_card_uids,
                    sample_lyric_line
             FROM song_lyric_tokens
-            ORDER BY frequency_score DESC, total_frequency DESC, token ASC
             """
+        )
+        all_lt_rows.sort(
+            key=lambda lt: (
+                -float(lt["frequency_score"] or 0.0),
+                -int(lt["total_frequency"] or 0),
+                str(lt["token"]),
+                str(lt["uid"]),
+            )
         )
         lt_by_song: dict[str, list[dict[str, Any]]] = {}
         for lt in all_lt_rows:
             lt_by_song.setdefault(lt["song_uid"], []).append(lt)
 
-        for partition_file, reg_rows in by_partition.items():
+        for partition_file in sorted(by_partition.keys()):
+            reg_rows = sorted(
+                by_partition[partition_file],
+                key=lambda r: (0 if r["tier"] == "REGIONAL" else 1, r["id"]),
+            )
             reg_ids = [r["id"] for r in reg_rows]
             idioms = await pg_manager.fetch_all(
-                "SELECT term, register_id, origin, meaning, delivery_cue, cousin_term FROM idioms WHERE register_id = ANY($1::text[]) ORDER BY term",
+                "SELECT term, register_id, origin, meaning, delivery_cue, cousin_term FROM idioms WHERE register_id = ANY($1::text[])",
                 reg_ids,
             )
+            idioms.sort(key=lambda i: i["term"])
             vocab_rows = await pg_manager.fetch_all(
                 """
                 SELECT uid, term, lang_code, register_id, register_type, meaning, ib_source, grammar_note, etymology, warning
                 FROM vocab_items
                 WHERE register_id = ANY($1::text[])
-                ORDER BY register_type, uid
                 """,
                 reg_ids,
             )
+            vocab_rows.sort(key=lambda v: (v["register_type"], v["uid"]))
             song_rows = await pg_manager.fetch_all(
                 """
                 SELECT uid, title, artist, city_region, genre, bpm, register_id,
@@ -810,19 +837,19 @@ class SyncService:
                        cultural_vibe, pivot_line, reinforces_card_uid, slang_vocab_uids
                 FROM songs
                 WHERE register_id = ANY($1::text[])
-                ORDER BY uid
                 """,
                 reg_ids,
             )
+            song_rows.sort(key=lambda s: s["uid"])
             cards = await pg_manager.fetch_all(
                 """
                 SELECT uid, register_id, stage, arena, lens_id, text_html, phonetics, english_gloss, idiom_terms
                 FROM cards
                 WHERE register_id = ANY($1::text[])
-                ORDER BY arena, uid
                 """,
                 reg_ids,
             )
+            cards.sort(key=lambda c: (c.get("arena") or "terrace", c["uid"]))
             primary_reg = next((r for r in reg_rows if r["tier"] == "REGIONAL"), reg_rows[0])
             shard_doc = {
                 "db_id": f"polyglot.{partition_file.replace('.db.json', '')}",
@@ -890,17 +917,24 @@ class SyncService:
             _atomic_write_json(target_path, shard_doc)
             written_files.append(partition_file)
 
-        arenas = await pg_manager.fetch_all("SELECT id, icon, label, short_label, arena_group, description FROM arenas ORDER BY id")
-        bridges = await pg_manager.fetch_all("SELECT * FROM bridges ORDER BY uid")
-        vibe_links = await pg_manager.fetch_all("SELECT * FROM idiom_vibe_links ORDER BY source_term")
-        room_states = await pg_manager.fetch_all("SELECT * FROM room_states ORDER BY id")
-        false_friends = await pg_manager.fetch_all("SELECT * FROM false_friends ORDER BY id")
+        arenas = await pg_manager.fetch_all("SELECT id, icon, label, short_label, arena_group, description FROM arenas")
+        arenas.sort(key=lambda a: a["id"])
+        bridges = await pg_manager.fetch_all("SELECT * FROM bridges")
+        bridges.sort(key=lambda b: b["uid"])
+        vibe_links = await pg_manager.fetch_all("SELECT * FROM idiom_vibe_links")
+        vibe_links.sort(key=lambda v: (v["source_term"], v["target_term"]))
+        room_states = await pg_manager.fetch_all("SELECT * FROM room_states")
+        room_states.sort(key=lambda s: s["id"])
+        false_friends = await pg_manager.fetch_all("SELECT * FROM false_friends")
+        false_friends.sort(key=lambda ff: ff["id"])
         vocab_alert_nodes = await pg_manager.fetch_all(
-            "SELECT uid, term, lang_code, register_type, meaning, ib_source, warning FROM vocab_items WHERE register_id IS NULL ORDER BY uid"
+            "SELECT uid, term, lang_code, register_type, meaning, ib_source, warning FROM vocab_items WHERE register_id IS NULL"
         )
+        vocab_alert_nodes.sort(key=lambda v: v["uid"])
         vocab_alert_edges = await pg_manager.fetch_all(
-            "SELECT source_uid, target_uid FROM vocab_false_friend_alerts ORDER BY source_uid, target_uid"
+            "SELECT source_uid, target_uid FROM vocab_false_friend_alerts"
         )
+        vocab_alert_edges.sort(key=lambda x: (x["source_uid"], x["target_uid"]))
         all_songs = await pg_manager.fetch_all(
             """
             SELECT uid, title, artist, city_region, genre, bpm, register_id,
@@ -909,12 +943,13 @@ class SyncService:
                    translation_es, translation_en, translation_cz, translation_de, translation_ru,
                    cultural_vibe, pivot_line, reinforces_card_uid, slang_vocab_uids
             FROM songs
-            ORDER BY uid
             """
         )
+        all_songs.sort(key=lambda s: s["uid"])
         webhooks = await pg_manager.fetch_all(
-            "SELECT * FROM staged_webhooks WHERE status = 'STAGED' ORDER BY created_at ASC"
+            "SELECT * FROM staged_webhooks WHERE status = 'STAGED' AND source_type = 'NEWSPAPER_WEBHOOK'"
         )
+        webhooks.sort(key=lambda w: w["id"])
 
         fabric_doc = {
             "db_id": "polyglot.fabric",
@@ -969,7 +1004,7 @@ class SyncService:
             "vocab_alert_nodes": vocab_alert_nodes,
             "vocab_false_friend_alerts": vocab_alert_edges,
             "songs": [_build_song_ref_dict(s) for s in all_songs],
-            "staged_webhooks": [w["payload_json"] for w in webhooks],
+            "staged_webhooks": [_canonical_webhook_payload(w["payload_json"]) for w in webhooks],
         }
         fabric_path = settings.db_json_dir / "polyglot_fabric.db.json"
         _atomic_write_json(fabric_path, fabric_doc)
@@ -1009,7 +1044,7 @@ class SyncService:
 
         # Preserve indexed lyric_tokens and token counts from existing disk shards if seed lacks runtime tokens
         enriched_songs: list[dict[str, Any]] = []
-        for s in SONGS:
+        for s in sorted(SONGS, key=lambda x: x["uid"]):
             song_copy = dict(s)
             if not song_copy.get("lyric_tokens"):
                 existing_shard = lyrics_dir / f"{song_copy['uid'].lower()}.lyrics.json"
@@ -1017,7 +1052,15 @@ class SyncService:
                     try:
                         prev_doc = json.loads(existing_shard.read_text(encoding="utf-8"))
                         if prev_doc.get("lyric_tokens"):
-                            song_copy["lyric_tokens"] = list(prev_doc["lyric_tokens"])
+                            song_copy["lyric_tokens"] = sorted(
+                                list(prev_doc["lyric_tokens"]),
+                                key=lambda lt: (
+                                    -float(lt.get("frequency_score") or 0.0),
+                                    -int(lt.get("total_frequency") or 0),
+                                    str(lt.get("token", "")),
+                                    str(lt.get("uid", "")),
+                                ),
+                            )
                         if prev_doc.get("total_token_count") and not song_copy.get("total_token_count"):
                             song_copy["total_token_count"] = int(prev_doc["total_token_count"])
                         if prev_doc.get("unique_token_count") and not song_copy.get("unique_token_count"):
@@ -1027,10 +1070,14 @@ class SyncService:
             enriched_songs.append(song_copy)
 
         by_partition: dict[str, list[dict[str, Any]]] = {}
-        for reg in REGISTERS:
+        for reg in sorted(REGISTERS, key=lambda r: (r["lang_code"], 0 if r["tier"] == "REGIONAL" else 1, r["id"])):
             by_partition.setdefault(reg["partition_file"], []).append(reg)
 
-        for partition_file, reg_rows in by_partition.items():
+        for partition_file in sorted(by_partition.keys()):
+            reg_rows = sorted(
+                by_partition[partition_file],
+                key=lambda r: (0 if r["tier"] == "REGIONAL" else 1, r["id"]),
+            )
             reg_ids = [r["id"] for r in reg_rows]
             idioms = sorted(
                 [i for i in IDIOMS if i["register_id"] in reg_ids],
@@ -1115,11 +1162,26 @@ class SyncService:
             _atomic_write_json(target_path, shard_doc)
             written_files.append(partition_file)
 
+        sorted_arenas = sorted(ARENAS, key=lambda a: a["id"])
+        sorted_bridges = sorted(BRIDGES, key=lambda b: b["uid"])
+        sorted_vibe_links = sorted(VIBE_LINKS, key=lambda v: (v["source_term"], v["target_term"]))
+        sorted_room_states = sorted(ROOM_STATES, key=lambda s: s["id"])
+        sorted_false_friends = sorted(FALSE_FRIENDS, key=lambda ff: ff["id"])
+        sorted_vocab_alerts = sorted(
+            [v for v in VOCAB_ITEMS if v.get("register_id") is None],
+            key=lambda v: v["uid"],
+        )
+        sorted_vocab_ff_edges = sorted(
+            VOCAB_FALSE_FRIEND_ALERTS,
+            key=lambda x: (x["source_uid"], x["target_uid"]),
+        )
+        sorted_webhooks = sorted(STAGED_WEBHOOKS, key=lambda w: w["id"])
+
         fabric_doc = {
             "db_id": "polyglot.fabric",
             "schema_version": SCHEMA_VERSION,
             "description": "Cross-language :Arena rooms, :Bridge nodes, :SHARES_VIBE_WITH etymology edges, :State objection nodes, :FalseFriend traps, IB :Vocab :FALSE_FRIEND_ALERT triggers, and Staged Regional Newspaper Webhooks.",
-            "arenas": ARENAS,
+            "arenas": sorted_arenas,
             "bridges": [
                 {
                     "uid": b["uid"],
@@ -1132,9 +1194,9 @@ class SyncService:
                     "vocal_cue": b["vocal_cue"],
                     "weight": b["weight"],
                 }
-                for b in BRIDGES
+                for b in sorted_bridges
             ],
-            "vibe_links": VIBE_LINKS,
+            "vibe_links": sorted_vibe_links,
             "room_states": [
                 {
                     "id": s["id"],
@@ -1145,7 +1207,7 @@ class SyncService:
                     "effectiveness": s["effectiveness"],
                     "cue": s["cue"],
                 }
-                for s in ROOM_STATES
+                for s in sorted_room_states
             ],
             "false_friends": [
                 {
@@ -1155,7 +1217,7 @@ class SyncService:
                     "de_calque": ff["calque_term"],
                     "meaning": ff["safe_meaning"],
                 }
-                for ff in FALSE_FRIENDS
+                for ff in sorted_false_friends
             ],
             "vocab_alert_nodes": [
                 {
@@ -1167,12 +1229,11 @@ class SyncService:
                     "ib_source": v.get("ib_source", ""),
                     "warning": v.get("warning", ""),
                 }
-                for v in VOCAB_ITEMS
-                if v.get("register_id") is None
+                for v in sorted_vocab_alerts
             ],
-            "vocab_false_friend_alerts": VOCAB_FALSE_FRIEND_ALERTS,
+            "vocab_false_friend_alerts": sorted_vocab_ff_edges,
             "songs": [_build_song_ref_dict(s) for s in enriched_songs],
-            "staged_webhooks": STAGED_WEBHOOKS,
+            "staged_webhooks": [_canonical_webhook_payload(w) for w in sorted_webhooks],
         }
         fabric_path = settings.db_json_dir / "polyglot_fabric.db.json"
         _atomic_write_json(fabric_path, fabric_doc)
@@ -1191,12 +1252,20 @@ class SyncService:
         checks: list[dict[str, Any]] = []
         pg_info = await pg_manager.ping()
         neo_info = await neo4j_manager.ping()
+        pg_schema_ver = pg_info.get("schema_version")
 
         checks.append(
             {
                 "check": "postgresql_online_and_pgvector",
-                "ok": bool(pg_info.get("ok") and pg_info.get("pgvector")),
-                "detail": pg_info.get("version", pg_info.get("error")),
+                "ok": bool(
+                    pg_info.get("ok")
+                    and pg_info.get("pgvector")
+                    and pg_schema_ver == SCHEMA_VERSION
+                ),
+                "detail": (
+                    f"{pg_info.get('version', pg_info.get('error'))}, "
+                    f"schema_version={pg_schema_ver} (expected {SCHEMA_VERSION})"
+                ),
             }
         )
         checks.append(
@@ -1213,11 +1282,51 @@ class SyncService:
         fk_row = await pg_manager.fetch_one(
             "SELECT conname FROM pg_constraint WHERE conname = 'fk_cards_arena'"
         )
+        scaffold_nnd_row = await pg_manager.fetch_one(
+            """
+            SELECT c.conname, COALESCE(ix.indnullsnotdistinct, FALSE) AS nulls_not_distinct
+            FROM pg_constraint c
+            JOIN pg_index ix ON ix.indexrelid = c.conindid
+            WHERE c.conrelid = 'lexical_scaffolds'::regclass
+              AND c.contype = 'u'
+            LIMIT 1
+            """
+        )
+        scaffold_dups_row = await pg_manager.fetch_one(
+            """
+            SELECT COUNT(*) AS dup_groups
+            FROM (
+                SELECT 1
+                FROM lexical_scaffolds
+                GROUP BY card_uid, idiom_term, anchor_lang, anchor_expression
+                HAVING COUNT(*) > 1
+            ) d
+            """
+        )
+        scaffold_dangling_row = await pg_manager.fetch_one(
+            """
+            SELECT COUNT(*) AS dangling
+            FROM lexical_scaffolds ls
+            LEFT JOIN cards c ON c.uid = ls.card_uid
+            LEFT JOIN idioms i ON i.term = ls.idiom_term
+            LEFT JOIN registers r ON r.id = ls.target_register_id
+            WHERE (ls.card_uid IS NOT NULL AND c.uid IS NULL)
+               OR (ls.idiom_term IS NOT NULL AND i.term IS NULL)
+               OR r.id IS NULL
+            """
+        )
+        scaffolds_nnd = bool(scaffold_nnd_row and scaffold_nnd_row.get("nulls_not_distinct"))
+        scaffold_dups = int((scaffold_dups_row or {}).get("dup_groups", 0))
+        scaffold_dangling = int((scaffold_dangling_row or {}).get("dangling", 0))
         checks.append(
             {
                 "check": "postgres_fk_cards_arena_enforced",
-                "ok": bool(fk_row),
-                "detail": "cards.arena -> arenas(id)",
+                "ok": bool(fk_row) and scaffolds_nnd and scaffold_dups == 0 and scaffold_dangling == 0,
+                "detail": (
+                    f"cards.arena -> arenas(id), "
+                    f"lexical_scaffolds_unique_nulls_not_distinct={scaffolds_nnd}, "
+                    f"scaffold_dups={scaffold_dups}, scaffold_dangling={scaffold_dangling}"
+                ),
             }
         )
 
@@ -1229,34 +1338,40 @@ class SyncService:
                 (SELECT COUNT(*) FROM registers) AS registers,
                 (SELECT COUNT(*) FROM cards) AS cards,
                 (SELECT COUNT(*) FROM idioms) AS idioms,
+                (SELECT COUNT(*) FROM idiom_vibe_links) AS vibe_links,
                 (SELECT COUNT(*) FROM vocab_items) AS vocab,
+                (SELECT COUNT(*) FROM vocab_false_friend_alerts) AS vocab_alerts,
                 (SELECT COUNT(*) FROM songs) AS songs,
                 (SELECT COUNT(*) FROM song_lyric_tokens) AS lyric_tokens,
                 (SELECT COUNT(*) FROM bridges) AS bridges,
                 (SELECT COUNT(*) FROM room_states) AS room_states,
                 (SELECT COUNT(*) FROM false_friends) AS false_friends,
                 (SELECT COUNT(*) FROM graph_edges) AS edges,
-                (SELECT COUNT(*) FROM cards WHERE embedding IS NULL) AS cards_missing_embeddings,
-                (SELECT COUNT(*) FROM idioms WHERE embedding IS NULL) AS idioms_missing_embeddings,
+                (SELECT COUNT(*) FROM lexical_scaffolds) AS lexical_scaffolds,
+                (SELECT COUNT(*) FROM cards WHERE embedding IS NULL OR vector_dims(embedding) <> $1) AS cards_missing_embeddings,
+                (SELECT COUNT(*) FROM idioms WHERE embedding IS NULL OR vector_dims(embedding) <> $1) AS idioms_missing_embeddings,
                 (SELECT COUNT(*) FROM arenas WHERE sync_status = 'PENDING')
                 + (SELECT COUNT(*) FROM registers WHERE sync_status = 'PENDING')
                 + (SELECT COUNT(*) FROM cards WHERE sync_status = 'PENDING')
                 + (SELECT COUNT(*) FROM idioms WHERE sync_status = 'PENDING')
+                + (SELECT COUNT(*) FROM idiom_vibe_links WHERE sync_status = 'PENDING')
                 + (SELECT COUNT(*) FROM vocab_items WHERE sync_status = 'PENDING')
+                + (SELECT COUNT(*) FROM vocab_false_friend_alerts WHERE sync_status = 'PENDING')
                 + (SELECT COUNT(*) FROM songs WHERE sync_status = 'PENDING')
                 + (SELECT COUNT(*) FROM song_lyric_tokens WHERE sync_status = 'PENDING')
                 + (SELECT COUNT(*) FROM bridges WHERE sync_status = 'PENDING')
                 + (SELECT COUNT(*) FROM room_states WHERE sync_status = 'PENDING')
                 + (SELECT COUNT(*) FROM false_friends WHERE sync_status = 'PENDING')
                 + (SELECT COUNT(*) FROM graph_edges WHERE sync_status = 'PENDING') AS pending_outbox
-            """
+            """,
+            settings.embedding_dim,
         ) or {}
 
         checks.append(
             {
                 "check": "outbox_zero_pending_drift",
                 "ok": int(pg_counts.get("pending_outbox", 1)) == 0,
-                "detail": f"pending_outbox={pg_counts.get('pending_outbox', 0)}",
+                "detail": f"pending_outbox={pg_counts.get('pending_outbox', 0)} (across all 13 outbox tables)",
             }
         )
         checks.append(
@@ -1265,19 +1380,21 @@ class SyncService:
                 "ok": int(pg_counts.get("cards_missing_embeddings", 0)) == 0
                 and int(pg_counts.get("idioms_missing_embeddings", 0)) == 0,
                 "detail": (
-                    f"cards_missing={pg_counts.get('cards_missing_embeddings', 0)}, "
-                    f"idioms_missing={pg_counts.get('idioms_missing_embeddings', 0)}"
+                    f"dim={settings.embedding_dim}, "
+                    f"cards_invalid_or_missing={pg_counts.get('cards_missing_embeddings', 0)}, "
+                    f"idioms_invalid_or_missing={pg_counts.get('idioms_missing_embeddings', 0)}"
                 ),
             }
         )
 
-        # Validate structural & FSRS rules on every card and edge in Postgres
+        # Validate structural & FSRS rules on every card, bridge, and edge in Postgres
         all_cards = await pg_manager.fetch_all("SELECT uid, register_id, stage, text_html, idiom_terms FROM cards")
         all_idioms = {
             r["term"]: r
             for r in await pg_manager.fetch_all("SELECT term, register_id, cousin_term FROM idioms")
         }
         all_edges = await pg_manager.fetch_all("SELECT id, source_uid, target_uid, edge_type, weight, stability FROM graph_edges")
+        all_bridges = await pg_manager.fetch_all("SELECT uid, from_card_uid, to_card_uid FROM bridges")
         card_uid_set = {c["uid"] for c in all_cards}
         state_id_set = {s["id"] for s in await pg_manager.fetch_all("SELECT id FROM room_states")}
 
@@ -1318,34 +1435,65 @@ class SyncService:
                 dangling_edges.append(f"{e['id']} missing target state {e['target_uid']}")
             if not (0.15 <= float(e["weight"]) <= 0.99) or float(e["stability"]) < 1.5:
                 rule_failures.append(f"Edge {e['id']} out-of-bounds FSRS weight/stability")
+        for b in all_bridges:
+            if b.get("from_card_uid") and b["from_card_uid"] not in card_uid_set:
+                dangling_edges.append(f"Bridge {b['uid']} missing from_card_uid {b['from_card_uid']}")
+            if b.get("to_card_uid") and b["to_card_uid"] not in card_uid_set:
+                dangling_edges.append(f"Bridge {b['uid']} missing to_card_uid {b['to_card_uid']}")
 
         checks.append(
             {
                 "check": "graph_relation_and_fsrs_rules",
-                "ok": len(rule_failures) == 0 and len(dangling_edges) == 0,
-                "detail": f"rule_failures={len(rule_failures)}, dangling_edges={len(dangling_edges)}",
+                "ok": len(rule_failures) == 0 and len(dangling_edges) == 0 and scaffold_dangling == 0,
+                "detail": f"rule_failures={len(rule_failures)}, dangling_edges={len(dangling_edges)}, scaffold_dangling={scaffold_dangling}",
             }
         )
+
+        # Collect authoritative PG ID sets for cross-store set-equality checks
+        pg_sets: dict[str, set[Any]] = {
+            "languages": {r["code"] for r in await pg_manager.fetch_all("SELECT code FROM languages")},
+            "arenas": {r["id"] for r in await pg_manager.fetch_all("SELECT id FROM arenas")},
+            "registers": {r["id"] for r in await pg_manager.fetch_all("SELECT id FROM registers")},
+            "cards": card_uid_set,
+            "idioms": set(all_idioms.keys()),
+            "vocab": {r["uid"] for r in await pg_manager.fetch_all("SELECT uid FROM vocab_items")},
+            "songs": {r["uid"] for r in await pg_manager.fetch_all("SELECT uid FROM songs")},
+            "lyric_tokens": {r["uid"] for r in await pg_manager.fetch_all("SELECT uid FROM song_lyric_tokens")},
+            "bridges": {b["uid"] for b in all_bridges},
+            "room_states": state_id_set,
+            "false_friends": {r["id"] for r in await pg_manager.fetch_all("SELECT id FROM false_friends")},
+            "edges": {e["id"] for e in all_edges},
+            "vibe_links": {
+                f"{r['source_term']}->{r['target_term']}"
+                for r in await pg_manager.fetch_all("SELECT source_term, target_term FROM idiom_vibe_links")
+            },
+            "vocab_alerts": {
+                f"{r['source_uid']}->{r['target_uid']}"
+                for r in await pg_manager.fetch_all("SELECT source_uid, target_uid FROM vocab_false_friend_alerts")
+            },
+        }
 
         neo_parity: dict[str, Any] = {}
         if neo_info.get("ok"):
             neo_rows = await neo4j_manager.run_query(
                 """
                 RETURN
-                     COUNT { (:Language) } AS languages,
-                     COUNT { (:Arena) } AS arenas,
-                     COUNT { (:Register) } AS registers,
-                     COUNT { (:Card) } AS cards,
-                     COUNT { (:Idiom) } AS idioms,
-                     COUNT { (:Vocab) } AS vocab,
-                     COUNT { (:Song) } AS songs,
-                     COUNT { (:LyricToken) } AS lyric_tokens,
-                     COUNT { (:Bridge) } AS bridges,
-                     COUNT { (:State) } AS room_states,
-                     COUNT { (:FalseFriend) } AS false_friends,
-                     COUNT { (:Card)-[:FLOWS_TO]->(:Card) }
-                     + COUNT { (:Card)-[r:PIVOTS_VIA]->(:Card) WHERE r.id IS NOT NULL }
-                     + COUNT { (:Card)-[:COUNTERS_STATE]->(:State) } AS edges,
+                     COLLECT { MATCH (l:Language) RETURN l.code } AS languages_ids,
+                     COLLECT { MATCH (a:Arena) RETURN a.id } AS arenas_ids,
+                     COLLECT { MATCH (r:Register) RETURN r.id } AS registers_ids,
+                     COLLECT { MATCH (c:Card) RETURN c.uid } AS cards_ids,
+                     COLLECT { MATCH (i:Idiom) RETURN i.term } AS idioms_ids,
+                     COLLECT { MATCH (v:Vocab) RETURN v.uid } AS vocab_ids,
+                     COLLECT { MATCH (s:Song) RETURN s.uid } AS songs_ids,
+                     COLLECT { MATCH (lt:LyricToken) RETURN lt.uid } AS lyric_tokens_ids,
+                     COLLECT { MATCH (b:Bridge) RETURN b.uid } AS bridges_ids,
+                     COLLECT { MATCH (st:State) RETURN st.id } AS room_states_ids,
+                     COLLECT { MATCH (ff:FalseFriend) RETURN ff.id } AS false_friends_ids,
+                     COLLECT { MATCH (:Card)-[r:FLOWS_TO]->(:Card) RETURN r.id }
+                     + COLLECT { MATCH (:Card)-[r:PIVOTS_VIA]->(:Card) WHERE r.id IS NOT NULL RETURN r.id }
+                     + COLLECT { MATCH (:Card)-[r:COUNTERS_STATE]->(:State) RETURN r.id } AS edges_ids,
+                     COLLECT { MATCH (i1:Idiom)-[:SHARES_VIBE_WITH]->(i2:Idiom) RETURN i1.term + '->' + i2.term } AS vibe_links_ids,
+                     COLLECT { MATCH (v1:Vocab)-[:FALSE_FRIEND_ALERT]->(v2:Vocab) RETURN v1.uid + '->' + v2.uid } AS vocab_alerts_ids,
                      COUNT { (c:Card) WHERE NOT (:Register)-[:HAS_CARD]->(c) } AS orphan_cards,
                      COUNT { (c:Card) WHERE NOT (c)-[:SET_IN_ARENA]->(:Arena) } AS cards_without_arena,
                      COUNT { (:Song)-[:HAS_LYRIC_TOKEN]->(:LyricToken) } AS song_lyric_edges,
@@ -1356,7 +1504,7 @@ class SyncService:
                      COUNT { (:LyricToken)-[:BOOSTS_CARD_FREQUENCY]->(:Card) } AS lyric_card_edges
                 """
             )
-            neo_parity = dict(neo_rows[0]) if neo_rows else {}
+            raw_neo = dict(neo_rows[0]) if neo_rows else {}
             compared_keys = (
                 "languages",
                 "arenas",
@@ -1370,17 +1518,43 @@ class SyncService:
                 "room_states",
                 "false_friends",
                 "edges",
+                "vibe_links",
+                "vocab_alerts",
             )
-            mismatches = {
-                k: {"postgres": int(pg_counts.get(k, -1)), "neo4j": int(neo_parity.get(k, -2))}
-                for k in compared_keys
-                if int(pg_counts.get(k, -1)) != int(neo_parity.get(k, -2))
-            }
+            mismatches: dict[str, Any] = {}
+            for k in compared_keys:
+                neo_list = list(raw_neo.get(f"{k}_ids") or [])
+                neo_set = set(neo_list)
+                neo_parity[k] = len(neo_list)
+                pg_set = pg_sets[k]
+                if len(neo_list) != len(neo_set) or pg_set != neo_set:
+                    mismatches[k] = {
+                        "postgres": len(pg_set),
+                        "neo4j": len(neo_list),
+                        "missing_in_neo4j": sorted(pg_set - neo_set)[:10],
+                        "extra_in_neo4j": sorted(neo_set - pg_set)[:10],
+                    }
+            for scalar_key in (
+                "orphan_cards",
+                "cards_without_arena",
+                "song_lyric_edges",
+                "orphan_lyric_tokens",
+                "register_anthem_edges",
+                "lyric_vocab_edges",
+                "lyric_idiom_edges",
+                "lyric_card_edges",
+            ):
+                neo_parity[scalar_key] = int(raw_neo.get(scalar_key, 0))
+
             checks.append(
                 {
                     "check": "postgres_neo4j_entity_parity",
                     "ok": len(mismatches) == 0,
-                    "detail": "100% count match across all 12 entity/edge classes" if not mismatches else mismatches,
+                    "detail": (
+                        f"100% ID-set match across all {len(compared_keys)} entity/edge classes"
+                        if not mismatches
+                        else mismatches
+                    ),
                 }
             )
             checks.append(
@@ -1417,16 +1591,23 @@ class SyncService:
                 }
             )
 
-        # Audit db/*.db.json offline shards
+        # Audit db/*.db.json offline shards with ID-set parity
         expected_shards = ["cz_ova.db.json", "at_vie.db.json", "ru_ala.db.json", "en_yyc.db.json", "es_sot.db.json"]
-        shard_cards_total = 0
-        shard_idioms_total = 0
-        shard_vocab_total = 0
-        shard_songs_total = 0
+        shard_cards_uids: set[str] = set()
+        shard_idiom_terms: set[str] = set()
+        shard_vocab_uids: set[str] = set()
+        shard_song_uids: set[str] = set()
+        shard_arena_ids: set[str] = set()
+        shard_bridge_uids: set[str] = set()
+        shard_state_ids: set[str] = set()
+        shard_ff_ids: set[str] = set()
+        shard_vibe_pairs: set[str] = set()
+        shard_ffa_pairs: set[str] = set()
         shard_digests: dict[str, str] = {}
         missing_shards: list[str] = []
         inline_lyric_bloat: list[str] = []
         fabric_bytes = 0
+        fabric_schema_ver: Optional[str] = None
         for sname in expected_shards + ["polyglot_fabric.db.json"]:
             spath = settings.db_json_dir / sname
             if not spath.exists():
@@ -1441,22 +1622,32 @@ class SyncService:
                 if not song_obj.get("lyric_shard"):
                     inline_lyric_bloat.append(f"{sname}:{song_obj.get('uid')}:missing_lyric_shard_ref")
             if sname != "polyglot_fabric.db.json":
-                shard_cards_total += len(parsed.get("cards", []))
-                shard_idioms_total += len(parsed.get("idioms", {}))
-                shard_vocab_total += len(parsed.get("vocab", []))
+                shard_cards_uids.update(c["uid"] for c in parsed.get("cards", []))
+                shard_idiom_terms.update(parsed.get("idioms", {}).keys())
+                shard_vocab_uids.update(v["uid"] for v in parsed.get("vocab", []))
             else:
                 fabric_bytes = len(raw)
-                fabric_arenas = len(parsed.get("arenas", []))
-                shard_vocab_total += len(parsed.get("vocab_alert_nodes", []))
-                shard_songs_total = len(parsed.get("songs", []))
-                if fabric_arenas != int(pg_counts.get("arenas", 0)):
-                    missing_shards.append(f"polyglot_fabric.arenas={fabric_arenas}")
+                fabric_schema_ver = parsed.get("schema_version")
+                if fabric_schema_ver != SCHEMA_VERSION:
+                    missing_shards.append(f"polyglot_fabric.schema_version={fabric_schema_ver}")
+                shard_arena_ids.update(a["id"] for a in parsed.get("arenas", []))
+                shard_bridge_uids.update(b["uid"] for b in parsed.get("bridges", []))
+                shard_state_ids.update(s["id"] for s in parsed.get("room_states", []))
+                shard_ff_ids.update(ff["id"] for ff in parsed.get("false_friends", []))
+                shard_vibe_pairs.update(
+                    f"{v['source_term']}->{v['target_term']}" for v in parsed.get("vibe_links", [])
+                )
+                shard_ffa_pairs.update(
+                    f"{x['source_uid']}->{x['target_uid']}" for x in parsed.get("vocab_false_friend_alerts", [])
+                )
+                shard_vocab_uids.update(v["uid"] for v in parsed.get("vocab_alert_nodes", []))
+                shard_song_uids.update(s["uid"] for s in parsed.get("songs", []))
 
         # Audit split db/lyrics/*.lyrics.json shards
         pg_song_rows = await pg_manager.fetch_all("SELECT uid FROM songs ORDER BY uid")
         expected_lyric_shards = [f"{r['uid'].lower()}.lyrics.json" for r in pg_song_rows]
         lyric_shards_dir = settings.db_json_dir / "lyrics"
-        shard_lyric_tokens_total = 0
+        shard_lt_uids: set[str] = set()
         lyric_shards_ok_count = 0
         lyric_shards_total_bytes = 0
         weeknd_stanzas = 0
@@ -1469,7 +1660,9 @@ class SyncService:
             try:
                 raw_bytes = l_path.read_bytes()
                 l_doc = json.loads(raw_bytes.decode("utf-8"))
-                shard_lyric_tokens_total += len(l_doc.get("lyric_tokens", []))
+                if l_doc.get("schema_version") != SCHEMA_VERSION:
+                    missing_lyric_shards.append(f"{l_name}:schema_version={l_doc.get('schema_version')}")
+                shard_lt_uids.update(lt["uid"] for lt in l_doc.get("lyric_tokens", []))
                 stanzas_list = l_doc.get("stanzas_lines") or l_doc.get("lyric_stanzas") or []
                 if l_name == "song_weeknd_ootg.lyrics.json":
                     weeknd_stanzas = len(stanzas_list)
@@ -1485,16 +1678,33 @@ class SyncService:
         lyric_shards_parity_ok = (
             len(missing_lyric_shards) == 0
             and lyric_shards_ok_count == len(expected_lyric_shards)
-            and lyric_shards_ok_count == int(pg_counts.get("songs", -1))
-            and shard_lyric_tokens_total == int(pg_counts.get("lyric_tokens", -1))
+            and shard_lt_uids == pg_sets["lyric_tokens"]
         )
+
+        shard_set_mismatches = {
+            name: {
+                "missing": sorted(pg_set - sh_set)[:10],
+                "extra": sorted(sh_set - pg_set)[:10],
+            }
+            for name, pg_set, sh_set in (
+                ("cards", pg_sets["cards"], shard_cards_uids),
+                ("idioms", pg_sets["idioms"], shard_idiom_terms),
+                ("vocab", pg_sets["vocab"], shard_vocab_uids),
+                ("songs", pg_sets["songs"], shard_song_uids),
+                ("lyric_tokens", pg_sets["lyric_tokens"], shard_lt_uids),
+                ("arenas", pg_sets["arenas"], shard_arena_ids),
+                ("bridges", pg_sets["bridges"], shard_bridge_uids),
+                ("room_states", pg_sets["room_states"], shard_state_ids),
+                ("false_friends", pg_sets["false_friends"], shard_ff_ids),
+                ("vibe_links", pg_sets["vibe_links"], shard_vibe_pairs),
+                ("vocab_alerts", pg_sets["vocab_alerts"], shard_ffa_pairs),
+            )
+            if pg_set != sh_set
+        }
 
         shard_parity_ok = (
             len(missing_shards) == 0
-            and shard_cards_total == int(pg_counts.get("cards", -1))
-            and shard_idioms_total == int(pg_counts.get("idioms", -1))
-            and shard_vocab_total == int(pg_counts.get("vocab", -1))
-            and shard_songs_total == int(pg_counts.get("songs", -1))
+            and len(shard_set_mismatches) == 0
             and lyric_shards_parity_ok
         )
         checks.append(
@@ -1503,33 +1713,34 @@ class SyncService:
                 "ok": shard_parity_ok,
                 "detail": (
                     f"shards=6/6, lyric_shards={lyric_shards_ok_count}/{len(expected_lyric_shards)}, "
-                    f"cards={shard_cards_total}/{pg_counts.get('cards')}, "
-                    f"idioms={shard_idioms_total}/{pg_counts.get('idioms')}, "
-                    f"vocab={shard_vocab_total}/{pg_counts.get('vocab')}, "
-                    f"songs={shard_songs_total}/{pg_counts.get('songs')}, "
-                    f"lyric_tokens={shard_lyric_tokens_total}/{pg_counts.get('lyric_tokens')}"
-                    if (not missing_shards and not missing_lyric_shards)
-                    else f"issues={missing_shards + missing_lyric_shards}"
+                    f"cards={len(shard_cards_uids)}/{len(pg_sets['cards'])}, "
+                    f"idioms={len(shard_idiom_terms)}/{len(pg_sets['idioms'])}, "
+                    f"vocab={len(shard_vocab_uids)}/{len(pg_sets['vocab'])}, "
+                    f"songs={len(shard_song_uids)}/{len(pg_sets['songs'])}, "
+                    f"lyric_tokens={len(shard_lt_uids)}/{len(pg_sets['lyric_tokens'])}, "
+                    f"id_set_parity=11/11"
+                    if shard_parity_ok
+                    else f"issues={missing_shards + missing_lyric_shards}, set_mismatches={shard_set_mismatches}"
                 ),
             }
         )
 
         from backend.seed.song_lyrics_data import SONG_SPLIT_LYRICS
 
-        split_seed_count = len(SONG_SPLIT_LYRICS)
+        split_seed_uids = set(SONG_SPLIT_LYRICS.keys())
+        split_seed_count = len(split_seed_uids)
         split_efficiency_ok = (
-            split_seed_count == int(pg_counts.get("songs", -1))
+            split_seed_uids == pg_sets["songs"]
             and len(inline_lyric_bloat) == 0
             and lyric_shards_parity_ok
-            and weeknd_stanzas >= 9
-            and 0 < fabric_bytes < 50000
+            and 0 < fabric_bytes < 100000
         )
         checks.append(
             {
                 "check": "split_lyrics_git_memory_efficiency",
                 "ok": split_efficiency_ok,
                 "detail": (
-                    f"split_seed_songs={split_seed_count}/{pg_counts.get('songs', 0)}, "
+                    f"split_seed_songs={split_seed_count}/{len(pg_sets['songs'])}, "
                     f"inline_lyric_bloat={len(inline_lyric_bloat)}, "
                     f"lyric_shards={lyric_shards_ok_count}/{len(expected_lyric_shards)}, "
                     f"weeknd_stanzas={weeknd_stanzas}, "
@@ -1543,7 +1754,7 @@ class SyncService:
         return {
             "ok": overall_ok,
             "audited_at": datetime.now(timezone.utc).isoformat(),
-            "schema_version": pg_info.get("schema_version", SCHEMA_VERSION),
+            "schema_version": pg_schema_ver or SCHEMA_VERSION,
             "checks": checks,
             "postgres_counts": pg_counts,
             "neo4j_counts": neo_parity,

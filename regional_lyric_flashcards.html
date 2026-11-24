@@ -83,55 +83,55 @@
   <main class="embed-compact-main max-w-6xl w-full mx-auto p-3 sm:p-4 space-y-4 flex-1">
 
     <!-- TRACK SELECTOR TABS -->
-    <div class="flex items-center gap-1.5 overflow-x-auto pb-1" id="trackTabs"></div>
+    <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1" id="trackTabs"></div>
 
     <!-- MAIN SPOTLIGHT: ANTHEM & FLASHCARD GRID -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
 
       <!-- LEFT: INTERACTIVE 3D LYRIC FLASHCARD (7 COLS) -->
-      <div class="lg:col-span-7 space-y-4">
-        <div class="flex items-center justify-between">
+      <div class="lg:col-span-7 space-y-3 sm:space-y-4">
+        <div class="flex items-center justify-between gap-2">
           <div class="flex items-center gap-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">
             <i data-lucide="layers" class="w-4 h-4 text-amber-400"></i>
             <span>Interactive 3D Cadence Flashcard</span>
           </div>
-          <span class="text-[11px] text-slate-400 italic">Tap/Space to flip • Swipe ⇄ to switch</span>
+          <span class="text-[10px] sm:text-[11px] text-slate-400 italic whitespace-nowrap">Tap to flip • Swipe ⇄</span>
         </div>
 
-        <div id="flashcardTouchZone" class="perspective-card min-h-[380px] sm:min-h-[400px] cursor-pointer select-none" onclick="flipCard()">
-          <div id="flashcardInner" class="card-inner relative w-full h-full min-h-[380px] sm:min-h-[400px] rounded-2xl neon-panel p-5 sm:p-8 flex flex-col justify-between">
+        <div id="flashcardTouchZone" class="perspective-card min-h-[310px] sm:min-h-[400px] cursor-pointer select-none" onclick="flipCard()">
+          <div id="flashcardInner" class="card-inner relative w-full h-full min-h-[310px] sm:min-h-[400px] rounded-2xl neon-panel p-4 sm:p-8 flex flex-col justify-between">
             
             <!-- FRONT: ORIGINAL DIALECT & REGIONAL ANTHEM -->
-            <div class="card-face w-full h-full flex flex-col justify-between space-y-6">
+            <div class="card-face w-full h-full flex flex-col justify-between space-y-4 sm:space-y-6">
               <div>
-                <div class="flex items-center justify-between text-xs mono mb-3">
-                  <span id="cardBadge" class="px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold">🇨🇿 OSTRAVA</span>
-                  <span id="cardGenre" class="text-slate-400">Industrial Miner Grit</span>
+                <div class="flex items-center justify-between gap-2 text-xs mono mb-2.5 sm:mb-3">
+                  <span id="cardBadge" class="px-2.5 py-0.5 sm:py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold shrink-0">🇨🇿 OSTRAVA</span>
+                  <span id="cardGenre" class="text-slate-400 truncate text-right">Industrial Miner Grit</span>
                 </div>
-                <h2 id="cardTitle" class="text-2xl font-bold text-white tracking-tight">Ostrava</h2>
-                <div id="cardArtist" class="text-sm font-semibold text-amber-400 mb-4">Jaromír Nohavica</div>
-                <p id="cardLyric" class="text-lg sm:text-xl font-medium text-slate-100 leading-relaxed italic bg-slate-950/60 p-4 rounded-xl border border-slate-800/80">
+                <h2 id="cardTitle" class="text-xl sm:text-2xl font-bold text-white tracking-tight">Ostrava</h2>
+                <div id="cardArtist" class="text-xs sm:text-sm font-semibold text-amber-400 mb-3 sm:mb-4">Jaromír Nohavica</div>
+                <p id="cardLyric" class="text-base sm:text-xl font-medium text-slate-100 leading-relaxed italic bg-slate-950/60 p-3.5 sm:p-4 rounded-xl border border-slate-800/80">
                   „Ostrava, Ostrava, město mezi městy, kaj ľudzie fchytaju šichtu a po robotě maju čistý fajront, bo ten motor pojede sám.“
                 </p>
               </div>
 
-              <div class="pt-4 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
+              <div class="pt-3 sm:pt-4 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400">
                 <span id="cardSlang" class="mono text-amber-300 font-semibold">Anchors: šichta • fajront • bo</span>
-                <span class="flex items-center gap-1 text-slate-300 hover:text-white">
-                  <span>See 5-Language Translations</span>
+                <span class="flex items-center gap-1 text-slate-300 hover:text-white whitespace-nowrap">
+                  <span>5-Lang Translations</span>
                   <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
                 </span>
               </div>
             </div>
 
             <!-- BACK: MULTI-LANGUAGE TRANSLATIONS -->
-            <div class="card-face card-back absolute inset-0 w-full h-full p-6 sm:p-8 flex flex-col justify-between bg-slate-950 rounded-2xl border border-amber-500/30">
-              <div class="space-y-3">
+            <div class="card-face card-back absolute inset-0 w-full h-full p-4 sm:p-8 flex flex-col justify-between bg-slate-950 rounded-2xl border border-amber-500/30">
+              <div class="space-y-2.5 sm:space-y-3">
                 <div class="flex items-center justify-between text-xs mono border-b border-slate-800 pb-2">
-                  <span class="text-amber-300 font-bold uppercase">Cross-Lingual Idiom Mapping</span>
+                  <span class="text-amber-300 font-bold uppercase">Cross-Lingual Mapping</span>
                   <span class="text-slate-400">Flip back [↺]</span>
                 </div>
-                <div id="translationsBox" class="space-y-2 text-xs leading-relaxed max-h-[260px] overflow-y-auto pr-1"></div>
+                <div id="translationsBox" class="space-y-2 text-xs leading-relaxed max-h-[210px] sm:max-h-[260px] overflow-y-auto pr-1"></div>
               </div>
               <div class="text-[11px] text-slate-400 italic pt-2 border-t border-slate-800">
                 Syllabic rhythm preserved for natural code-switching practice.
@@ -203,21 +203,26 @@
                 R(t)=94% • S=6.5d • Edge: E_CZ_3
               </span>
             </div>
-            <div class="grid grid-cols-5 gap-1.5">
-              <button onclick="gradeAnthemPivot(1)" class="py-2 rounded-lg bg-rose-950/60 hover:bg-rose-900/80 border border-rose-500/30 text-rose-300 text-[11px] font-bold mono transition">
-                1 Freeze
+            <div class="grid grid-cols-5 gap-1 sm:gap-1.5">
+              <button onclick="gradeAnthemPivot(1)" class="min-h-[44px] py-1.5 px-1 rounded-lg bg-rose-950/60 hover:bg-rose-900/80 border border-rose-500/30 text-rose-300 font-bold mono transition flex flex-col items-center justify-center leading-tight">
+                <span class="text-xs">1</span>
+                <span class="text-[9px] sm:text-[10px] opacity-85">Freeze</span>
               </button>
-              <button onclick="gradeAnthemPivot(2)" class="py-2 rounded-lg bg-orange-950/60 hover:bg-orange-900/80 border border-orange-500/30 text-orange-300 text-[11px] font-bold mono transition">
-                2 Stiff
+              <button onclick="gradeAnthemPivot(2)" class="min-h-[44px] py-1.5 px-1 rounded-lg bg-orange-950/60 hover:bg-orange-900/80 border border-orange-500/30 text-orange-300 font-bold mono transition flex flex-col items-center justify-center leading-tight">
+                <span class="text-xs">2</span>
+                <span class="text-[9px] sm:text-[10px] opacity-85">Stiff</span>
               </button>
-              <button onclick="gradeAnthemPivot(3)" class="py-2 rounded-lg bg-amber-950/60 hover:bg-amber-900/80 border border-amber-500/30 text-amber-300 text-[11px] font-bold mono transition">
-                3 Pass
+              <button onclick="gradeAnthemPivot(3)" class="min-h-[44px] py-1.5 px-1 rounded-lg bg-amber-950/60 hover:bg-amber-900/80 border border-amber-500/30 text-amber-300 font-bold mono transition flex flex-col items-center justify-center leading-tight">
+                <span class="text-xs">3</span>
+                <span class="text-[9px] sm:text-[10px] opacity-85">Pass</span>
               </button>
-              <button onclick="gradeAnthemPivot(4)" class="py-2 rounded-lg bg-teal-950/60 hover:bg-teal-900/80 border border-teal-500/30 text-teal-300 text-[11px] font-bold mono transition">
-                4 Smooth
+              <button onclick="gradeAnthemPivot(4)" class="min-h-[44px] py-1.5 px-1 rounded-lg bg-teal-950/60 hover:bg-teal-900/80 border border-teal-500/30 text-teal-300 font-bold mono transition flex flex-col items-center justify-center leading-tight">
+                <span class="text-xs">4</span>
+                <span class="text-[9px] sm:text-[10px] opacity-85">Smooth</span>
               </button>
-              <button onclick="gradeAnthemPivot(5)" class="py-2 rounded-lg bg-emerald-950/70 hover:bg-emerald-900/90 border border-emerald-500/40 text-emerald-300 text-[11px] font-bold mono transition">
-                5 Groove
+              <button onclick="gradeAnthemPivot(5)" class="min-h-[44px] py-1.5 px-1 rounded-lg bg-emerald-950/70 hover:bg-emerald-900/90 border border-emerald-500/40 text-emerald-300 font-bold mono transition flex flex-col items-center justify-center leading-tight">
+                <span class="text-xs">5</span>
+                <span class="text-[9px] sm:text-[10px] opacity-85">Groove</span>
               </button>
             </div>
             <div id="fsrsFeedbackMsg" class="text-[11px] mono text-slate-400 text-center min-h-[16px]"></div>
@@ -228,7 +233,7 @@
         <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs space-y-1.5">
           <div class="flex items-center justify-between text-slate-400 mono text-[10px]">
             <span>CYPHER NODE UID</span>
-            <span class="text-emerald-400">NEO4J v3.3</span>
+            <span class="text-emerald-400">NEO4J v3.6</span>
           </div>
           <div id="cypherUidTag" class="mono text-indigo-300 font-semibold truncate">
             (:Song {uid: 'SONG_CZ_OVA_NOHAVICA'})
@@ -569,6 +574,21 @@
 
     async function hydrateLiveSongsAndEdges() {
       if (!window.PolyglotAPI) return;
+      const TRANS_META = [
+        { key: 'ES', label: '🇪🇸 Spanish' },
+        { key: 'EN', label: '🇬🇧 English' },
+        { key: 'CZ', label: '🇨🇿 Czech' },
+        { key: 'DE', label: '🇩🇪 German' },
+        { key: 'RU', label: '🇷🇺 Russian' }
+      ];
+      const NATIVE_TRANS_KEY = {
+        CZ_OVA: 'CZ',
+        AT_VIE: 'DE',
+        RU_ALA: 'RU',
+        EN_YYC: 'EN',
+        ES_SOT: 'ES',
+        WEEKND: 'EN'
+      };
       try {
         const songRes = await window.PolyglotAPI.fetchSongs();
         if (songRes && Array.isArray(songRes.songs) && songRes.songs.length) {
@@ -577,6 +597,26 @@
             if (match) {
               match.uid = liveSong.uid;
               match.lyric_shard = liveSong.lyric_shard || match.lyric_shard;
+              if (liveSong.title) match.title = liveSong.title;
+              if (liveSong.artist) match.artist = liveSong.artist;
+              if (liveSong.genre) match.genre = liveSong.genre;
+              if (liveSong.bpm) match.bpm = Number(liveSong.bpm);
+              if (liveSong.original_lyric) match.lyric = liveSong.original_lyric;
+              if (liveSong.pivot_line) match.pivotText = liveSong.pivot_line;
+              const tMap = liveSong.translations || {
+                ES: liveSong.translation_es,
+                EN: liveSong.translation_en,
+                CZ: liveSong.translation_cz,
+                DE: liveSong.translation_de,
+                RU: liveSong.translation_ru
+              };
+              const nativeKey = NATIVE_TRANS_KEY[match.id];
+              const hydratedTranslations = TRANS_META
+                .filter(tm => tm.key !== nativeKey && tMap && tMap[tm.key])
+                .map(tm => ({ lang: tm.label, text: tMap[tm.key] }));
+              if (hydratedTranslations.length) {
+                match.translations = hydratedTranslations;
+              }
               if (Array.isArray(liveSong.lyric_stanzas) && liveSong.lyric_stanzas.length) {
                 match.lyric_stanzas = liveSong.lyric_stanzas;
               }
@@ -593,6 +633,8 @@
               ? 'Offline Split .lyrics.json (:LyricToken Lazy)'
               : 'Live PG + Neo4j (:LyricToken Synced)';
           }
+          renderTabs();
+          renderCurrent();
         }
         await ensureTrackLyricsLoaded(currentIdx, false);
         const st = await window.PolyglotAPI.fetchFullState(false);
