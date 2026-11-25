@@ -99,11 +99,14 @@
       <!-- Audio Rhythm Player Trigger + Cross-Tab Workflow Handoffs -->
       <div class="flex flex-wrap items-center justify-between sm:justify-end gap-2 w-full sm:w-auto sm:ml-auto">
         <div class="flex items-center gap-1.5">
-          <button id="masterAudioBtn" onclick="toggleAudio()" class="min-h-[32px] px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-500 hover:bg-amber-400 text-slate-950 transition flex items-center gap-1.5 shadow-md">
+          <button id="masterAudioBtn" onclick="toggleAudio()"
+            class="min-h-[32px] px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-500 hover:bg-amber-400 text-slate-950 transition flex items-center gap-1.5 shadow-md">
             <i data-lucide="play" id="audioIcon" class="w-3.5 h-3.5 fill-current"></i>
             <span id="audioLabel">Play Cadence Beat</span>
           </button>
-          <span id="bpmBadge" class="text-xs mono px-2 py-1.5 rounded bg-slate-900 border border-slate-800 text-amber-300 font-semibold">130 BPM</span>
+          <span id="bpmBadge"
+            class="text-xs mono px-2 py-1.5 rounded bg-slate-900 border border-slate-800 text-amber-300 font-semibold">130
+            BPM</span>
         </div>
         <div class="flex items-center gap-1.5 text-[11px] mono">
           <button
@@ -166,8 +169,10 @@
           </div>
         </div>
 
-        <div id="flashcardTouchZone" class="perspective-card min-h-[305px] sm:min-h-[350px] cursor-pointer select-none" onclick="flipCard()">
-          <div id="flashcardInner" class="card-inner relative w-full h-full min-h-[305px] sm:min-h-[350px] rounded-2xl neon-panel p-4 sm:p-5 flex flex-col justify-between">
+        <div id="flashcardTouchZone" class="perspective-card min-h-[305px] sm:min-h-[350px] cursor-pointer select-none"
+          onclick="flipCard()">
+          <div id="flashcardInner"
+            class="card-inner relative w-full h-full min-h-[305px] sm:min-h-[350px] rounded-2xl neon-panel p-4 sm:p-5 flex flex-col justify-between">
 
             <!-- FRONT: DYNAMIC LYRIC HOOK + ARENA CUE (RECALL) OR SPOKEN NATIVE RIFF (READ) -->
             <div id="flashcardFront"
@@ -347,7 +352,8 @@
     <!-- BELOW THE FOLD: INTERACTIVE LYRICS + 5 LANGUAGES & 8 SOCIAL ARENAS HUB -->
     <section class="neon-panel-subtle rounded-2xl p-3 sm:p-5 space-y-3 border border-amber-500/20">
       <!-- Mobile Section Switcher (Compresses 3,776px scroll into focused 1-tap tabs on phones; hidden on Desktop) -->
-      <div id="mobileHubTabs" class="grid grid-cols-3 gap-1 p-1 rounded-xl bg-slate-950 border border-slate-800 lg:hidden text-[11px] mono">
+      <div id="mobileHubTabs"
+        class="grid grid-cols-3 gap-1 p-1 rounded-xl bg-slate-950 border border-slate-800 lg:hidden text-[11px] mono">
         <button type="button" id="mobileHubTab_arenas" onclick="selectMobileHubTab('arenas')"
           class="min-h-[34px] px-1.5 py-1.5 rounded-lg bg-amber-500 text-slate-950 font-bold transition truncate">
           ✨ Arenas &amp; Spin-Offs
@@ -363,25 +369,39 @@
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
-        <!-- Left 5 Cols: Compact Clickable Anchor Chips & Full Lyrics -->
+        <!-- Left 5 Cols: Live Arena Lyric Remix + Clickable Stanzas -->
         <div id="mobileLyricsCol" class="hidden lg:block lg:col-span-5 space-y-2.5 min-w-0">
           <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-2">
-            <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-300 mono">
+            <div class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-amber-300 mono min-w-0">
               <i data-lucide="music" class="w-4 h-4 shrink-0"></i>
-              <span>Full Lyrics (Tap Anchor)</span>
+              <span id="lyricsHeaderTitle" class="truncate">🎛️ Arena Remix Lyrics</span>
             </div>
-            <span id="stanzaStatsBadge"
-              class="text-[10px] mono px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-slate-300">4
-              stanzas</span>
+            <div class="flex items-center gap-1.5 ml-auto">
+              <div class="inline-flex items-center rounded-lg bg-slate-950 border border-slate-800 p-0.5 text-[10px] mono">
+                <button type="button" id="lyricsModeRemixBtn" onclick="setLyricsRemixMode('remix')"
+                  class="px-2 py-0.5 rounded-md bg-amber-500 text-slate-950 font-bold transition whitespace-nowrap">
+                  🎛️ Remix
+                </button>
+                <button type="button" id="lyricsModeOrigBtn" onclick="setLyricsRemixMode('original')"
+                  class="px-2 py-0.5 rounded-md text-slate-300 hover:text-white transition whitespace-nowrap">
+                  📜 Original
+                </button>
+              </div>
+              <span id="stanzaStatsBadge"
+                class="text-[10px] mono px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-slate-300 whitespace-nowrap">4 stanzas</span>
+            </div>
           </div>
           <div id="lyricTokenPills" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5"></div>
-          <div id="stanzasBox" class="space-y-2.5 max-h-[360px] overflow-y-auto pr-1 text-xs leading-relaxed"></div>
+          <div id="stanzasBox" class="space-y-2.5 max-h-[380px] overflow-y-auto pr-1 text-xs leading-relaxed"></div>
         </div>
 
         <!-- Right 7 Cols: 5 Languages & 8 Social Arenas Direct Links -->
         <div id="langAndArenaHub" class="lg:col-span-7 space-y-3.5 min-w-0">
-          <div id="fiveLangLinksBox" class="hidden lg:block p-3 sm:p-3.5 rounded-xl bg-slate-950/75 border border-slate-800/90 space-y-2.5"></div>
-          <div id="socialArenaLinksBox" class="p-3 sm:p-3.5 rounded-xl bg-slate-950/75 border border-slate-800/90 space-y-2.5"></div>
+          <div id="fiveLangLinksBox"
+            class="hidden lg:block p-3 sm:p-3.5 rounded-xl bg-slate-950/75 border border-slate-800/90 space-y-2.5">
+          </div>
+          <div id="socialArenaLinksBox"
+            class="p-3 sm:p-3.5 rounded-xl bg-slate-950/75 border border-slate-800/90 space-y-2.5"></div>
         </div>
       </div>
     </section>
@@ -621,6 +641,15 @@
       }
     };
 
+    const SONG_REMIX_CALLINS = {
+      SONG_CZ_OVA_NOHAVICA: 'Ostravo, Ostravo, černá hvězdo nad hlavou —',
+      SONG_AT_VIE_FALCO: 'Vienna Calling! Kein Stress, der Schmäh rennt eh —',
+      SONG_RU_ALA_ASTUDIO: 'Джулия, под тёплыми звёздами Алматы —',
+      SONG_EN_YYC_LOVERBOY: 'Everybody’s working for the weekend, bud —',
+      SONG_ES_SOT_CAMARON: 'Volando voy, volando vengo con duende —',
+      SONG_WEEKND_OOTG: 'Give me tough love, just to be one of the girls tonight —'
+    };
+
     const studioState = {
       hydrated: false,
       arenas: [],
@@ -640,6 +669,8 @@
     let activeSwitchTargetReg = null;
     let recallMode = 'recall'; // 'recall' (active recall front -> answer+switch back) | 'read'
     let mobileHubTab = 'arenas'; // 'arenas' | 'langs' | 'lyrics'
+    let lyricsRemixMode = 'remix'; // 'remix' | 'original'
+    let remixInTargetLang = false;
     let nativePeeked = false;
     let autoNextAfterGrade = true;
     let spinOffOffset = 0;
@@ -1152,6 +1183,26 @@
       renderLyricDrawer();
     }
 
+    function setLyricsRemixMode(mode) {
+      if (window.PolyglotMobile) window.PolyglotMobile.haptic(8);
+      lyricsRemixMode = mode === 'original' ? 'original' : 'remix';
+      renderLyricDrawer();
+    }
+
+    function toggleRemixTargetLang() {
+      if (window.PolyglotMobile) window.PolyglotMobile.haptic(8);
+      remixInTargetLang = !remixInTargetLang;
+      renderLyricDrawer();
+    }
+
+    function jumpToMobileRemixLyrics() {
+      mobileHubTab = 'lyrics';
+      lyricsRemixMode = 'remix';
+      renderLyricDrawer();
+      const col = document.getElementById('mobileLyricsCol');
+      if (col) col.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
     function toggleAutoNextGrade() {
       autoNextAfterGrade = !autoNextAfterGrade;
       try {
@@ -1177,6 +1228,7 @@
       stopSwitchChain(false);
       activeArenaId = arenaId || 'terrace';
       spinOffOffset = 0;
+      remixInTargetLang = false;
       showCustomSpinOffComposer = false;
       expandedSpinOffKeys = new Set();
       isFlipped = false;
@@ -1770,6 +1822,53 @@
       updateSwitchChainUi();
     }
 
+    function buildArenaLyricRemix(ctx) {
+      const arenaId = ctx.activeCard.arena || activeArenaId || 'terrace';
+      const targetReg = ctx.targetCard?.lang || activeSwitchTargetReg || ctx.targetOrder[0];
+      const useReg = remixInTargetLang ? targetReg : ctx.nativeReg;
+      const outroReg = remixInTargetLang ? ctx.nativeReg : targetReg;
+      const songCallIn = SONG_REMIX_CALLINS[ctx.song.uid] || `${ctx.song.title} —`;
+      const settingLead = (ARENA_SETTING_FRAMES[arenaId] && ARENA_SETTING_FRAMES[arenaId][useReg]) || `${ctx.activeArenaMeta.short_label || arenaId}:`;
+
+      const findRoomCard = (reg, stage) => studioState.allCards.find(c =>
+        c.lang === reg && !c.lens_id && (c.arena || 'terrace') === arenaId && c.stage === stage
+      );
+
+      const openCard = findRoomCard(useReg, 'COMPLIMENT') || findRoomCard(useReg, 'CHAMELEON') || ctx.activeCard;
+      const flipCardObj = findRoomCard(useReg, 'COUNTERACT') || findRoomCard(useReg, 'CHAMELEON') || ctx.activeCard;
+      const outroCard = findRoomCard(outroReg, 'CURIOSITY') || findRoomCard(outroReg, ctx.activeCard.stage) || ctx.targetCard;
+      const bridgeObj = findMatchingBridge(useReg, outroReg);
+
+      const bars = [
+        { tag: 'HOOK × ROOM', reg: useReg, text: remixInTargetLang ? `${settingLead}` : `${songCallIn} ${settingLead}` },
+        { tag: openCard?.stage || 'COMPLIMENT', reg: useReg, text: stripHtmlToText(openCard?.text || ctx.song.lyric) },
+        { tag: flipCardObj?.stage || 'COUNTERACT', reg: useReg, text: stripHtmlToText(flipCardObj?.text || ctx.song.pivotText) },
+        {
+          tag: `SWITCH → ${(LANGUAGE_REG_META[outroReg]?.shortCode || outroReg)}`,
+          reg: outroReg,
+          text: `${bridgeObj ? `${stripHtmlToText(bridgeObj.text)} ` : ''}${stripHtmlToText(outroCard?.text || '')}`.trim()
+        }
+      ].filter(b => b.text);
+
+      // Build per-stanza inline Arena Remix Drop for stanzas containing arena-linked lyric motifs
+      const roomTokens = [];
+      (ctx.tokens || []).forEach(lt => {
+        const hit = resolveTokenCards(lt, ctx.song).find(c => (c.arena || 'terrace') === arenaId);
+        if (hit) roomTokens.push({ token: lt.token, card: hit });
+      });
+
+      const stanzaDrops = {};
+      ctx.stanzas.forEach((st, idx) => {
+        const stLower = String(st || '').toLowerCase();
+        const hit = roomTokens.find(rt => rt.token && stLower.includes(rt.token.toLowerCase()));
+        if (hit) {
+          stanzaDrops[idx] = hit;
+        }
+      });
+
+      return { arenaId, useReg, outroReg, bars, stanzaDrops };
+    }
+
     function renderLyricDrawer(ctx = getActiveDrillContext()) {
       const tokenPillsEl = document.getElementById('lyricTokenPills');
       const stanzasEl = document.getElementById('stanzasBox');
@@ -1777,6 +1876,13 @@
       const socialArenaEl = document.getElementById('socialArenaLinksBox');
       const mobileLyricsColEl = document.getElementById('mobileLyricsCol');
       const stanzaBadge = document.getElementById('stanzaStatsBadge');
+      const lyricsHeaderEl = document.getElementById('lyricsHeaderTitle');
+      const remixBtnEl = document.getElementById('lyricsModeRemixBtn');
+      const origBtnEl = document.getElementById('lyricsModeOrigBtn');
+
+      const curArenaTop = ctx.activeArenaMeta || {};
+      const arenaIconTop = curArenaTop.icon || '🎙️';
+      const arenaLabelTop = curArenaTop.short_label || curArenaTop.label || ctx.activeCard.arena || 'Terrace';
 
       if (mobileLyricsColEl && fiveLangEl && socialArenaEl) {
         mobileLyricsColEl.className = `${mobileHubTab === 'lyrics' ? 'block' : 'hidden'} lg:block lg:col-span-5 space-y-2.5 min-w-0`;
@@ -1786,11 +1892,28 @@
       ['arenas', 'langs', 'lyrics'].forEach(t => {
         const b = document.getElementById(`mobileHubTab_${t}`);
         if (b) {
+          if (t === 'lyrics') {
+            b.textContent = lyricsRemixMode === 'remix' ? `🎛️ ${arenaIconTop} Remix` : '📜 Full Lyrics';
+          }
           b.className = mobileHubTab === t
             ? 'min-h-[34px] px-1.5 py-1.5 rounded-lg bg-amber-500 text-slate-950 font-bold transition truncate'
             : 'min-h-[34px] px-1.5 py-1.5 rounded-lg text-slate-300 hover:text-white transition truncate';
         }
       });
+
+      if (lyricsHeaderEl) {
+        lyricsHeaderEl.textContent = lyricsRemixMode === 'remix'
+          ? `🎛️ ${arenaIconTop} ${arenaLabelTop} Remix`
+          : '📜 Full Lyrics (Original)';
+      }
+      if (remixBtnEl && origBtnEl) {
+        remixBtnEl.className = lyricsRemixMode === 'remix'
+          ? 'px-2 py-0.5 rounded-md bg-amber-500 text-slate-950 font-bold transition whitespace-nowrap'
+          : 'px-2 py-0.5 rounded-md text-slate-300 hover:text-white transition whitespace-nowrap';
+        origBtnEl.className = lyricsRemixMode === 'original'
+          ? 'px-2 py-0.5 rounded-md bg-amber-500 text-slate-950 font-bold transition whitespace-nowrap'
+          : 'px-2 py-0.5 rounded-md text-slate-300 hover:text-white transition whitespace-nowrap';
+      }
 
       if (stanzaBadge) {
         const wc = ctx.song.total_token_count ? ` • ${ctx.song.total_token_count} words` : '';
@@ -1814,12 +1937,68 @@
         }).join('');
       }
 
+      const remixData = buildArenaLyricRemix(ctx);
+
       if (stanzasEl) {
         const highlightTerms = ctx.tokens.map(t => t.token).filter(t => t && t.length >= 2);
         const activeLower = ctx.selectedToken?.token ? ctx.selectedToken.token.toLowerCase() : '';
-        stanzasEl.innerHTML = ctx.stanzas.map((st, idx) => {
+        const useMeta = LANGUAGE_REG_META[remixData.useReg] || { flag: ctx.song.flag, shortCode: remixData.useReg };
+        const outroMeta = LANGUAGE_REG_META[remixData.outroReg] || { flag: '🌐', shortCode: remixData.outroReg };
+        const fullRemixSpeech = remixData.bars.map(b => b.text).join(' — ');
+        const remixTtsIdx = registerTtsPayload(fullRemixSpeech, remixData.useReg);
+
+        const remixCardHtml = lyricsRemixMode === 'remix' ? `
+          <div id="arenaRemixVerseCard" class="p-3 rounded-xl bg-gradient-to-br from-fuchsia-950/45 via-slate-950 to-amber-950/35 border border-amber-400/55 space-y-2">
+            <div class="flex flex-wrap items-center justify-between gap-1.5 text-[10px] mono">
+              <span class="font-bold text-amber-300 uppercase truncate">
+                🎛️ ${escHtml(ctx.song.title)} × ${escHtml(arenaIconTop)} ${escHtml(arenaLabelTop)}
+              </span>
+              <div class="flex items-center gap-1 ml-auto">
+                <span class="px-1.5 py-0.5 rounded bg-slate-900 border border-slate-700 text-amber-200">${ctx.song.bpm} BPM</span>
+                <button type="button" id="remixLangFlipBtn" onclick="toggleRemixTargetLang()"
+                  class="px-1.5 py-0.5 rounded border transition ${remixInTargetLang ? 'bg-emerald-500/20 border-emerald-400/60 text-emerald-200 font-bold' : 'bg-slate-900 hover:bg-slate-800 border-slate-700 text-slate-200'}">
+                  ⇄ ${escHtml(useMeta.flag)} → ${escHtml(outroMeta.flag)}
+                </button>
+                <button type="button" onclick="speakTtsByIdx(${remixTtsIdx})"
+                  class="px-1.5 py-0.5 rounded bg-amber-500/20 hover:bg-amber-500/35 border border-amber-400/50 text-amber-200 font-bold">
+                  🔊 Mix
+                </button>
+              </div>
+            </div>
+            <div class="space-y-1.5">
+              ${remixData.bars.map(bar => `
+                <div class="text-xs leading-relaxed text-slate-100">
+                  <span class="text-[9px] mono px-1.5 py-0.5 rounded bg-slate-900/90 border border-slate-700/80 text-cyan-300 mr-1.5">${escHtml(bar.tag)}</span>
+                  <span>${highlightTokensSafe(bar.text, highlightTerms, ctx.selectedToken?.token, false)}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        ` : '';
+
+        const stanzasHtml = ctx.stanzas.map((st, idx) => {
           const containsActive = Boolean(activeLower && String(st || '').toLowerCase().includes(activeLower));
           const bodyHtml = highlightTokensSafe(st, highlightTerms, ctx.selectedToken?.token, true);
+          const dropHit = lyricsRemixMode === 'remix' ? remixData.stanzaDrops[idx] : null;
+          let dropHtml = '';
+          if (dropHit) {
+            const dropPlain = stripHtmlToText(dropHit.card.text);
+            const dropTts = registerTtsPayload(dropPlain, dropHit.card.lang);
+            dropHtml = `
+              <div class="mt-2 pt-2 border-t border-slate-800/80 bg-slate-900/75 rounded-lg p-2 space-y-1">
+                <div class="flex flex-wrap items-center justify-between gap-1 text-[9px] mono">
+                  <span class="text-cyan-300 font-bold uppercase">↳ ${escHtml(arenaIconTop)} ${escHtml(arenaLabelTop)} Drop (${escHtml(dropHit.card.stage)})</span>
+                  <div class="flex items-center gap-1">
+                    <button type="button" onclick="speakTtsByIdx(${dropTts})" class="px-1.5 py-0.5 rounded bg-slate-950 border border-slate-700 text-slate-300">🔊</button>
+                    <button type="button" data-drop-stage="${escHtml(dropHit.card.stage)}" data-drop-tok="${escHtml(dropHit.token)}"
+                      onclick="loadSpinOffToSpotlight(this.getAttribute('data-drop-stage'), this.getAttribute('data-drop-tok'))"
+                      class="px-1.5 py-0.5 rounded bg-amber-500/15 border border-amber-500/35 text-amber-200 font-semibold">⬆ Drill</button>
+                  </div>
+                </div>
+                <div class="text-[11px] text-amber-100 leading-snug">${highlightTokensSafe(dropPlain, [dropHit.token], dropHit.token, false)}</div>
+              </div>
+            `;
+          }
           return `
             <div class="p-3 rounded-xl bg-slate-950/85 border ${containsActive ? 'border-amber-500/45 border-l-2 border-l-amber-400' : 'border-slate-800/80'}">
               <div class="text-[10px] mono ${containsActive ? 'text-amber-300 font-semibold' : 'text-amber-400/75'} mb-1 uppercase flex items-center justify-between gap-2">
@@ -1827,9 +2006,12 @@
                 ${containsActive ? `<span class="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30">Active</span>` : ''}
               </div>
               <div class="text-slate-200 leading-relaxed">${bodyHtml}</div>
+              ${dropHtml}
             </div>
           `;
         }).join('');
+
+        stanzasEl.innerHTML = remixCardHtml + stanzasHtml;
       }
 
       if (fiveLangEl) {
@@ -2010,6 +2192,7 @@
                 🎬 Lyric Spin-Offs in ${escHtml(curArena.short_label || arenaNow)} (${spinOffData.totalCount || spinOffData.visibleItems.length})
               </span>
               <div class="flex items-center gap-1.5">
+                <button type="button" onclick="jumpToMobileRemixLyrics()" class="lg:hidden px-2 py-0.5 rounded bg-fuchsia-500/15 hover:bg-fuchsia-500/25 border border-fuchsia-500/35 text-fuchsia-200 transition">🎛️ Full Remix</button>
                 ${spinOffData.hasMore ? `<button type="button" onclick="cycleArenaSpinOffs()" class="px-2 py-0.5 rounded bg-slate-900 hover:bg-slate-800 border border-slate-700 text-amber-200 transition">🎲 More</button>` : ''}
                 <button type="button" id="toggleComposerBtn" onclick="toggleCustomSpinOffComposer()" class="px-2 py-0.5 rounded bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/35 text-emerald-300 transition">
                   ${showCustomSpinOffComposer ? '✕ Close' : '＋ Spin-Off'}
@@ -2279,6 +2462,7 @@
       activeLyricToken = null;
       activeSwitchTargetReg = null;
       nativePeeked = false;
+      remixInTargetLang = false;
       spinOffOffset = 0;
       showCustomSpinOffComposer = false;
       expandedSpinOffKeys = new Set();

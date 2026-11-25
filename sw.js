@@ -1,4 +1,4 @@
-const CACHE_NAME = 'polyglot-riff-studio-v4.0';
+const CACHE_NAME = 'polyglot-riff-studio-v4.1';
 const PRECACHE_URLS = [
   './index.html',
   './manifest.webmanifest',
