@@ -266,23 +266,23 @@
                 </div>
 
                 <!-- Action Bar: Mode Switcher + Practice Timer + Stage -->
-                <div class="flex items-center gap-2 sm:gap-2.5 flex-shrink-0">
+                <div class="flex flex-wrap items-center justify-between sm:justify-end gap-1.5 sm:gap-2 w-full sm:w-auto">
                     <!-- Mode Toggle: Regional Flow vs Chameleon Roulette -->
                     <div class="bg-studio-900 p-1 rounded-xl border border-studio-800 flex items-center">
-                        <button id="modePersonaBtn" onclick="setStudioMode('persona')" class="px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all flex items-center gap-1.5 bg-amber-500 text-slate-950 font-semibold shadow-sm">
+                        <button id="modePersonaBtn" onclick="setStudioMode('persona')" class="px-2 sm:px-3 py-1.5 rounded-lg text-[11px] sm:text-sm font-medium transition-all flex items-center gap-1.5 bg-amber-500 text-slate-950 font-semibold shadow-sm whitespace-nowrap">
                             <i class="ph-bold ph-flame"></i>
                             <span>Cultural Vibe</span>
                         </button>
-                        <button id="modeMashupBtn" onclick="setStudioMode('mashup')" class="px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all flex items-center gap-1.5 text-gray-400 hover:text-white">
+                        <button id="modeMashupBtn" onclick="setStudioMode('mashup')" class="px-2 sm:px-3 py-1.5 rounded-lg text-[11px] sm:text-sm font-medium transition-all flex items-center gap-1.5 text-gray-400 hover:text-white whitespace-nowrap">
                             <i class="ph-bold ph-shuffle"></i>
-                            <span>Polyglot Roulette</span>
+                            <span><span class="hidden sm:inline">Polyglot </span>Roulette</span>
                         </button>
                     </div>
 
                     <!-- Pacing Stopwatch -->
-                    <div class="flex items-center gap-1.5 bg-studio-900 border border-studio-800 px-2.5 py-1.5 rounded-xl">
+                    <div class="flex items-center gap-1 bg-studio-900 border border-studio-800 px-2 py-1 rounded-xl">
                         <div id="timerIndicator" class="w-2 h-2 rounded-full bg-gray-500"></div>
-                        <span id="timerDisplay" class="font-mono text-sm font-semibold text-gray-200 w-11 text-center">00:00</span>
+                        <span id="timerDisplay" class="font-mono text-xs sm:text-sm font-semibold text-gray-200 w-10 sm:w-11 text-center">00:00</span>
                         <button id="timerToggleBtn" onclick="toggleTimer()" title="Start/Pause Riff Timer" class="p-1 text-gray-400 hover:text-emerald-400 transition-colors">
                             <i id="timerIcon" class="ph-fill ph-play text-base"></i>
                         </button>
@@ -292,9 +292,9 @@
                     </div>
 
                     <!-- Full Script Teleprompter Button -->
-                    <button onclick="openTeleprompter(0)" class="px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500/20 to-rose-500/20 hover:from-amber-500/30 hover:to-rose-500/30 text-amber-300 border border-amber-500/30 text-xs font-medium flex items-center gap-1.5 transition-all shadow-sm">
+                    <button onclick="openTeleprompter(0)" class="px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500/20 to-rose-500/20 hover:from-amber-500/30 hover:to-rose-500/30 text-amber-300 border border-amber-500/30 text-xs font-medium flex items-center gap-1.5 transition-all shadow-sm whitespace-nowrap">
                         <i class="ph-bold ph-corners-out text-sm"></i>
-                        <span class="hidden md:inline">Spotlight</span>
+                        <span class="hidden sm:inline">Spotlight</span>
                     </button>
 
                     <!-- Cross-Tab Workflow Handoff -->

@@ -883,6 +883,7 @@
       .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
       @media (max-width: 640px) {
         html.polyglot-embedded .embed-compact-main { padding-left: 0.65rem !important; padding-right: 0.65rem !important; padding-bottom: 1.5rem !important; }
+        button:not(.dial-carousel-item):not([class*="w-[18px]"]):not([data-lyric-token]):not(#hub-backend-pill) { min-height: 32px; }
       }
     `;
     (global.document.head || global.document.documentElement).appendChild(st);
