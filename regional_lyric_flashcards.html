@@ -273,53 +273,27 @@
 
     </section>
 
-    <!-- BELOW THE FOLD: COMPACT INTERACTIVE STANZAS & :LYRICTOKEN DRIVER (ZERO CARD DUPLICATION) -->
+    <!-- BELOW THE FOLD: INTERACTIVE LYRICS + 5 LANGUAGES & 8 SOCIAL ARENAS HUB -->
     <section class="neon-panel-subtle rounded-2xl p-3.5 sm:p-5 space-y-3 border border-amber-500/20">
-      <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-2.5">
-        <div class="min-w-0">
-          <div class="flex flex-wrap items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-400 mono">
-            <i data-lucide="network" class="w-4 h-4 shrink-0"></i>
-            <span>Interactive Lyrics &amp; :LyricToken Driver</span>
-            <span id="stanzaStatsBadge" class="text-[10px] px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-amber-300 font-normal">4 stanzas</span>
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+        <!-- Left 5 Cols: Compact Clickable Anchor Chips & Full Lyrics -->
+        <div class="lg:col-span-5 space-y-2.5 min-w-0">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-2">
+            <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-300 mono">
+              <i data-lucide="music" class="w-4 h-4 shrink-0"></i>
+              <span>Full Lyrics (Tap Anchor)</span>
+            </div>
+            <span id="stanzaStatsBadge" class="text-[10px] mono px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-slate-300">4 stanzas</span>
           </div>
-          <p class="text-[11px] text-slate-400 mt-0.5">
-            Tap any highlighted lyric motif below to snap the Spotlight Stage above into its linked Arena &amp; 4-C riff.
-          </p>
+          <div id="lyricTokenPills" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5"></div>
+          <div id="stanzasBox" class="space-y-2.5 max-h-[360px] overflow-y-auto pr-1 text-xs leading-relaxed"></div>
         </div>
 
-        <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
-          <div class="inline-flex items-center rounded-lg bg-slate-950 border border-slate-800 p-0.5 text-[11px] mono">
-            <button type="button" id="drawerStanzasBtn" onclick="setLyricDrawerTab('stanzas')"
-              class="px-2.5 py-1 rounded-md bg-amber-500 text-slate-950 font-bold transition whitespace-nowrap">
-              📜 Full Stanzas
-            </button>
-            <button type="button" id="drawerFreqBtn" onclick="setLyricDrawerTab('frequency')"
-              class="px-2.5 py-1 rounded-md text-slate-300 hover:text-white transition whitespace-nowrap">
-              📊 Motif Frequency
-            </button>
-          </div>
-          <span id="reachStatusBadge" class="text-[10px] mono px-2 py-1 rounded bg-slate-900 border border-slate-800 text-slate-300">
-            Ready (:LyricToken Sync)
-          </span>
-          <button type="button" id="reachIndexBtn" onclick="runAgentReachIndex()" class="px-2.5 py-1 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-300 text-[11px] font-semibold mono transition flex items-center gap-1 whitespace-nowrap">
-            <i data-lucide="radar" class="w-3.5 h-3.5"></i>
-            <span>⚡ Agent-Reach</span>
-          </button>
+        <!-- Right 7 Cols: 5 Languages & 8 Social Arenas Direct Links -->
+        <div id="langAndArenaHub" class="lg:col-span-7 space-y-3.5 min-w-0">
+          <div id="fiveLangLinksBox" class="p-3 sm:p-3.5 rounded-xl bg-slate-950/75 border border-slate-800/90 space-y-2.5"></div>
+          <div id="socialArenaLinksBox" class="p-3 sm:p-3.5 rounded-xl bg-slate-950/75 border border-slate-800/90 space-y-2.5"></div>
         </div>
-      </div>
-
-      <!-- Swipeable Motif Frequency Pills -->
-      <div id="lyricTokenPills" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5"></div>
-
-      <!-- Drawer Body: Stanzas Grid OR Motif Frequency Cards -->
-      <div id="lyricDrawerBody">
-        <div id="stanzasBox" class="grid grid-cols-1 md:grid-cols-2 gap-2.5 max-h-[340px] overflow-y-auto pr-1 text-xs leading-relaxed"></div>
-      </div>
-
-      <!-- Compact Cypher Lineage Footer -->
-      <div class="pt-2 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-2 text-[10px] mono text-slate-400">
-        <span id="cypherUidTag" class="text-indigo-300 truncate max-w-full">(:Song {uid: 'SONG_CZ_OVA_NOHAVICA'})-[:HAS_LYRIC_TOKEN]->(:LyricToken)</span>
-        <span id="graphLinksSummary" class="text-emerald-400 whitespace-nowrap">Neo4j v3.7 • Mobile Offline Ready</span>
       </div>
     </section>
 
@@ -1441,29 +1415,15 @@
     }
 
     function renderLyricDrawer(ctx = getActiveDrillContext()) {
-      const stanzasBtn = document.getElementById('drawerStanzasBtn');
-      const freqBtn = document.getElementById('drawerFreqBtn');
       const tokenPillsEl = document.getElementById('lyricTokenPills');
-      const bodyEl = document.getElementById('lyricDrawerBody');
+      const stanzasEl = document.getElementById('stanzasBox');
+      const fiveLangEl = document.getElementById('fiveLangLinksBox');
+      const socialArenaEl = document.getElementById('socialArenaLinksBox');
       const stanzaBadge = document.getElementById('stanzaStatsBadge');
-      const cypherEl = document.getElementById('cypherUidTag');
-
-      if (stanzasBtn && freqBtn) {
-        stanzasBtn.className = lyricDrawerTab === 'stanzas'
-          ? 'px-2.5 py-1 rounded-md bg-amber-500 text-slate-950 font-bold transition whitespace-nowrap'
-          : 'px-2.5 py-1 rounded-md text-slate-300 hover:text-white transition whitespace-nowrap';
-        freqBtn.className = lyricDrawerTab === 'frequency'
-          ? 'px-2.5 py-1 rounded-md bg-amber-500 text-slate-950 font-bold transition whitespace-nowrap'
-          : 'px-2.5 py-1 rounded-md text-slate-300 hover:text-white transition whitespace-nowrap';
-      }
 
       if (stanzaBadge) {
         const wc = ctx.song.total_token_count ? ` • ${ctx.song.total_token_count} words` : '';
         stanzaBadge.textContent = `${ctx.stanzas.length} stanzas${wc}`;
-      }
-
-      if (cypherEl) {
-        cypherEl.textContent = `(:Song {uid: '${ctx.song.uid}'})-[:HAS_LYRIC_TOKEN]->(:LyricToken ${ctx.selectedToken ? `{token: '${ctx.selectedToken.token}'}` : ''})->(:Card {uid: '${ctx.activeCard.uid}'})`;
       }
 
       if (tokenPillsEl) {
@@ -1478,79 +1438,136 @@
                   : 'bg-slate-950 hover:bg-slate-900 text-slate-300 border border-slate-800'
               }">
               <span>"${escHtml(lt.token)}"</span>
-              <span class="opacity-75 text-[10px]">${lt.song_count || 1}×</span>
               ${linkInArena ? `<span class="w-1.5 h-1.5 rounded-full ${isAct ? 'bg-slate-950' : 'bg-emerald-400'}"></span>` : ''}
             </button>
           `;
         }).join('');
       }
 
-      if (!bodyEl) return;
+      if (stanzasEl) {
+        const highlightTerms = ctx.tokens.map(t => t.token).filter(t => t && t.length >= 2);
+        const activeLower = ctx.selectedToken?.token ? ctx.selectedToken.token.toLowerCase() : '';
+        stanzasEl.innerHTML = ctx.stanzas.map((st, idx) => {
+          const containsActive = Boolean(activeLower && String(st || '').toLowerCase().includes(activeLower));
+          const bodyHtml = highlightTokensSafe(st, highlightTerms, ctx.selectedToken?.token, true);
+          return `
+            <div class="p-3 rounded-xl bg-slate-950/85 border ${containsActive ? 'border-amber-500/45 border-l-2 border-l-amber-400' : 'border-slate-800/80'}">
+              <div class="text-[10px] mono ${containsActive ? 'text-amber-300 font-semibold' : 'text-amber-400/75'} mb-1 uppercase flex items-center justify-between gap-2">
+                <span>Stanza ${idx + 1} ${idx === ctx.stanzas.length - 1 ? '• Regional Hook' : ''}</span>
+                ${containsActive ? `<span class="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30">Active</span>` : ''}
+              </div>
+              <div class="text-slate-200 leading-relaxed">${bodyHtml}</div>
+            </div>
+          `;
+        }).join('');
+      }
 
-      if (lyricDrawerTab === 'frequency') {
-        if (!ctx.tokens.length) {
-          bodyEl.innerHTML = `<div class="p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-400 italic">${ctx.song._loadingLyrics ? '⏳ Lazy-loading split lyric shard…' : 'Click "⚡ Agent-Reach" to index motif frequencies.'}</div>`;
-          return;
-        }
-        bodyEl.innerHTML = `
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 max-h-[340px] overflow-y-auto pr-1">
-            ${ctx.tokens.map(lt => {
-              const pct = Math.min(100, Math.round((Number(lt.frequency_score || 0.4)) * 100));
-              const resolvedCards = resolveTokenCards(lt, ctx.song);
-              const arenaChips = [];
-              const seenChip = new Set();
-              resolvedCards.forEach(rc => {
-                const arMeta = studioState.arenasById[rc.arena] || { icon: '🎙️', short_label: rc.arena || 'Terrace' };
-                if (!seenChip.has(arMeta.short_label)) {
-                  seenChip.add(arMeta.short_label);
-                  arenaChips.push(`${arMeta.icon || '🎙️'} ${arMeta.short_label}`);
-                }
-              });
-              const isAct = ctx.selectedToken && lt.token === ctx.selectedToken.token;
-              const cousin = findVibeOrCousin(lt);
+      if (fiveLangEl) {
+        const langDefs = [
+          { reg: 'CZ_OVA', idx: 0 },
+          { reg: 'AT_VIE', idx: 1 },
+          { reg: 'RU_ALA', idx: 2 },
+          { reg: 'EN_YYC', idx: 3 },
+          { reg: 'ES_SOT', idx: 4 }
+        ];
+        const arenaNow = ctx.activeCard.arena || activeArenaId || 'terrace';
+        fiveLangEl.innerHTML = `
+          <div class="flex flex-wrap items-center justify-between gap-2 text-[11px] mono">
+            <span class="font-bold uppercase tracking-wider text-amber-300">🌐 5 Languages (Direct Links):</span>
+            <span class="text-slate-400 text-[10px]">Jump straight into Switcher, Atelier or Lounge</span>
+          </div>
+          <div class="space-y-1.5">
+            ${langDefs.map(ld => {
+              const lm = LANGUAGE_REG_META[ld.reg];
+              const isCur = ctx.nativeReg === ld.reg;
+              const isLockedTgt = activeSwitchTargetReg === ld.reg;
               return `
-                <button type="button" data-lyric-token="${escHtml(lt.token)}" onclick="selectLyricToken(this.getAttribute('data-lyric-token'))"
-                  class="text-left p-3 rounded-xl bg-slate-950 hover:bg-slate-900 border ${isAct ? 'border-amber-400/75 ring-1 ring-amber-400/25' : 'border-slate-800'} space-y-1.5 text-xs transition cursor-pointer">
-                  <div class="flex items-center justify-between gap-2">
-                    <span class="font-bold text-amber-300 mono text-sm truncate">"${escHtml(lt.token)}"</span>
-                    <span class="text-[10px] mono px-1.5 py-0.5 rounded bg-emerald-950/70 border border-emerald-500/30 text-emerald-300 shrink-0">${pct}% Freq</span>
+                <div class="p-2 rounded-xl border transition flex flex-wrap items-center justify-between gap-2 ${
+                  isCur
+                    ? 'bg-amber-500/12 border-amber-400/60'
+                    : isLockedTgt
+                      ? 'bg-emerald-500/10 border-emerald-400/45'
+                      : 'bg-slate-900/75 border-slate-800/90 hover:border-slate-700'
+                }">
+                  <button type="button" onclick="selectTrack(${ld.idx})" class="flex items-center gap-2 text-left min-w-0">
+                    <span class="text-sm leading-none">${escHtml(lm.flag)}</span>
+                    <span class="text-xs font-semibold text-white truncate">${escHtml(lm.langName)}</span>
+                    <span class="text-[10px] mono text-slate-400 hidden sm:inline">(${escHtml(lm.city)} · ${escHtml(lm.personaName)})</span>
+                    ${isCur ? '<span class="text-[9px] mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-200 border border-amber-400/40">ACTIVE</span>' : ''}
+                    ${isLockedTgt ? '<span class="text-[9px] mono px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-200 border border-emerald-400/40">TARGET</span>' : ''}
+                  </button>
+                  <div class="flex flex-wrap items-center gap-1 text-[10px] mono ml-auto">
+                    ${!isCur ? `<button type="button" onclick="selectSwitchTarget('${escHtml(ld.reg)}')" class="px-2 py-1 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-700 text-amber-200 transition">⇄ Lock</button>` : ''}
+                    <button type="button" onclick="window.PolyglotSyncBus && window.PolyglotSyncBus.navigateApp('czech_register_switcher_widget.html', { registerId: '${escHtml(ld.reg)}' })"
+                      class="px-2 py-1 rounded-lg bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/35 text-indigo-200 transition whitespace-nowrap">
+                      ⇄ Switcher
+                    </button>
+                    <button type="button" onclick="window.PolyglotSyncBus && window.PolyglotSyncBus.navigateApp('polyglot_riff_studio_v3_1_atelier_edition.html', { registerId: '${escHtml(ld.reg)}', arena: '${escHtml(arenaNow)}' })"
+                      class="px-2 py-1 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/35 text-emerald-200 transition whitespace-nowrap">
+                      ★ Atelier
+                    </button>
+                    <button type="button" onclick="window.PolyglotSyncBus && window.PolyglotSyncBus.navigateApp('polyglot_riff_studio_v1_zero_corporate.html', { registerId: '${escHtml(ld.reg)}', arena: '${escHtml(arenaNow)}' })"
+                      class="px-2 py-1 rounded-lg bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/35 text-cyan-200 transition whitespace-nowrap">
+                      🎙️ Lounge
+                    </button>
                   </div>
-                  <div class="text-[11px] text-slate-300 leading-snug line-clamp-2">${escHtml(lt.meaning_gloss || '')}</div>
-                  ${cousin ? `<div class="text-[10px] mono text-fuchsia-300 truncate">↔ ${escHtml(cousin)}</div>` : ''}
-                  <div class="w-full h-1.5 rounded-full bg-slate-900 overflow-hidden">
-                    <div class="h-full bg-gradient-to-r from-amber-400 to-emerald-400" style="width:${pct}%"></div>
-                  </div>
-                  <div class="flex flex-wrap items-center gap-1 pt-0.5 text-[10px] mono">
-                    <span class="px-1.5 py-0.5 rounded bg-slate-900 text-amber-200 border border-slate-800">Song: ${lt.song_count || 1}×</span>
-                    ${arenaChips.slice(0, 2).map(ch => `<span class="px-1.5 py-0.5 rounded bg-emerald-950/50 text-emerald-300 border border-emerald-500/20">${escHtml(ch)}</span>`).join('')}
-                  </div>
-                </button>
+                </div>
               `;
             }).join('')}
           </div>
         `;
-        return;
       }
 
-      const highlightTerms = ctx.tokens.map(t => t.token).filter(t => t && t.length >= 2);
-      const activeLower = ctx.selectedToken?.token ? ctx.selectedToken.token.toLowerCase() : '';
-      bodyEl.innerHTML = `
-        <div id="stanzasBox" class="grid grid-cols-1 md:grid-cols-2 gap-2.5 max-h-[340px] overflow-y-auto pr-1 text-xs leading-relaxed">
-          ${ctx.stanzas.map((st, idx) => {
-            const containsActive = Boolean(activeLower && String(st || '').toLowerCase().includes(activeLower));
-            const bodyHtml = highlightTokensSafe(st, highlightTerms, ctx.selectedToken?.token, true);
-            return `
-              <div class="p-3 rounded-xl bg-slate-950/85 border ${containsActive ? 'border-amber-500/45 border-l-2 border-l-amber-400' : 'border-slate-800/80'}">
-                <div class="text-[10px] mono ${containsActive ? 'text-amber-300 font-semibold' : 'text-amber-400/75'} mb-1 uppercase flex items-center justify-between gap-2">
-                  <span>Stanza ${idx + 1} ${idx === ctx.stanzas.length - 1 ? '• Regional Chorus Hook' : ''}</span>
-                  ${containsActive ? `<span class="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30">Active Motif</span>` : ''}
-                </div>
-                <div class="text-slate-200 leading-relaxed">${bodyHtml}</div>
-              </div>
-            `;
-          }).join('')}
-        </div>
-      `;
+      if (socialArenaEl) {
+        const curArena = ctx.activeArenaMeta || {};
+        const arenaGroup = curArena.arena_group || 'Social Arena';
+        const arenaDesc = curArena.description || 'Pick any social room to drill its 4-C spoken riffs & cross-lingual bridges.';
+        const arenaNow = ctx.activeCard.arena || activeArenaId || 'terrace';
+        socialArenaEl.innerHTML = `
+          <div class="flex flex-wrap items-center justify-between gap-2 text-[11px] mono">
+            <span class="font-bold uppercase tracking-wider text-amber-300">✨ SOCIAL ARENA (8 UNIFIED ROOMS):</span>
+            <span class="text-slate-400 text-[10px] truncate max-w-full">[${escHtml(arenaGroup)}] ${escHtml(arenaDesc)}</span>
+          </div>
+          <div class="flex flex-wrap gap-1.5 sm:gap-2">
+            ${ctx.arenas.map(ar => {
+              const isAct = ar.id === arenaNow;
+              const fullTitle = ar.label || ar.short_label || ar.id;
+              return `
+                <button type="button" data-social-arena="${escHtml(ar.id)}" onclick="selectLyricArena('${escHtml(ar.id)}')"
+                  class="px-3 py-1.5 rounded-full text-xs border transition flex items-center gap-1.5 ${
+                    isAct
+                      ? 'bg-amber-500/20 border-amber-400/75 text-amber-200 font-semibold shadow-sm'
+                      : 'bg-slate-900/90 hover:bg-slate-800 border-slate-800 text-slate-200'
+                  }">
+                  <span>${escHtml(ar.icon || '🎙️')}</span>
+                  <span>${escHtml(fullTitle)}</span>
+                </button>
+              `;
+            }).join('')}
+          </div>
+          <div class="pt-2 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-2 text-[11px] mono">
+            <span class="text-slate-400 text-[10px]">Open <span class="text-amber-300 font-semibold">${escHtml(curArena.label || arenaNow)}</span> in:</span>
+            <div class="flex flex-wrap items-center gap-1.5">
+              <button type="button" onclick="window.PolyglotSyncBus && window.PolyglotSyncBus.navigateApp('polyglot_riff_studio_v3_1_atelier_edition.html', { registerId: '${escHtml(ctx.nativeReg)}', arena: '${escHtml(arenaNow)}' })"
+                class="px-2.5 py-1 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/35 text-emerald-300 transition whitespace-nowrap">
+                ★ Atelier v3.1 →
+              </button>
+              <button type="button" onclick="window.PolyglotSyncBus && window.PolyglotSyncBus.navigateApp('polyglot_riff_studio_v1_zero_corporate.html', { registerId: '${escHtml(ctx.nativeReg)}', arena: '${escHtml(arenaNow)}' })"
+                class="px-2.5 py-1 rounded-lg bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/35 text-cyan-300 transition whitespace-nowrap">
+                🎙️ Lounge v1.0 →
+              </button>
+              <button type="button" onclick="window.PolyglotSyncBus && window.PolyglotSyncBus.navigateApp('polyglot_riff_studio_v3_0_neo4j_srs_heatmap.html', { registerId: '${escHtml(ctx.nativeReg)}', arena: '${escHtml(arenaNow)}' })"
+                class="px-2.5 py-1 rounded-lg bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/35 text-indigo-300 transition whitespace-nowrap">
+                🗺️ SRS Heatmap →
+              </button>
+              <button type="button" onclick="window.PolyglotSyncBus && window.PolyglotSyncBus.navigateApp('polyglot_audio_rhythm_studio_v4_5.html', { registerId: '${escHtml(ctx.nativeReg)}', arena: '${escHtml(arenaNow)}' })"
+                class="px-2.5 py-1 rounded-lg bg-fuchsia-500/15 hover:bg-fuchsia-500/25 border border-fuchsia-500/35 text-fuchsia-300 transition whitespace-nowrap">
+                🎛️ Rhythm Lab →
+              </button>
+            </div>
+          </div>
+        `;
+      }
     }
 
     function renderUnifiedStudio() {
