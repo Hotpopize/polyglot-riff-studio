@@ -236,6 +236,7 @@
           text: c.text,
           phonetics: c.phonetics || '',
           english: c.english || '',
+          delivery: c.delivery || '',
           idioms: c.idioms || []
         };
         allCards.push(cardItem);
@@ -272,6 +273,7 @@
       songs,
       vocab,
       vocabFalseFriendAlerts: fabric.vocab_false_friend_alerts || [],
+      vibeLinks: fabric.vibe_links || [],
       stagedWebhooks: fabric.staged_webhooks || []
     };
 

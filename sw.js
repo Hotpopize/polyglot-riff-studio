@@ -1,4 +1,4 @@
-const CACHE_NAME = 'polyglot-riff-studio-v3.6';
+const CACHE_NAME = 'polyglot-riff-studio-v3.7';
 const PRECACHE_URLS = [
   './index.html',
   './manifest.webmanifest',
@@ -44,15 +44,29 @@ self.addEventListener('fetch', (event) => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
 
-  // Network-first for API requests
-  if (url.pathname.startsWith('/api/')) {
+  // Network-first for API requests, HTML navigations, HTML views, and core JS (instant phone GitHub Pages updates)
+  if (
+    url.pathname.startsWith('/api/') ||
+    req.mode === 'navigate' ||
+    url.pathname.endsWith('.html') ||
+    url.pathname.endsWith('.js') ||
+    url.pathname.endsWith('/')
+  ) {
     event.respondWith(
-      fetch(req).catch(() => caches.match(req))
+      fetch(req)
+        .then((res) => {
+          if (res && res.status === 200) {
+            const copy = res.clone();
+            caches.open(CACHE_NAME).then((c) => c.put(req, copy)).catch(() => {});
+          }
+          return res;
+        })
+        .catch(() => caches.match(req))
     );
     return;
   }
 
-  // Stale-while-revalidate for Studio HTML, JS, and .db.json shards
+  // Stale-while-revalidate for .db.json / .lyrics.json shards and manifest assets
   event.respondWith(
     caches.match(req).then((cached) => {
       const networkFetch = fetch(req)
