@@ -471,6 +471,66 @@
 
     const FSRS_LOCAL_KEY = 'polyglot_lyric_arena_fsrs_v1';
     const AUTO_NEXT_KEY = 'polyglot_lyric_auto_next_v1';
+    const CUSTOM_SPINOFFS_KEY = 'polyglot_arena_spinoffs_v1';
+
+    const ARENA_SETTING_FRAMES = {
+      terrace: {
+        CZ_OVA: 'Na noční terase po půlnoci:',
+        AT_VIE: 'Auf der Dachterrasse um eins:',
+        RU_ALA: 'На ночной террасе под звёздами:',
+        EN_YYC: 'Out on the midnight terrace:',
+        ES_SOT: 'En la terraza de madrugada:'
+      },
+      spark: {
+        CZ_OVA: 'Prvních 20 vteřin u baru:',
+        AT_VIE: 'In den ersten 20 Sekunden an der Bar:',
+        RU_ALA: 'В первые 20 секунд у входа:',
+        EN_YYC: 'First 20 seconds across the room:',
+        ES_SOT: 'Primeros 20 segundos al cruzar la mirada:'
+      },
+      adventure: {
+        CZ_OVA: 'Když navrhneš spontánní únik:',
+        AT_VIE: 'Beim spontanen Aufbruch:',
+        RU_ALA: 'Когда зовёшь сменить маршрут:',
+        EN_YYC: 'Tearing up the itinerary:',
+        ES_SOT: 'Cuando propones cambiar de rumbo:'
+      },
+      runway: {
+        CZ_OVA: 'V zákulisí mezi modely:',
+        AT_VIE: 'Backstage vor dem Laufsteg:',
+        RU_ALA: 'За кулисами перед показом:',
+        EN_YYC: 'Backstage behind the velvet rope:',
+        ES_SOT: 'Entre bastidores de pasarela:'
+      },
+      hochkultur: {
+        CZ_OVA: 'V lóži o přestávce opery:',
+        AT_VIE: 'In der Staatsoper-Pause beim Sekt:',
+        RU_ALA: 'В фойе оперы в антракте:',
+        EN_YYC: 'Intermission in the opera box:',
+        ES_SOT: 'En el palco durante el entreacto:'
+      },
+      polo: {
+        CZ_OVA: 'U paddocku u koní na slunci:',
+        AT_VIE: 'Am Poloplatz beim Sattelplatz:',
+        RU_ALA: 'У конюшен поло-клуба на солнце:',
+        EN_YYC: 'Trackside by the polo paddock:',
+        ES_SOT: 'A pie de cancha en el paddock:'
+      },
+      wien: {
+        CZ_OVA: 'U rohového stolku ve Vídni:',
+        AT_VIE: 'Am Eck-Tisch im Wiener Kaffeehaus:',
+        RU_ALA: 'За угловым столиком венского кафе:',
+        EN_YYC: 'Corner table at Station Wien Café:',
+        ES_SOT: 'Mesa de esquina en el café vienés:'
+      },
+      b2b: {
+        CZ_OVA: 'Z zasedačky rovnou pod kapotu:',
+        AT_VIE: 'Vom Boardroom direkt in die Technik:',
+        RU_ALA: 'Из переговорки прямо к команде:',
+        EN_YYC: 'Off the boardroom deck onto the floor:',
+        ES_SOT: 'De la sala de juntas al taller:'
+      }
+    };
 
     const studioState = {
       hydrated: false,
@@ -490,9 +550,11 @@
     let activeLyricToken = null;
     let activeSwitchTargetReg = null;
     let recallMode = 'recall'; // 'recall' (active recall front -> answer+switch back) | 'read'
-    let lyricDrawerTab = 'stanzas'; // 'stanzas' | 'frequency'
     let nativePeeked = false;
     let autoNextAfterGrade = true;
+    let spinOffOffset = 0;
+    let showCustomSpinOffComposer = false;
+    let expandedSpinOffKeys = new Set();
     try {
       const savedAutoNext = localStorage.getItem(AUTO_NEXT_KEY);
       if (savedAutoNext === 'false') autoNextAfterGrade = false;
@@ -1023,6 +1085,9 @@
       cancelAutoNext();
       stopSwitchChain(false);
       activeArenaId = arenaId || 'terrace';
+      spinOffOffset = 0;
+      showCustomSpinOffComposer = false;
+      expandedSpinOffKeys = new Set();
       isFlipped = false;
       nativePeeked = false;
       document.getElementById('flashcardInner')?.classList.remove('is-flipped');
@@ -1047,6 +1112,212 @@
         }
       }
       renderUnifiedStudio();
+    }
+
+    function readCustomSpinOffsMap() {
+      try {
+        const raw = localStorage.getItem(CUSTOM_SPINOFFS_KEY);
+        return raw ? (JSON.parse(raw) || {}) : {};
+      } catch (_) {
+        return {};
+      }
+    }
+
+    function saveCustomSpinOff(songUid, arenaId, stage, lyricLine, spinoffText) {
+      const cleanText = String(spinoffText || '').trim();
+      if (!cleanText) return;
+      const key = `${songUid}::${arenaId}`;
+      const map = readCustomSpinOffsMap();
+      const list = Array.isArray(map[key]) ? map[key] : [];
+      list.unshift({
+        id: `sp_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+        stage: STAGE_ORDER.includes(stage) ? stage : 'CHAMELEON',
+        lyricLine: String(lyricLine || '').trim(),
+        spinoffText: cleanText,
+        createdAt: new Date().toISOString()
+      });
+      map[key] = list.slice(0, 12);
+      try {
+        localStorage.setItem(CUSTOM_SPINOFFS_KEY, JSON.stringify(map));
+      } catch (_) {}
+    }
+
+    function deleteCustomSpinOff(songUid, arenaId, id) {
+      const key = `${songUid}::${arenaId}`;
+      const map = readCustomSpinOffsMap();
+      if (!Array.isArray(map[key])) return;
+      map[key] = map[key].filter(item => item.id !== id);
+      try {
+        localStorage.setItem(CUSTOM_SPINOFFS_KEY, JSON.stringify(map));
+      } catch (_) {}
+      renderUnifiedStudio();
+    }
+
+    function extractMatchingLyricLine(stanzas, tokenStr, fallbackLyric) {
+      const lines = (stanzas || [])
+        .flatMap(st => String(st || '').split('\n'))
+        .map(l => l.trim())
+        .filter(Boolean);
+      const tokLower = String(tokenStr || '').toLowerCase();
+      if (tokLower) {
+        const idx = lines.findIndex(l => l.toLowerCase().includes(tokLower));
+        if (idx >= 0) {
+          let snippet = lines[idx];
+          if (snippet.length < 44 && lines[idx + 1]) {
+            snippet = `${snippet} / ${lines[idx + 1]}`;
+          }
+          return snippet.length > 120 ? `${snippet.slice(0, 117)}…` : snippet;
+        }
+      }
+      const fb = String(fallbackLyric || lines[0] || '').trim();
+      return fb.length > 120 ? `${fb.slice(0, 117)}…` : fb;
+    }
+
+    function buildArenaSpinOffs(ctx) {
+      const arenaId = ctx.activeCard.arena || activeArenaId || 'terrace';
+      const customMap = readCustomSpinOffsMap();
+      const customRows = Array.isArray(customMap[`${ctx.song.uid}::${arenaId}`])
+        ? customMap[`${ctx.song.uid}::${arenaId}`]
+        : [];
+      const customItems = customRows.map(cr => ({
+        key: cr.id,
+        id: cr.id,
+        isCustom: true,
+        stage: cr.stage || 'CHAMELEON',
+        token: '',
+        lyricLine: cr.lyricLine || extractMatchingLyricLine(ctx.stanzas, ctx.selectedToken?.token, ctx.song.lyric),
+        spinoffText: cr.spinoffText,
+        lang: ctx.nativeReg,
+        arena: arenaId
+      }));
+
+      const seenCardUids = new Set();
+      const rawLinked = [];
+      (ctx.tokens || []).forEach(lt => {
+        resolveTokenCards(lt, ctx.song).forEach(c => {
+          if ((c.arena || 'terrace') === arenaId && !seenCardUids.has(c.uid)) {
+            seenCardUids.add(c.uid);
+            rawLinked.push({
+              key: c.uid,
+              isCustom: false,
+              stage: c.stage,
+              token: lt.token,
+              lyricLine: extractMatchingLyricLine(ctx.stanzas, lt.token, lt.sample_lyric_line || ctx.song.lyric),
+              spinoffText: stripHtmlToText(c.text),
+              english: c.english || '',
+              lang: c.lang,
+              arena: arenaId,
+              cardUid: c.uid
+            });
+          }
+        });
+      });
+
+      // Supplement cleanly from full arena deck when a song (e.g. Weeknd) has <2 direct token hits in a room
+      if (rawLinked.length < 2 && studioState.allCards.length) {
+        studioState.allCards.forEach(c => {
+          if (c.lang === ctx.nativeReg && !c.lens_id && (c.arena || 'terrace') === arenaId && !seenCardUids.has(c.uid)) {
+            seenCardUids.add(c.uid);
+            rawLinked.push({
+              key: c.uid,
+              isCustom: false,
+              stage: c.stage,
+              token: ctx.selectedToken?.token || '',
+              lyricLine: extractMatchingLyricLine(ctx.stanzas, ctx.selectedToken?.token, ctx.song.lyric),
+              spinoffText: stripHtmlToText(c.text),
+              english: c.english || '',
+              lang: c.lang,
+              arena: arenaId,
+              cardUid: c.uid
+            });
+          }
+        });
+      }
+
+      // Order so first 4 items cover distinct 4-C stages where possible
+      const picked = [];
+      const leftovers = [];
+      const seenStages = new Set();
+      STAGE_ORDER.forEach(st => {
+        const match = rawLinked.find(item => item.stage === st);
+        if (match && !seenStages.has(st)) {
+          seenStages.add(st);
+          picked.push(match);
+        }
+      });
+      rawLinked.forEach(item => {
+        if (!picked.includes(item)) leftovers.push(item);
+      });
+
+      const orderedLinked = [...picked, ...leftovers];
+      const customCount = customItems.length;
+      const allItems = [...customItems, ...orderedLinked];
+      if (!orderedLinked.length) {
+        return { allItems, visibleItems: allItems.slice(0, 4), hasMore: false };
+      }
+      const windowSize = 3;
+      const start = spinOffOffset % orderedLinked.length;
+      const rotated = [];
+      for (let i = 0; i < Math.min(windowSize, orderedLinked.length); i++) {
+        rotated.push(orderedLinked[(start + i) % orderedLinked.length]);
+      }
+      return {
+        allItems,
+        visibleItems: [...customItems, ...rotated],
+        hasMore: orderedLinked.length > windowSize,
+        totalCount: customCount + orderedLinked.length
+      };
+    }
+
+    function cycleArenaSpinOffs() {
+      if (window.PolyglotMobile) window.PolyglotMobile.haptic(8);
+      spinOffOffset += 3;
+      renderUnifiedStudio();
+    }
+
+    function toggleSpinOffTargetPreview(key) {
+      if (window.PolyglotMobile) window.PolyglotMobile.haptic(8);
+      if (expandedSpinOffKeys.has(key)) expandedSpinOffKeys.delete(key);
+      else expandedSpinOffKeys.add(key);
+      renderLyricDrawer();
+    }
+
+    function toggleCustomSpinOffComposer() {
+      if (window.PolyglotMobile) window.PolyglotMobile.haptic(8);
+      showCustomSpinOffComposer = !showCustomSpinOffComposer;
+      renderLyricDrawer();
+    }
+
+    function submitCustomSpinOff(ev) {
+      if (ev && typeof ev.preventDefault === 'function') ev.preventDefault();
+      const ctx = getActiveDrillContext();
+      const arenaNow = ctx.activeCard.arena || activeArenaId || 'terrace';
+      const stageEl = document.getElementById('customSpinOffStage');
+      const lyricEl = document.getElementById('customSpinOffLyric');
+      const textEl = document.getElementById('customSpinOffText');
+      if (!textEl || !textEl.value.trim()) return;
+      saveCustomSpinOff(ctx.song.uid, arenaNow, stageEl?.value || 'CHAMELEON', lyricEl?.value || '', textEl.value);
+      showCustomSpinOffComposer = false;
+      renderUnifiedStudio();
+    }
+
+    function loadSpinOffToSpotlight(stage, tokenStr) {
+      if (window.PolyglotMobile) window.PolyglotMobile.haptic(10);
+      cancelAutoNext();
+      stopSwitchChain(false);
+      if (STAGE_ORDER.includes(stage)) activeStage = stage;
+      if (tokenStr) activeLyricToken = tokenStr;
+      isFlipped = false;
+      nativePeeked = false;
+      document.getElementById('flashcardInner')?.classList.remove('is-flipped');
+      renderUnifiedStudio();
+      const stageEl = document.getElementById('spotlightStageSection');
+      if (stageEl) {
+        const rect = stageEl.getBoundingClientRect();
+        if (rect.top < 0 || rect.top > window.innerHeight * 0.6) {
+          stageEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
     }
 
     function selectStage(stage) {
@@ -1523,6 +1794,95 @@
         const arenaGroup = curArena.arena_group || 'Social Arena';
         const arenaDesc = curArena.description || 'Pick any social room to drill its 4-C spoken riffs & cross-lingual bridges.';
         const arenaNow = ctx.activeCard.arena || activeArenaId || 'terrace';
+        const spinOffData = buildArenaSpinOffs(ctx);
+        const settingLead = (ARENA_SETTING_FRAMES[arenaNow] && ARENA_SETTING_FRAMES[arenaNow][ctx.nativeReg]) || `${curArena.short_label || arenaNow}:`;
+        const tgtMeta = LANGUAGE_REG_META[ctx.targetCard?.lang || activeSwitchTargetReg] || { flag: '🌐', shortCode: 'TGT', langName: 'Target' };
+        const defaultComposerLyric = extractMatchingLyricLine(ctx.stanzas, ctx.selectedToken?.token, ctx.song.lyric);
+
+        const spinOffCardsHtml = spinOffData.visibleItems.map(item => {
+          const spTtsIdx = registerTtsPayload(item.spinoffText, item.lang || ctx.nativeReg);
+          const isExpanded = expandedSpinOffKeys.has(item.key);
+          const lyricHl = highlightTokensSafe(item.lyricLine, [item.token], item.token, false);
+          const riffHl = highlightTokensSafe(item.spinoffText, [item.token], item.token, false);
+
+          let switchHtml = '';
+          if (isExpanded) {
+            const targetReg = ctx.targetCard?.lang || activeSwitchTargetReg || ctx.targetOrder[0];
+            const parallelCard = studioState.allCards.find(c =>
+              c.lang === targetReg && !c.lens_id && (c.arena || 'terrace') === arenaNow && c.stage === item.stage
+            ) || ctx.parallelCards.find(c => c.lang === targetReg) || ctx.parallelCards[0];
+            const bridgeObj = findMatchingBridge(ctx.nativeReg, targetReg);
+            const pText = parallelCard ? stripHtmlToText(parallelCard.text) : '';
+            const pSettingLead = (ARENA_SETTING_FRAMES[arenaNow] && ARENA_SETTING_FRAMES[arenaNow][targetReg]) || '';
+            const pTtsIdx = pText ? registerTtsPayload(pText, targetReg) : -1;
+            const tMeta = LANGUAGE_REG_META[targetReg] || tgtMeta;
+            switchHtml = `
+              <div class="mt-2 pt-2 border-t border-slate-800/80 space-y-1.5 bg-indigo-950/20 rounded-lg p-2">
+                ${bridgeObj ? `<div class="text-[10px] mono text-indigo-300">⇄ ${escHtml(stripHtmlToText(bridgeObj.text))}</div>` : ''}
+                <div class="flex items-start justify-between gap-2">
+                  <div class="text-[11px] text-emerald-100 leading-relaxed min-w-0">
+                    <span class="mono text-[10px] font-bold text-emerald-300 mr-1">${escHtml(tMeta.flag)} ${escHtml(pSettingLead)}</span>
+                    ${escHtml(pText || 'Parallel room riff hydrating…')}
+                  </div>
+                  ${pTtsIdx >= 0 ? `<button type="button" onclick="speakTtsByIdx(${pTtsIdx})" class="px-1.5 py-0.5 rounded bg-emerald-500/15 hover:bg-emerald-500/30 border border-emerald-500/35 text-[10px] mono text-emerald-200 shrink-0">🔊</button>` : ''}
+                </div>
+              </div>
+            `;
+          }
+
+          return `
+            <div class="p-2.5 sm:p-3 rounded-xl bg-slate-900/85 border ${item.isCustom ? 'border-emerald-500/40' : 'border-slate-800/90'} space-y-1.5">
+              <div class="flex flex-wrap items-center justify-between gap-1.5 text-[10px] mono">
+                <div class="flex flex-wrap items-center gap-1.5 min-w-0">
+                  <span class="px-1.5 py-0.5 rounded border font-bold ${getStageBadgeClass(item.stage, true)}">${escHtml(item.stage)}</span>
+                  ${item.isCustom
+                    ? `<span class="px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">✍️ Custom</span>`
+                    : (item.token ? `<span class="px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-200 border border-amber-500/30">🎵 "${escHtml(item.token)}"</span>` : '')}
+                </div>
+                <div class="flex items-center gap-1 shrink-0">
+                  <button type="button" onclick="speakTtsByIdx(${spTtsIdx})" title="Speak spin-off" class="px-1.5 py-0.5 rounded bg-slate-950 hover:bg-slate-800 border border-slate-700 text-slate-300">🔊</button>
+                  <button type="button" data-spinoff-toggle="${escHtml(item.key)}" onclick="toggleSpinOffTargetPreview(this.getAttribute('data-spinoff-toggle'))"
+                    class="px-1.5 py-0.5 rounded border transition ${isExpanded ? 'bg-amber-500/20 border-amber-400/60 text-amber-200 font-bold' : 'bg-slate-950 hover:bg-slate-800 border-slate-700 text-slate-300'}">
+                    ⇄ ${escHtml(tgtMeta.shortCode)}
+                  </button>
+                  <button type="button" data-spinoff-stage="${escHtml(item.stage)}" data-spinoff-tok="${escHtml(item.token || '')}"
+                    onclick="loadSpinOffToSpotlight(this.getAttribute('data-spinoff-stage'), this.getAttribute('data-spinoff-tok'))"
+                    class="px-2 py-0.5 rounded bg-amber-500/15 hover:bg-amber-500/30 border border-amber-500/35 text-amber-200 font-semibold">
+                    ⬆ Drill
+                  </button>
+                  ${item.isCustom ? `<button type="button" data-del-spinoff="${escHtml(item.id)}" onclick="deleteCustomSpinOff('${escHtml(ctx.song.uid)}','${escHtml(arenaNow)}',this.getAttribute('data-del-spinoff'))" class="px-1.5 py-0.5 rounded bg-rose-950/60 hover:bg-rose-900 border border-rose-500/30 text-rose-300">×</button>` : ''}
+                </div>
+              </div>
+              <div class="text-[11px] text-slate-400 italic leading-snug">
+                <span class="not-italic mono text-[10px] text-amber-400/80 mr-1">🎵 Lyric:</span>“${lyricHl}”
+              </div>
+              <div class="text-xs text-slate-100 leading-relaxed bg-slate-950/75 p-2 rounded-lg border border-slate-800/80">
+                <span class="mono text-[10px] font-semibold text-cyan-300 mr-1">${escHtml(curArena.icon || '🎙️')} ${escHtml(settingLead)}</span>
+                ${riffHl}
+              </div>
+              ${switchHtml}
+            </div>
+          `;
+        }).join('');
+
+        const composerHtml = showCustomSpinOffComposer ? `
+          <form onsubmit="submitCustomSpinOff(event)" class="p-2.5 rounded-xl bg-slate-900 border border-emerald-500/40 space-y-2 text-xs">
+            <div class="flex flex-wrap items-center justify-between gap-2 text-[10px] mono text-emerald-300 font-bold uppercase">
+              <span>New Spin-Off for ${escHtml(curArena.short_label || arenaNow)}</span>
+              <select id="customSpinOffStage" class="bg-slate-950 border border-slate-700 rounded px-2 py-0.5 text-[10px] text-slate-200">
+                ${STAGE_ORDER.map(st => `<option value="${st}" ${st === ctx.activeCard.stage ? 'selected' : ''}>${st}</option>`).join('')}
+              </select>
+            </div>
+            <input id="customSpinOffLyric" type="text" value="${escHtml(defaultComposerLyric)}" placeholder="Lyric line or hook…"
+              class="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-200 focus:outline-none focus:border-amber-400" />
+            <div class="flex flex-col sm:flex-row gap-1.5">
+              <input id="customSpinOffText" type="text" placeholder="Spoken riff adapted into ${escHtml(curArena.short_label || arenaNow)}…"
+                class="flex-1 min-w-0 bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-400" />
+              <button type="submit" class="px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs mono transition shrink-0">Save Spin-Off</button>
+            </div>
+          </form>
+        ` : '';
+
         socialArenaEl.innerHTML = `
           <div class="flex flex-wrap items-center justify-between gap-2 text-[11px] mono">
             <span class="font-bold uppercase tracking-wider text-amber-300">✨ SOCIAL ARENA (8 UNIFIED ROOMS):</span>
@@ -1545,6 +1905,24 @@
               `;
             }).join('')}
           </div>
+
+          <!-- LYRIC SPIN-OFFS ADAPTED INTO THIS SOCIAL ARENA -->
+          <div id="arenaSpinOffsBox" class="pt-2.5 border-t border-slate-800/80 space-y-2">
+            <div class="flex flex-wrap items-center justify-between gap-2 text-[10px] sm:text-[11px] mono">
+              <span class="font-bold uppercase tracking-wider text-cyan-300">
+                🎬 Lyric Spin-Offs in ${escHtml(curArena.short_label || arenaNow)} (${spinOffData.totalCount || spinOffData.visibleItems.length})
+              </span>
+              <div class="flex items-center gap-1.5">
+                ${spinOffData.hasMore ? `<button type="button" onclick="cycleArenaSpinOffs()" class="px-2 py-0.5 rounded bg-slate-900 hover:bg-slate-800 border border-slate-700 text-amber-200 transition">🎲 More</button>` : ''}
+                <button type="button" id="toggleComposerBtn" onclick="toggleCustomSpinOffComposer()" class="px-2 py-0.5 rounded bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/35 text-emerald-300 transition">
+                  ${showCustomSpinOffComposer ? '✕ Close' : '＋ Spin-Off'}
+                </button>
+              </div>
+            </div>
+            ${composerHtml}
+            <div class="space-y-2">${spinOffCardsHtml || `<div class="text-xs text-slate-400 italic">Loading room spin-offs…</div>`}</div>
+          </div>
+
           <div class="pt-2 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-2 text-[11px] mono">
             <span class="text-slate-400 text-[10px]">Open <span class="text-amber-300 font-semibold">${escHtml(curArena.label || arenaNow)}</span> in:</span>
             <div class="flex flex-wrap items-center gap-1.5">
@@ -1845,6 +2223,9 @@
       activeLyricToken = null;
       activeSwitchTargetReg = null;
       nativePeeked = false;
+      spinOffOffset = 0;
+      showCustomSpinOffComposer = false;
+      expandedSpinOffKeys = new Set();
       const song = ANTHEMS[currentIdx];
       const counts = getSongArenaCounts(song);
       const topArena = Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0];
